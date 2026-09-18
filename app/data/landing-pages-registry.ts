@@ -725,6 +725,53 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
         ]
       }
     }
+  },
+
+  // ── 11. RIWAAYAT · Royal Indian Couture & Heirloom Silks (Sabyasachi & Raw Mango Funnel) ──
+  {
+    id: "landing-ethnic-dress",
+    name: "RIWAAYAT · Royal Indian Couture & Heirloom Silks",
+    niche: "ethnic-wear",
+    nicheLabel: "Indian Ethnic & Bridal Couture",
+    badge: "👑 100% PURE SILK MARK & HANDCRAFTED ZARDOZI",
+    tagline: "Where Regal Heritage Meets Modern Majesty",
+    description: "Sabyasachi and Raw Mango inspired high-converting bridal and festive couture landing page. Featuring asymmetric editorial hero collage, 5-tab collection vault, Silk Mark certificate proof, WhatsApp senior stylist concierge, and bespoke salon booking.",
+    accentColor: "#C5A059",
+    heroImg: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1600&q=85",
+    stats: "100% Pure Silk Mark Certified · 450+ Karigar Hours · 2,400+ Real Brides",
+    conversionFeatures: [
+      "Royal Asymmetric Visual Collage & 360° Rotating Gold Seal",
+      "Curated 5-Tab Collection Vault (Bridal, Sarees, Anarkalis, Fusion)",
+      "Instant WhatsApp Senior Stylist Concierge & Inquiry Generator",
+      "Living Tapestry & Varanasi Master Weaver Guild Spotlight",
+      "Editorial Lookbook 2026 & Real Brides Diaries Wall",
+      "VIP Salon Video Drape & Bespoke Sizing Appointment Booking",
+      "Collapsible 18-Point Custom Tailoring FAQ Accordion",
+      "Mobile Bottom Sticky Conversion Bar"
+    ],
+    palette: {
+      background: "#FAF7F2",
+      text: "#19211E",
+      primary: "#0E3025",
+      accent: "#C5A059"
+    },
+    announcement: "",
+    header: "",
+    footer: "",
+    sections: [
+      { componentId: "royal-dress-landing", role: "main", title: "Complete Royal Indian Dress Landing Page" }
+    ],
+    contentOverrides: {
+      hero: {
+        eyebrow: "PURE BANARASI SILK & HANDCRAFTED ZARDOZI",
+        heading: "Where Regal Heritage Meets Modern Majesty.",
+        subtext: "Heirloom bridal lehengas, hand-spun Katan silks, and majestic festive attire crafted by master karigars across Varanasi and Jaipur.",
+        image: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1600&q=85",
+        pressOutlet: "VOGUE INDIA",
+        pressQuote: "Breathtaking heritage craftsmanship that brings royal museum heirlooms into the contemporary bridal repertoire.",
+        socialProof: "4.98★ by 2,400+ Real Brides"
+      }
+    }
   }
 ];
 

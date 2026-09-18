@@ -36,7 +36,7 @@ import { installLandingPage } from "../services/landing-page-install.server";
 
 const CATEGORIES = [
   { id: "all", label: "All Sections (37)" },
-  { id: "landing-page", label: "Landing Pages (10) 🔥" },
+  { id: "landing-page", label: "Landing Pages (11) 🔥" },
   { id: "announcement", label: "Announcement Bars (2)" },
   { id: "hero", label: "Hero Banners (5)" },
   { id: "product-page", label: "PDP & Sticky ATC (5)" },

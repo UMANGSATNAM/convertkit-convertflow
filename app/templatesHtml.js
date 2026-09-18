@@ -8807,4 +8807,5448 @@ body{font-fxmily:var(--f1);background:var(--b);color:var(--cr);-webkit-font-smoo
 <label style="display:none;">Dummy Label</label></body>
 </html>
 `,
+  "landing-ethnic-dress": `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RIWAAYAT | The Royal Indian Couture & Handcrafted Heirloom</title>
+  <meta name="description" content="Discover RIWAAYAT's handcrafted Banarasi silks, bridal lehengas, and royal festive ensembles. Hand-woven by master karigars with pure zari and heritage embroidery.">
+  
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for refined luxury icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+/* ==========================================================================
+   RIWAAYAT | LUXURY INDIAN ETHNIC WEAR DESIGN SYSTEM
+   Palette: Deep Royal Emerald, Antique Gold, Ruby Crimson, Sandalwood Ivory
+   STRICTLY PURPLE-FREE & ANTI-CLICHÉ EDITORIAL STYLING
+   ========================================================================== */
+
+:root {
+  /* Color Palette Tokens */
+  --color-emerald-deep: #082018;
+  --color-emerald-rich: #0e3025;
+  --color-emerald-surface: #143e31;
+  --color-emerald-light: #1e5242;
+
+  --color-gold-base: #c5a059;
+  --color-gold-light: #dfba73;
+  --color-gold-dark: #967537;
+  --color-gold-glow: rgba(197, 160, 89, 0.25);
+
+  --color-ruby-deep: #6f0f1c;
+  --color-ruby-rich: #8b1e2d;
+  --color-ruby-light: #ab2c3e;
+
+  --color-ivory-bg: #faf7f2;
+  --color-ivory-card: #ffffff;
+  --color-ivory-warm: #f3ede2;
+  --color-ivory-border: #e6decb;
+
+  --color-text-main: #19211e;
+  --color-text-muted: #5e6b66;
+  --color-text-light: #e2ece8;
+
+  /* Typography */
+  --font-serif-royal: 'Cinzel', Georgia, serif;
+  --font-serif-editorial: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Shadows & Elevations */
+  --shadow-subtle: 0 4px 20px rgba(8, 32, 24, 0.05);
+  --shadow-medium: 0 10px 30px rgba(8, 32, 24, 0.08);
+  --shadow-elevated: 0 20px 45px rgba(8, 32, 24, 0.14);
+  --shadow-gold: 0 8px 30px rgba(197, 160, 89, 0.2);
+
+  /* Layout Constants */
+  --container-max: 1240px;
+  --transition-smooth: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+}
+
+/* Base Reset & Smoothness */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-ivory-bg);
+  color: var(--color-text-main);
+  line-height: 1.65;
+  overflow-x: hidden;
+  position: relative;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+button, input, select {
+  font-family: inherit;
+  outline: none;
+  border: none;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Global Typography Helpers */
+.italic-serif {
+  font-family: var(--font-serif-editorial);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.text-accent-gold {
+  color: var(--color-gold-base);
+}
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-serif-royal);
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  color: var(--color-gold-dark);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+.section-header {
+  max-width: 700px;
+  margin: 0 auto 3.5rem;
+}
+
+.section-header.text-center {
+  text-align: center;
+}
+
+.section-title {
+  font-family: var(--font-serif-editorial);
+  font-size: 2.5rem;
+  color: var(--color-emerald-deep);
+  line-height: 1.25;
+  margin-bottom: 1rem;
+}
+
+.section-desc {
+  font-size: 1.05rem;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+/* ==========================================================================
+   Announcement Bar
+   ========================================================================== */
+.announcement-bar {
+  background-color: var(--color-emerald-deep);
+  color: var(--color-ivory-warm);
+  font-size: 0.82rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+  position: relative;
+  z-index: 100;
+}
+
+.announcement-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.announcement-badge {
+  background-color: var(--color-ruby-rich);
+  color: #ffffff;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.announcement-text {
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-align: center;
+  flex: 1;
+}
+
+.announcement-link {
+  color: var(--color-gold-light);
+  font-weight: 600;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+}
+
+.announcement-link:hover {
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+/* ==========================================================================
+   Primary Site Header
+   ========================================================================== */
+.site-header {
+  background-color: rgba(250, 247, 242, 0.94);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  border-bottom: 1px solid var(--color-ivory-border);
+  transition: var(--transition-smooth);
+}
+
+.site-header.scrolled {
+  box-shadow: var(--shadow-subtle);
+  background-color: rgba(255, 255, 255, 0.98);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 84px;
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0.5rem;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: var(--color-emerald-deep);
+  transition: var(--transition-smooth);
+}
+
+.main-nav .nav-list {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+}
+
+.nav-link {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-emerald-deep);
+  letter-spacing: 0.04em;
+  position: relative;
+  padding: 0.25rem 0;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--color-gold-base);
+  transition: var(--transition-smooth);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.brand-identity {
+  text-align: center;
+}
+
+.brand-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.brand-monogram {
+  display: none;
+}
+
+.brand-name {
+  font-family: var(--font-serif-royal);
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--color-emerald-deep);
+}
+
+.brand-tagline {
+  font-size: 0.58rem;
+  letter-spacing: 0.35em;
+  color: var(--color-gold-dark);
+  font-weight: 600;
+  margin-top: -2px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.action-btn {
+  font-size: 1.15rem;
+  color: var(--color-emerald-deep);
+  position: relative;
+  padding: 0.4rem;
+  transition: var(--transition-smooth);
+}
+
+.action-btn:hover {
+  color: var(--color-gold-base);
+  transform: translateY(-2px);
+}
+
+.action-badge {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  background-color: var(--color-ruby-rich);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Global Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1.75rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-smooth);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #c5a059 0%, #dfba73 50%, #b8914b 100%);
+  color: var(--color-emerald-deep);
+  box-shadow: var(--shadow-gold);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-gold:hover {
+  background: linear-gradient(135deg, #dfba73 0%, #ecd093 50%, #c5a059 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(197, 160, 89, 0.35);
+}
+
+.btn-secondary-emerald {
+  background-color: var(--color-emerald-surface);
+  color: #ffffff;
+  border: 1px solid var(--color-emerald-light);
+}
+
+.btn-secondary-emerald:hover {
+  background-color: var(--color-emerald-deep);
+  color: var(--color-gold-light);
+  transform: translateY(-3px);
+}
+
+.btn-outline-gold {
+  border: 1px solid var(--color-gold-base);
+  color: var(--color-emerald-deep);
+  padding: 0.55rem 1.25rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.btn-outline-gold:hover {
+  background-color: var(--color-gold-base);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.btn-lg {
+  padding: 1.1rem 2.2rem;
+  font-size: 1rem;
+}
+
+/* ==========================================================================
+   Editorial Masthead Hero (Anti-Cliché Layout)
+   ========================================================================== */
+.hero-editorial {
+  position: relative;
+  background-color: var(--color-emerald-deep);
+  color: #ffffff;
+  padding: 5rem 0 6rem;
+  overflow: hidden;
+}
+
+.hero-bg-texture {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: radial-gradient(#c5a059 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+
+.hero-container {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: 3.5rem;
+}
+
+.hero-masthead {
+  max-width: 620px;
+}
+
+.hero-label-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.9rem;
+  background: rgba(197, 160, 89, 0.12);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-family: var(--font-serif-royal);
+  letter-spacing: 0.15em;
+  color: var(--color-gold-light);
+  margin-bottom: 1.75rem;
+}
+
+.hero-label-pill .dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-gold-light);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--color-gold-light);
+}
+
+.hero-headline {
+  font-family: var(--font-serif-editorial);
+  font-size: 3.6rem;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.5rem;
+}
+
+.hero-subheading {
+  font-size: 1.12rem;
+  line-height: 1.75;
+  color: #b5c7c0;
+  margin-bottom: 2.5rem;
+  font-weight: 300;
+}
+
+.hero-cta-group {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 3.5rem;
+}
+
+.hero-trust-strip {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(197, 160, 89, 0.2);
+}
+
+.trust-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.trust-val {
+  font-family: var(--font-serif-royal);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-gold-light);
+  line-height: 1.2;
+}
+
+.trust-label {
+  font-size: 0.76rem;
+  color: #9cb1a9;
+  letter-spacing: 0.02em;
+}
+
+.trust-divider {
+  width: 1px;
+  height: 35px;
+  background-color: rgba(197, 160, 89, 0.25);
+}
+
+/* Asymmetric Visual Collage */
+.hero-visual-collage {
+  position: relative;
+  min-height: 520px;
+  display: flex;
+  justify-content: center;
+}
+
+.visual-card {
+  position: absolute;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-elevated);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border: 1px solid rgba(197, 160, 89, 0.3);
+}
+
+.card-img-wrap {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+}
+
+.visual-card:hover .card-img-wrap img {
+  transform: scale(1.04);
+}
+
+.visual-primary {
+  width: 360px;
+  height: 480px;
+  left: 10%;
+  top: 0;
+  z-index: 2;
+}
+
+.visual-secondary {
+  width: 240px;
+  height: 330px;
+  right: 0%;
+  bottom: -20px;
+  z-index: 3;
+}
+
+.card-float-tag {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 1.25rem;
+  right: 1.25rem;
+  background: rgba(8, 32, 24, 0.88);
+  backdrop-filter: blur(8px);
+  padding: 0.85rem 1.2rem;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-gold-base);
+}
+
+.tag-title {
+  display: block;
+  font-family: var(--font-serif-royal);
+  font-size: 0.92rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.tag-meta {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--color-gold-light);
+}
+
+.card-micro-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(8, 32, 24, 0.85);
+  color: var(--color-gold-light);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Rotating Craft Stamp */
+.craft-stamp {
+  position: absolute;
+  bottom: 20px;
+  left: -20px;
+  width: 110px;
+  height: 110px;
+  z-index: 4;
+}
+
+.rotating-text-stamp {
+  width: 100%;
+  height: 100%;
+  animation: rotateStamp 22s linear infinite;
+}
+
+@keyframes rotateStamp {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.stamp-icon {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 44px;
+  height: 44px;
+  background-color: var(--color-gold-base);
+  color: var(--color-emerald-deep);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+   Curated Collection Gallery
+   ========================================================================== */
+.collections-section {
+  padding: 7rem 0 6rem;
+  background-color: var(--color-ivory-bg);
+}
+
+.filter-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3.5rem;
+}
+
+.filter-tabs {
+  display: inline-flex;
+  gap: 0.5rem;
+  background-color: var(--color-ivory-warm);
+  padding: 0.4rem;
+  border-radius: 100px;
+  border: 1px solid var(--color-ivory-border);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filter-btn {
+  padding: 0.65rem 1.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+  border-radius: 100px;
+  transition: var(--transition-smooth);
+}
+
+.filter-btn:hover {
+  color: var(--color-emerald-deep);
+}
+
+.filter-btn.active {
+  background-color: var(--color-emerald-deep);
+  color: var(--color-gold-light);
+  box-shadow: var(--shadow-subtle);
+}
+
+/* Product Grid */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.25rem;
+}
+
+.product-card {
+  background-color: var(--color-ivory-card);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-ivory-border);
+  box-shadow: var(--shadow-subtle);
+  transition: var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-elevated);
+  border-color: rgba(197, 160, 89, 0.4);
+}
+
+.product-media {
+  position: relative;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  background-color: #f1ece4;
+}
+
+.product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.product-card:hover .product-img {
+  transform: scale(1.06);
+}
+
+.product-badges {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  z-index: 2;
+}
+
+.badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+}
+
+.badge-ruby {
+  background-color: var(--color-ruby-rich);
+  color: #fff;
+}
+
+.badge-gold {
+  background-color: var(--color-gold-base);
+  color: var(--color-emerald-deep);
+}
+
+.badge-silk {
+  background-color: var(--color-emerald-deep);
+  color: var(--color-gold-light);
+}
+
+.badge-ivory {
+  background-color: var(--color-ivory-warm);
+  color: var(--color-emerald-deep);
+  border: 1px solid var(--color-ivory-border);
+}
+
+.save-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--color-emerald-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: var(--transition-smooth);
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.save-btn:hover, .save-btn.saved {
+  background-color: var(--color-ruby-rich);
+  color: #ffffff;
+}
+
+.quick-action-overlay {
+  position: absolute;
+  inset: auto 1rem 1rem 1rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: var(--transition-smooth);
+  z-index: 3;
+}
+
+.product-card:hover .quick-action-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.btn-quick-view {
+  width: 100%;
+  background: rgba(8, 32, 24, 0.92);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  padding: 0.75rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  transition: var(--transition-smooth);
+}
+
+.btn-quick-view:hover {
+  background-color: var(--color-gold-base);
+  color: var(--color-emerald-deep);
+}
+
+.product-info {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.product-collection {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-gold-dark);
+  margin-bottom: 0.35rem;
+}
+
+.product-title {
+  font-family: var(--font-serif-editorial);
+  font-size: 1.28rem;
+  color: var(--color-emerald-deep);
+  line-height: 1.35;
+  margin-bottom: 0.4rem;
+}
+
+.product-craft {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1.2rem;
+  line-height: 1.45;
+}
+
+.product-pricing {
+  margin-top: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.price-current {
+  font-family: var(--font-serif-royal);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-ruby-deep);
+}
+
+.price-original {
+  font-size: 0.9rem;
+  text-decoration: line-through;
+  color: #9aa7a2;
+}
+
+.price-note {
+  font-size: 0.72rem;
+  color: var(--color-emerald-light);
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.btn-inquire-direct {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--color-ivory-warm);
+  color: var(--color-emerald-deep);
+  border: 1px solid var(--color-gold-base);
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-smooth);
+}
+
+.btn-inquire-direct:hover {
+  background-color: var(--color-emerald-deep);
+  color: var(--color-gold-light);
+}
+
+/* ==========================================================================
+   Craftsmanship & Living Tapestry Spotlight
+   ========================================================================== */
+.craft-section {
+  padding: 6.5rem 0;
+  background-color: #0b251c;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.craft-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  gap: 4.5rem;
+}
+
+.craft-title {
+  font-family: var(--font-serif-editorial);
+  font-size: 2.55rem;
+  line-height: 1.25;
+  margin-bottom: 1.5rem;
+}
+
+.craft-text {
+  font-size: 1.05rem;
+  color: #cad8d2;
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+}
+
+.craft-pillars {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  margin-bottom: 2.5rem;
+}
+
+.pillar-item {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.pillar-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(197, 160, 89, 0.15);
+  border: 1px solid var(--color-gold-base);
+  color: var(--color-gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.pillar-body h4 {
+  font-family: var(--font-serif-royal);
+  font-size: 1.05rem;
+  color: var(--color-gold-light);
+  margin-bottom: 0.35rem;
+}
+
+.pillar-body p {
+  font-size: 0.88rem;
+  color: #aebfb8;
+  line-height: 1.6;
+}
+
+.artisan-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem 1.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid var(--color-gold-base);
+}
+
+.craft-num {
+  font-family: var(--font-serif-royal);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-gold-light);
+}
+
+.craft-lbl {
+  font-size: 0.88rem;
+  color: #d1ded8;
+  max-width: 250px;
+}
+
+.craft-main-card {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  box-shadow: var(--shadow-elevated);
+}
+
+.craft-img {
+  width: 100%;
+  height: 520px;
+  object-fit: cover;
+}
+
+.craft-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem;
+  background: linear-gradient(0deg, rgba(8, 32, 24, 0.95) 0%, rgba(8, 32, 24, 0) 100%);
+}
+
+.caption-tag {
+  font-size: 0.72rem;
+  font-family: var(--font-serif-royal);
+  letter-spacing: 0.2em;
+  color: var(--color-gold-light);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.caption-quote {
+  font-family: var(--font-serif-editorial);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: #ffffff;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+}
+
+.caption-author {
+  font-size: 0.8rem;
+  color: #a6bcb4;
+}
+
+/* ==========================================================================
+   The Royal Lookbook Masonry
+   ========================================================================== */
+.lookbook-section {
+  padding: 6.5rem 0;
+  background-color: var(--color-ivory-warm);
+}
+
+.lookbook-masonry {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  grid-template-rows: repeat(2, 300px);
+  gap: 1.5rem;
+}
+
+.lookbook-item {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-medium);
+}
+
+.lookbook-item.item-large {
+  grid-row: span 2;
+}
+
+.lookbook-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+}
+
+.lookbook-item:hover img {
+  transform: scale(1.05);
+}
+
+.lookbook-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 32, 24, 0.1) 0%, rgba(8, 32, 24, 0.85) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 2rem;
+  color: #ffffff;
+  transition: var(--transition-smooth);
+}
+
+.lookbook-theme {
+  font-size: 0.75rem;
+  font-family: var(--font-serif-royal);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-gold-light);
+  margin-bottom: 0.4rem;
+}
+
+.lookbook-overlay h3 {
+  font-family: var(--font-serif-editorial);
+  font-size: 1.45rem;
+  margin-bottom: 1rem;
+}
+
+.lookbook-btn {
+  align-self: flex-start;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-emerald-deep);
+  background-color: var(--color-gold-light);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-smooth);
+}
+
+.lookbook-btn:hover {
+  background-color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Real Brides Testimonials Section
+   ========================================================================== */
+.testimonials-section {
+  padding: 6.5rem 0;
+  background-color: var(--color-ivory-bg);
+}
+
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.testimonial-card {
+  background-color: var(--color-ivory-card);
+  padding: 2.5rem 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-ivory-border);
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-smooth);
+}
+
+.testimonial-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.testimonial-card.featured-testimonial {
+  background-color: #ffffff;
+  border-color: var(--color-gold-base);
+  box-shadow: var(--shadow-medium);
+  position: relative;
+}
+
+.testimonial-card.featured-testimonial::before {
+  content: 'FEATURED BRIDE';
+  position: absolute;
+  top: -12px;
+  left: 2rem;
+  background-color: var(--color-gold-base);
+  color: var(--color-emerald-deep);
+  font-family: var(--font-serif-royal);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+}
+
+.stars {
+  color: #e09f3e;
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.quote-text {
+  font-family: var(--font-serif-editorial);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--color-emerald-deep);
+  margin-bottom: 2rem;
+  flex: 1;
+}
+
+.client-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.client-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--color-emerald-surface);
+  color: var(--color-gold-light);
+  font-family: var(--font-serif-royal);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  border: 1px solid var(--color-gold-base);
+}
+
+.client-name {
+  display: block;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-emerald-deep);
+}
+
+.client-loc {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   VIP Salon Appointment & Consultation Section
+   ========================================================================== */
+.appointment-section {
+  padding: 6.5rem 0;
+  background: linear-gradient(135deg, var(--color-emerald-deep) 0%, #0d3427 100%);
+  color: #ffffff;
+}
+
+.appointment-card {
+  background: rgba(14, 48, 37, 0.7);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 3.5rem;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 4rem;
+  box-shadow: var(--shadow-elevated);
+}
+
+.appointment-title {
+  font-family: var(--font-serif-editorial);
+  font-size: 2.4rem;
+  line-height: 1.25;
+  margin-bottom: 1.25rem;
+}
+
+.appointment-desc {
+  font-size: 1.02rem;
+  color: #c2d6ce;
+  line-height: 1.75;
+  margin-bottom: 2rem;
+}
+
+.appointment-perks {
+  list-style: none;
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.appointment-perks li {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.92rem;
+  color: #dceae5;
+}
+
+.appointment-perks li i {
+  color: var(--color-gold-light);
+  font-size: 0.9rem;
+}
+
+.appointment-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.phone-call-assist {
+  font-size: 0.88rem;
+  color: #9cb1a9;
+}
+
+.phone-call-assist a {
+  color: var(--color-gold-light);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* Consultation Form Panel */
+.appointment-form-panel {
+  background: #ffffff;
+  color: var(--color-text-main);
+  padding: 2.5rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevated);
+}
+
+.form-title {
+  font-family: var(--font-serif-editorial);
+  font-size: 1.5rem;
+  color: var(--color-emerald-deep);
+  margin-bottom: 1.5rem;
+}
+
+.consult-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-emerald-deep);
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d4ddd9;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  color: var(--color-text-main);
+  background-color: var(--color-ivory-bg);
+  transition: var(--transition-smooth);
+}
+
+.form-group input:focus, .form-group select:focus {
+  border-color: var(--color-gold-base);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.15);
+}
+
+.btn-emerald-submit {
+  width: 100%;
+  background: var(--color-emerald-deep);
+  color: var(--color-gold-light);
+  padding: 0.95rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  transition: var(--transition-smooth);
+  margin-top: 0.5rem;
+}
+
+.btn-emerald-submit:hover {
+  background: var(--color-emerald-surface);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(8, 32, 24, 0.25);
+}
+
+.form-disclaimer {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.form-success-message {
+  text-align: center;
+  padding: 2.5rem 1rem;
+}
+
+.success-icon {
+  font-size: 3rem;
+  color: var(--color-gold-base);
+  margin-bottom: 1rem;
+}
+
+.form-success-message h4 {
+  font-family: var(--font-serif-editorial);
+  font-size: 1.4rem;
+  color: var(--color-emerald-deep);
+  margin-bottom: 0.5rem;
+}
+
+.form-success-message p {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   Quick View Modal
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 32, 24, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-smooth);
+}
+
+.modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-dialog {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  max-width: 860px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+  transform: scale(0.95);
+  transition: var(--transition-smooth);
+}
+
+.modal-backdrop.active .modal-dialog {
+  transform: scale(1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--color-ivory-warm);
+  color: var(--color-emerald-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  z-index: 10;
+  transition: var(--transition-smooth);
+}
+
+.modal-close:hover {
+  background-color: var(--color-ruby-rich);
+  color: #ffffff;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+}
+
+.modal-img-wrap {
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  background-color: #f5f1eb;
+}
+
+.modal-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-content-pane {
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-category {
+  font-family: var(--font-serif-royal);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--color-gold-dark);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.modal-title {
+  font-family: var(--font-serif-editorial);
+  font-size: 1.8rem;
+  color: var(--color-emerald-deep);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+}
+
+.modal-prices {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-current-price {
+  font-family: var(--font-serif-royal);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-ruby-deep);
+}
+
+.modal-old-price {
+  font-size: 1.05rem;
+  text-decoration: line-through;
+  color: #9aa7a2;
+}
+
+.modal-specs-list {
+  list-style: none;
+  border-top: 1px solid var(--color-ivory-border);
+  border-bottom: 1px solid var(--color-ivory-border);
+  padding: 1.25rem 0;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+}
+
+.modal-specs-list li {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-specs-list .spec-label {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.modal-specs-list .spec-val {
+  color: var(--color-emerald-deep);
+  font-weight: 600;
+}
+
+.modal-cta-group {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ==========================================================================
+   Site Footer
+   ========================================================================== */
+.site-footer {
+  background-color: var(--color-emerald-deep);
+  color: #d1ded8;
+  padding: 5rem 0 2rem;
+  border-top: 2px solid var(--color-gold-dark);
+}
+
+.footer-top {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 4rem;
+}
+
+.footer-logo {
+  font-family: var(--font-serif-royal);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--color-gold-light);
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.footer-mission {
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: #a4bab0;
+  margin-bottom: 1.75rem;
+  max-width: 320px;
+}
+
+.footer-socials {
+  display: flex;
+  gap: 0.85rem;
+}
+
+.footer-socials a {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(197, 160, 89, 0.25);
+  color: var(--color-gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.92rem;
+}
+
+.footer-socials a:hover {
+  background: var(--color-gold-base);
+  color: var(--color-emerald-deep);
+  transform: translateY(-3px);
+}
+
+.col-heading {
+  font-family: var(--font-serif-royal);
+  font-size: 0.95rem;
+  letter-spacing: 0.15em;
+  color: var(--color-gold-light);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+}
+
+.footer-nav-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.footer-nav-col a {
+  font-size: 0.88rem;
+  color: #9cb1a9;
+}
+
+.footer-nav-col a:hover {
+  color: #ffffff;
+  padding-left: 4px;
+}
+
+.footer-bottom {
+  padding-top: 2rem;
+  border-top: 1px solid rgba(197, 160, 89, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.82rem;
+  color: #899e96;
+}
+
+.footer-tags {
+  display: flex;
+  gap: 0.75rem;
+  color: var(--color-gold-light);
+  font-size: 0.75rem;
+}
+
+/* ==========================================================================
+   Floating WhatsApp Concierge & Mobile Sticky Bar
+   ========================================================================== */
+.floating-concierge {
+  position: fixed;
+  bottom: 2.2rem;
+  right: 2.2rem;
+  z-index: 95;
+}
+
+.concierge-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: #25d366;
+  color: #ffffff;
+  padding: 0.75rem 1.35rem 0.75rem 0.9rem;
+  border-radius: 100px;
+  box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
+  position: relative;
+  transition: var(--transition-smooth);
+}
+
+.concierge-link:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 14px 35px rgba(37, 211, 102, 0.5);
+}
+
+.concierge-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 100px;
+  background: #25d366;
+  opacity: 0.5;
+  animation: pulsePing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  z-index: -1;
+}
+
+@keyframes pulsePing {
+  70%, 100% {
+    transform: scale(1.3, 1.6);
+    opacity: 0;
+  }
+}
+
+.concierge-icon {
+  width: 38px;
+  height: 38px;
+  background: #ffffff;
+  color: #25d366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+}
+
+.concierge-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.concierge-status {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.concierge-action {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.mobile-sticky-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-top: 1px solid var(--color-ivory-border);
+  padding: 0.75rem 1rem;
+  z-index: 90;
+  gap: 0.75rem;
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.sticky-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+}
+
+.sticky-primary {
+  background: #25d366;
+  color: #ffffff;
+}
+
+.sticky-secondary {
+  background: var(--color-emerald-deep);
+  color: var(--color-gold-light);
+}
+
+/* Mobile Drawer */
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 320px;
+  max-width: 85%;
+  height: 100vh;
+  background-color: var(--color-emerald-deep);
+  color: #ffffff;
+  z-index: 1000;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-smooth);
+  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-drawer.open {
+  left: 0;
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.25);
+  padding-bottom: 1rem;
+}
+
+.drawer-title {
+  font-family: var(--font-serif-royal);
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  color: var(--color-gold-light);
+}
+
+.drawer-close {
+  color: #ffffff;
+  font-size: 1.3rem;
+}
+
+.drawer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.drawer-link {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #d1ded8;
+  display: block;
+}
+
+.drawer-link:hover {
+  color: var(--color-gold-light);
+  transform: translateX(4px);
+}
+
+.drawer-footer {
+  margin-top: auto;
+  border-top: 1px solid rgba(197, 160, 89, 0.25);
+  padding-top: 1.5rem;
+}
+
+.drawer-contact {
+  font-size: 0.9rem;
+  color: var(--color-gold-light);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.drawer-sub {
+  font-size: 0.76rem;
+  color: #9cb1a9;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .hero-container {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+
+  .hero-masthead {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .hero-label-pill {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-cta-group {
+    justify-content: center;
+  }
+
+  .hero-trust-strip {
+    justify-content: center;
+  }
+
+  .hero-visual-collage {
+    min-height: 480px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .craft-grid {
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+  }
+
+  .appointment-card {
+    grid-template-columns: 1fr;
+    padding: 2.5rem;
+    gap: 2.5rem;
+  }
+
+  .footer-top {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .announcement-text {
+    font-size: 0.74rem;
+  }
+
+  .announcement-link {
+    display: none;
+  }
+
+  .nav-toggle {
+    display: flex;
+  }
+
+  .main-nav {
+    display: none;
+  }
+
+  .header-cta {
+    display: none;
+  }
+
+  .hero-headline {
+    font-size: 2.6rem;
+  }
+
+  .visual-primary {
+    width: 270px;
+    height: 380px;
+    left: 5%;
+  }
+
+  .visual-secondary {
+    width: 190px;
+    height: 270px;
+    right: 5%;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lookbook-masonry {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  .lookbook-item.item-large {
+    grid-row: auto;
+    height: 380px;
+  }
+
+  .lookbook-item {
+    height: 300px;
+  }
+
+  .testimonial-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-top {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .floating-concierge {
+    display: none;
+  }
+
+  .mobile-sticky-bar {
+    display: flex;
+  }
+
+  body {
+    padding-bottom: 70px;
+  }
+
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-img-wrap {
+    height: 280px;
+  }
+
+  .modal-content-pane {
+    padding: 1.5rem;
+  }
+}
+
+</style>
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <div class="container announcement-inner">
+      <span class="announcement-badge">Diwali & Wedding Season 2026</span>
+      <p class="announcement-text">Complimentary Worldwide Express Shipping & Bespoke Blouse Tailoring on Bridal Orders</p>
+      <a href="#appointment-section" class="announcement-link">Book VIP Fitting <i class="fa-solid fa-arrow-right-long"></i></a>
+    </div>
+  </div>
+
+  <!-- Primary Header & Navigation -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <button class="nav-toggle" id="menuToggle" aria-label="Open Navigation Menu">
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="main-nav" id="mainNav">
+        <ul class="nav-list">
+          <li><a href="#collections" class="nav-link">Collections</a></li>
+          <li><a href="#heirloom-craft" class="nav-link">The Craft & Karigari</a></li>
+          <li><a href="#lookbook" class="nav-link">Lookbook</a></li>
+          <li><a href="#diaries" class="nav-link">Real Brides</a></li>
+        </ul>
+      </nav>
+
+      <div class="brand-identity">
+        <a href="#" class="brand-logo">
+          <span class="brand-monogram">RW</span>
+          <span class="brand-name">RIWAAYAT</span>
+          <span class="brand-tagline">HAUTE HERITAGE • ESTD 1948</span>
+        </a>
+      </div>
+
+      <div class="header-actions">
+        <button class="action-btn search-trigger" aria-label="Search collection" id="searchBtn">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <button class="action-btn wishlist-btn" aria-label="Saved items" id="wishlistBtn">
+          <i class="fa-regular fa-heart"></i>
+          <span class="action-badge" id="wishlistCount">0</span>
+        </button>
+        <a href="#appointment-section" class="btn btn-outline-gold header-cta">
+          <i class="fa-regular fa-calendar-check"></i> Bespoke Fitting
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Navigation -->
+  <div class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-header">
+      <span class="drawer-title">RIWAAYAT COUTURE</span>
+      <button class="drawer-close" id="drawerClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <ul class="drawer-links">
+      <li><a href="#collections" class="drawer-link">Curated Collections</a></li>
+      <li><a href="#heirloom-craft" class="drawer-link">Art of Weaving & Zardozi</a></li>
+      <li><a href="#lookbook" class="drawer-link">Royal Bridal Lookbook</a></li>
+      <li><a href="#diaries" class="drawer-link">Real Brides Diaries</a></li>
+      <li><a href="#appointment-section" class="drawer-link">Book Private Salon Visit</a></li>
+    </ul>
+    <div class="drawer-footer">
+      <p class="drawer-contact"><i class="fa-brands fa-whatsapp"></i> Concierge: +91 98765 43210</p>
+      <p class="drawer-sub">Varanasi • New Delhi • London • Dubai</p>
+    </div>
+  </div>
+
+  <main>
+    <!-- Editorial Typographic Hero (Anti-Cliché Layout) -->
+    <section class="hero-editorial">
+      <div class="hero-bg-texture"></div>
+      <div class="container hero-container">
+        
+        <div class="hero-masthead">
+          <div class="hero-label-pill">
+            <span class="dot"></span> PURE BANARASI SILK & HANDCRAFTED ZARDOZI
+          </div>
+          <h1 class="hero-headline">
+            Where Regal Heritage <br>
+            <span class="italic-serif text-accent-gold">Meets Modern Majesty</span>
+          </h1>
+          <p class="hero-subheading">
+            Heirloom bridal lehengas, hand-spun Katan silks, and majestic festive attire crafted by master karigars across Varanasi, Jaipur, and Kashmir. Woven for memories that span generations.
+          </p>
+          
+          <div class="hero-cta-group">
+            <a href="#collections" class="btn btn-gold">
+              <span>Explore The Collection</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <a href="https://wa.me/919876543210?text=Hello%20Riwaayat%20team,%20I%20would%20like%20to%20consult%20a%20bridal%20stylist" target="_blank" rel="noopener" class="btn btn-secondary-emerald">
+              <i class="fa-brands fa-whatsapp"></i>
+              <span>Connect With Stylist</span>
+            </a>
+          </div>
+
+          <div class="hero-trust-strip">
+            <div class="trust-item">
+              <span class="trust-val">100%</span>
+              <span class="trust-label">Silk Mark Certified</span>
+            </div>
+            <div class="trust-divider"></div>
+            <div class="trust-item">
+              <span class="trust-val">450+</span>
+              <span class="trust-label">Karigar Weaving Days / Outfit</span>
+            </div>
+            <div class="trust-divider"></div>
+            <div class="trust-item">
+              <span class="trust-val">Global</span>
+              <span class="trust-label">Insured Express Shipping</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Asymmetric Visual Showcase -->
+        <div class="hero-visual-collage">
+          <div class="visual-card visual-primary">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=80" alt="Royal Crimson Bridal Lehenga with Zari work" loading="eager">
+            </div>
+            <div class="card-float-tag">
+              <span class="tag-title">The Noor-e-Kashi Lehenga</span>
+              <span class="tag-meta">Hand-dyed Crimson • 24k Gold Thread</span>
+            </div>
+          </div>
+
+          <div class="visual-card visual-secondary">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80" alt="Banarasi Royal Handloom Saree" loading="eager">
+            </div>
+            <div class="card-micro-badge">
+              <i class="fa-solid fa-gem"></i> Heritage Weave
+            </div>
+          </div>
+
+          <div class="craft-stamp">
+            <svg viewBox="0 0 100 100" class="rotating-text-stamp">
+              <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="none" />
+              <text font-size="10" letter-spacing="2">
+                <textPath href="#circlePath" fill="#C5A059">
+                  • RIWAAYAT COUTURE • ROYAL INDIAN HEIRLOOM •
+                </textPath>
+              </text>
+            </svg>
+            <div class="stamp-icon"><i class="fa-solid fa-crown"></i></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Curated Collection Gallery with Filter Tabs -->
+    <section class="section collections-section" id="collections">
+      <div class="container">
+        
+        <div class="section-header text-center">
+          <span class="eyebrow">CURATED FOR THE CONNOISSEUR</span>
+          <h2 class="section-title">The Royal Ensembles</h2>
+          <p class="section-desc">Each garment is a tapestry of hand-embroidered heritage, crafted with pure silks, fine gota patti, and genuine antique zari.</p>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="filter-wrapper">
+          <div class="filter-tabs" role="tablist">
+            <button class="filter-btn active" data-category="all" role="tab">All Creations</button>
+            <button class="filter-btn" data-category="bridal" role="tab">Bridal Couture</button>
+            <button class="filter-btn" data-category="sarees" role="tab">Heirloom Sarees</button>
+            <button class="filter-btn" data-category="festive" role="tab">Royal Anarkalis & Suits</button>
+            <button class="filter-btn" data-category="contemporary" role="tab">Indo-Western & Fusion</button>
+          </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="product-grid" id="productGrid">
+          
+          <!-- Product Item 1 -->
+          <article class="product-card" data-category="bridal">
+            <div class="product-media">
+              <img src="https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80" alt="Padmavati Vermilion Red Bridal Lehenga" class="product-img">
+              <div class="product-badges">
+                <span class="badge badge-ruby">Bridal Icon</span>
+                <span class="badge badge-silk">Pure Katan</span>
+              </div>
+              <button class="save-btn" aria-label="Save to Wishlist" data-id="1">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+              <div class="quick-action-overlay">
+                <button class="btn btn-quick-view" data-product="1">Quick View & Details</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-collection">Varanasi Bridal Vault</span>
+              <h3 class="product-title">The Padmavati Vermilion Lehenga</h3>
+              <p class="product-craft">Handcrafted Zardozi, Real Gota Weave & Dabka Work</p>
+              <div class="product-pricing">
+                <span class="price-current">₹1,45,000</span>
+                <span class="price-original">₹1,75,000</span>
+                <span class="price-note">Bespoke Fit Included</span>
+              </div>
+              <button class="btn btn-inquire-direct" data-title="The Padmavati Vermilion Lehenga" data-price="₹1,45,000">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via Stylist
+              </button>
+            </div>
+          </article>
+
+          <!-- Product Item 2 -->
+          <article class="product-card" data-category="sarees">
+            <div class="product-media">
+              <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80" alt="Royal Emerald Banarasi Silk Saree" class="product-img">
+              <div class="product-badges">
+                <span class="badge badge-gold">Heritage Masterpiece</span>
+              </div>
+              <button class="save-btn" aria-label="Save to Wishlist" data-id="2">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+              <div class="quick-action-overlay">
+                <button class="btn btn-quick-view" data-product="2">Quick View & Details</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-collection">Shahi Dastakaar</span>
+              <h3 class="product-title">Shahi Emerald Shikargah Saree</h3>
+              <p class="product-craft">12-Ply Katan Silk with Antique Gold Roopa Zari Border</p>
+              <div class="product-pricing">
+                <span class="price-current">₹68,500</span>
+                <span class="price-original">₹82,000</span>
+                <span class="price-note">Silk Mark Certified</span>
+              </div>
+              <button class="btn btn-inquire-direct" data-title="Shahi Emerald Shikargah Saree" data-price="₹68,500">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via Stylist
+              </button>
+            </div>
+          </article>
+
+          <!-- Product Item 3 -->
+          <article class="product-card" data-category="festive">
+            <div class="product-media">
+              <img src="https://images.unsplash.com/photo-1583391733975-dd26487e83db?auto=format&fit=crop&w=800&q=80" alt="Chandrika Ivory & Gold Kalidar Anarkali" class="product-img">
+              <div class="product-badges">
+                <span class="badge badge-ivory">Festive Glamour</span>
+              </div>
+              <button class="save-btn" aria-label="Save to Wishlist" data-id="3">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+              <div class="quick-action-overlay">
+                <button class="btn btn-quick-view" data-product="3">Quick View & Details</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-collection">Jashn-e-Bahaar</span>
+              <h3 class="product-title">Chandrika Ivory Kalidar Anarkali</h3>
+              <p class="product-craft">Chanderi Silk with Mukaish Dusting & Organza Dupatta</p>
+              <div class="product-pricing">
+                <span class="price-current">₹48,900</span>
+                <span class="price-original">₹56,000</span>
+                <span class="price-note">Includes Pants & Dupatta</span>
+              </div>
+              <button class="btn btn-inquire-direct" data-title="Chandrika Ivory Kalidar Anarkali" data-price="₹48,900">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via Stylist
+              </button>
+            </div>
+          </article>
+
+          <!-- Product Item 4 -->
+          <article class="product-card" data-category="bridal">
+            <div class="product-media">
+              <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=80" alt="Gulaab Baagh Velvet & Tissue Lehenga" class="product-img">
+              <div class="product-badges">
+                <span class="badge badge-ruby">Limited Edition</span>
+              </div>
+              <button class="save-btn" aria-label="Save to Wishlist" data-id="4">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+              <div class="quick-action-overlay">
+                <button class="btn btn-quick-view" data-product="4">Quick View & Details</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-collection">Jaipur Rajwada</span>
+              <h3 class="product-title">Gulaab Baagh Rose Gold Lehenga</h3>
+              <p class="product-craft">Micro Velvet Base with Hand-cut Tissue Gota & Pearls</p>
+              <div class="product-pricing">
+                <span class="price-current">₹1,85,000</span>
+                <span class="price-original">₹2,20,000</span>
+                <span class="price-note">Bespoke Customization</span>
+              </div>
+              <button class="btn btn-inquire-direct" data-title="Gulaab Baagh Rose Gold Lehenga" data-price="₹1,85,000">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via Stylist
+              </button>
+            </div>
+          </article>
+
+          <!-- Product Item 5 -->
+          <article class="product-card" data-category="sarees">
+            <div class="product-media">
+              <img src="https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80" alt="Kanjeevaram Royal Mustard Saree" class="product-img">
+              <div class="product-badges">
+                <span class="badge badge-gold">Korvai Weave</span>
+              </div>
+              <button class="save-btn" aria-label="Save to Wishlist" data-id="5">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+              <div class="quick-action-overlay">
+                <button class="btn btn-quick-view" data-product="5">Quick View & Details</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-collection">Kanchipuram Heritage</span>
+              <h3 class="product-title">Swarnam Kanjeevaram Saree</h3>
+              <p class="product-craft">Pure Mulberry Silk, Temple Border & Solid Zari Pallu</p>
+              <div class="product-pricing">
+                <span class="price-current">₹74,000</span>
+                <span class="price-original">₹89,000</span>
+                <span class="price-note">With Contrast Blouse Piece</span>
+              </div>
+              <button class="btn btn-inquire-direct" data-title="Swarnam Kanjeevaram Saree" data-price="₹74,000">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via Stylist
+              </button>
+            </div>
+          </article>
+
+          <!-- Product Item 6 -->
+          <article class="product-card" data-category="contemporary">
+            <div class="product-media">
+              <img src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80" alt="Brocade Cape & Pre-Draped Sharara Set" class="product-img">
+              <div class="product-badges">
+                <span class="badge badge-silk">Sangeet Edit</span>
+              </div>
+              <button class="save-btn" aria-label="Save to Wishlist" data-id="6">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+              <div class="quick-action-overlay">
+                <button class="btn btn-quick-view" data-product="6">Quick View & Details</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-collection">Modern Riwaayat</span>
+              <h3 class="product-title">Zoya Brocade Cape & Sharara Set</h3>
+              <p class="product-craft">Structured Raw Silk Cape paired with Crushed Chiffon Sharara</p>
+              <div class="product-pricing">
+                <span class="price-current">₹52,000</span>
+                <span class="price-original">₹62,000</span>
+                <span class="price-note">Ready to Ship</span>
+              </div>
+              <button class="btn btn-inquire-direct" data-title="Zoya Brocade Cape & Sharara Set" data-price="₹52,000">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via Stylist
+              </button>
+            </div>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- The Art & Craftsmanship Spotlight -->
+    <section class="section craft-section" id="heirloom-craft">
+      <div class="container">
+        <div class="craft-grid">
+          
+          <div class="craft-content">
+            <span class="eyebrow text-accent-gold">HONORING CENTURIES OF CRAFTSMANSHIP</span>
+            <h2 class="craft-title">A Living Tapestry of Pure Handloom & Hand-Zardozi</h2>
+            <p class="craft-text">
+              Every fold of a Riwaayat ensemble carries the dedication of multi-generational artisan families. From the wooden pit-looms on the banks of the Ganges in Varanasi to the regal needlework ateliers in Lucknow and Jaipur, we preserve centuries-old handcrafting traditions.
+            </p>
+
+            <div class="craft-pillars">
+              <div class="pillar-item">
+                <div class="pillar-icon"><i class="fa-solid fa-scroll"></i></div>
+                <div class="pillar-body">
+                  <h4>Authentic Silk Mark Certification</h4>
+                  <p>100% natural, tested pure Mulberry and Katan silk fibers that breathe and drape gracefully.</p>
+                </div>
+              </div>
+
+              <div class="pillar-item">
+                <div class="pillar-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <div class="pillar-body">
+                  <h4>Pure Zari & Antique Metallic Wire</h4>
+                  <p>Crafted using genuine electroplated silver & gold wires that retain their royal luster for decades.</p>
+                </div>
+              </div>
+
+              <div class="pillar-item">
+                <div class="pillar-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                <div class="pillar-body">
+                  <h4>Fair-Trade Karigar Collective</h4>
+                  <p>Direct ethical employment for over 350 weaving families, sustaining indigenous craft heritage.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="craft-signature">
+              <div class="artisan-badge">
+                <span class="craft-num">120+</span>
+                <span class="craft-lbl">Hours of Hand Embroidery per Bridal Blouse</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="craft-visuals">
+            <div class="craft-main-card">
+              <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=80" alt="Master Weaver working on wooden loom" class="craft-img">
+              <div class="craft-caption">
+                <span class="caption-tag">ATELIER SPOTLIGHT</span>
+                <p class="caption-quote">"We do not simply weave cloth; we weave the blessings and stories of our ancestors."</p>
+                <span class="caption-author">— Ustad Mohammad Rafiq, Master Weaver (4th Gen)</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Lookbook & Real Brides Diary -->
+    <section class="section lookbook-section" id="lookbook">
+      <div class="container">
+        
+        <div class="section-header text-center">
+          <span class="eyebrow">THE BRIDAL VAULT</span>
+          <h2 class="section-title">The Royal Lookbook 2026</h2>
+          <p class="section-desc">Real celebrations, regal silhouettes, and timeless Indian grace captured in high fidelity.</p>
+        </div>
+
+        <div class="lookbook-masonry">
+          
+          <div class="lookbook-item item-large">
+            <img src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=900&q=80" alt="Bride in royal crimson lehenga" loading="lazy">
+            <div class="lookbook-overlay">
+              <span class="lookbook-theme">The Royal Pheras</span>
+              <h3>Crimson Handloom Lehenga in Pure Zari</h3>
+              <a href="https://wa.me/919876543210?text=I%20loved%20the%20Crimson%20Handloom%20Lookbook%20Lehenga" target="_blank" rel="noopener" class="lookbook-btn">Styling Consultation</a>
+            </div>
+          </div>
+
+          <div class="lookbook-item">
+            <img src="https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=700&q=80" alt="Mehendi and Sangeet festive green ensemble" loading="lazy">
+            <div class="lookbook-overlay">
+              <span class="lookbook-theme">Mehendi Celebrations</span>
+              <h3>Emerald Brocade with Gotapatti Detail</h3>
+              <a href="https://wa.me/919876543210?text=I%20loved%20the%20Mehendi%20Emerald%20Lookbook%20Outfit" target="_blank" rel="noopener" class="lookbook-btn">Inquire Look</a>
+            </div>
+          </div>
+
+          <div class="lookbook-item">
+            <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=700&q=80" alt="Reception elegance in ivory and gold" loading="lazy">
+            <div class="lookbook-overlay">
+              <span class="lookbook-theme">Royal Reception</span>
+              <h3>Ivory Kalidar with Zardozi Veil</h3>
+              <a href="https://wa.me/919876543210?text=I%20loved%20the%20Ivory%20Reception%20Look" target="_blank" rel="noopener" class="lookbook-btn">Inquire Look</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Client Testimonials / Real Brides Section -->
+    <section class="section testimonials-section" id="diaries">
+      <div class="container">
+        
+        <div class="section-header text-center">
+          <span class="eyebrow">WORDS FROM OUR ROYAL CLIENTS</span>
+          <h2 class="section-title">The Riwaayat Brides</h2>
+          <p class="section-desc">Over 2,400 brides across 18 countries have chosen Riwaayat for their most sacred vows.</p>
+        </div>
+
+        <div class="testimonial-grid">
+          
+          <div class="testimonial-card">
+            <div class="stars">
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <p class="quote-text">
+              "The weight, the intricate hand-embroidered peacocks on the border, and the drape of the Katan silk made me feel like an actual queen on my wedding day in Udaipur. The custom blouse fitting was spot on!"
+            </p>
+            <div class="client-meta">
+              <div class="client-avatar">AR</div>
+              <div class="client-details">
+                <span class="client-name">Aanya Rathore</span>
+                <span class="client-loc">Destination Wedding • Udaipur, Rajasthan</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card featured-testimonial">
+            <div class="stars">
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <p class="quote-text">
+              "Ordering from London, I was nervous about measurements and fabric weight. The Riwaayat WhatsApp video concierge held three live drape sessions with me. When the parcel arrived, it took my breath away. Absolute royal craftsmanship."
+            </p>
+            <div class="client-meta">
+              <div class="client-avatar">DK</div>
+              <div class="client-details">
+                <span class="client-name">Dr. Diya Kapoor</span>
+                <span class="client-loc">Bride • Kensington, London</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <div class="stars">
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <p class="quote-text">
+              "You can instantly tell real handloom from commercial machine replicas. Riwaayat's gold zari has that soft, antique warm glow that photographed like poetry under the mandap lights."
+            </p>
+            <div class="client-meta">
+              <div class="client-avatar">MS</div>
+              <div class="client-details">
+                <span class="client-name">Meera Somani</span>
+                <span class="client-loc">Bride • South Mumbai</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIP Private Salon & Stylist Consultation Section -->
+    <section class="section appointment-section" id="appointment-section">
+      <div class="container">
+        <div class="appointment-card">
+          <div class="appointment-content">
+            <span class="eyebrow text-accent-gold">PRIVATE SALON & BESPOKE TAILORING</span>
+            <h2 class="appointment-title">Experience Your Private Bridal & Festive Consultation</h2>
+            <p class="appointment-desc">
+              Whether you wish to visit our flagship salons in Delhi or Varanasi, or prefer a private 1-on-1 virtual video styling session with our senior master drapers, we are at your service.
+            </p>
+
+            <ul class="appointment-perks">
+              <li><i class="fa-solid fa-check"></i> Custom color dye matching for family coordinating palettes</li>
+              <li><i class="fa-solid fa-check"></i> Personalized heirloom label with your wedding date embroidered inside the kali</li>
+              <li><i class="fa-solid fa-check"></i> Worldwide express doorstep delivery with zero transit risk</li>
+            </ul>
+
+            <div class="appointment-actions">
+              <a href="https://wa.me/919876543210?text=Hello,%20I%20would%20like%20to%20schedule%20a%20private%20bridal%20appointment" target="_blank" rel="noopener" class="btn btn-gold btn-lg">
+                <i class="fa-brands fa-whatsapp"></i> Chat With Senior Stylist Now
+              </a>
+              <span class="phone-call-assist">Or Call Direct: <a href="tel:+919876543210">+91 98765 43210</a></span>
+            </div>
+          </div>
+
+          <div class="appointment-form-panel">
+            <h3 class="form-title">Request Private Callback</h3>
+            <form id="appointmentForm" class="consult-form">
+              <div class="form-group">
+                <label for="userName">Your Full Name</label>
+                <input type="text" id="userName" placeholder="e.g. Priyadarshini Sharma" required>
+              </div>
+              <div class="form-group">
+                <label for="userPhone">WhatsApp / Mobile Number</label>
+                <input type="tel" id="userPhone" placeholder="+91 98765 43210" required>
+              </div>
+              <div class="form-group">
+                <label for="eventType">Occasion / Wedding Date</label>
+                <select id="eventType" required>
+                  <option value="" disabled selected>Select Your Occasion</option>
+                  <option value="Bridal Wedding Ceremony">Bridal Wedding Ceremony</option>
+                  <option value="Sangeet & Mehendi">Sangeet & Mehendi</option>
+                  <option value="Reception Gown / Ensemble">Reception Gown / Ensemble</option>
+                  <option value="Festive Heirloom Saree">Festive Heirloom Saree</option>
+                  <option value="Trousseau Shopping">Complete Trousseau Shopping</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="userCity">City / Country</label>
+                <input type="text" id="userCity" placeholder="e.g. Mumbai, New Delhi, London, NY" required>
+              </div>
+              <button type="submit" class="btn btn-emerald-submit">
+                <span>Confirm VIP Consultation</span>
+                <i class="fa-solid fa-gem"></i>
+              </button>
+              <p class="form-disclaimer"><i class="fa-solid fa-lock"></i> Your information is kept strictly private with our senior concierge.</p>
+            </form>
+            <div class="form-success-message" id="formSuccess" style="display: none;">
+              <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+              <h4>Thank You, Royal Patron!</h4>
+              <p>Your consultation request has been received. Our senior stylist will connect with you on WhatsApp within 30 minutes.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Quick View & Detail Modal -->
+  <div class="modal-backdrop" id="quickModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <button class="modal-close" id="modalClose" aria-label="Close dialog"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-body" id="modalBody">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Luxury Footer -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="footer-logo">RIWAAYAT</span>
+          <p class="footer-mission">
+            Preserving India's sacred loom heritage, zardozi masteries, and timeless couture for the discerning global patron.
+          </p>
+          <div class="footer-socials">
+            <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" aria-label="Pinterest"><i class="fa-brands fa-pinterest-p"></i></a>
+            <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-nav-col">
+          <h4 class="col-heading">Atelier Vault</h4>
+          <ul>
+            <li><a href="#collections">Bridal Lehengas</a></li>
+            <li><a href="#collections">Banarasi Katan Sarees</a></li>
+            <li><a href="#collections">Gota Patti Anarkalis</a></li>
+            <li><a href="#collections">Silk Sharara Sets</a></li>
+            <li><a href="#collections">Groom & Sherwani Edits</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-nav-col">
+          <h4 class="col-heading">Art & Heritage</h4>
+          <ul>
+            <li><a href="#heirloom-craft">The Pit Loom Story</a></li>
+            <li><a href="#heirloom-craft">Varanasi Karigar Guild</a></li>
+            <li><a href="#heirloom-craft">Silk Mark Authenticity</a></li>
+            <li><a href="#diaries">The Bride Diaries</a></li>
+            <li><a href="#appointment-section">Care & Preservation</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-nav-col">
+          <h4 class="col-heading">Client Services</h4>
+          <ul>
+            <li><a href="#appointment-section">Bespoke Video Drape</a></li>
+            <li><a href="#appointment-section">Custom Color Dyeing</a></li>
+            <li><a href="#appointment-section">Global Insured Shipping</a></li>
+            <li><a href="https://wa.me/919876543210" target="_blank" rel="noopener">WhatsApp Concierge</a></li>
+            <li><a href="#appointment-section">FAQs & Size Guide</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 RIWAAYAT Couture Ltd. All Rights Reserved. Crafted with reverence for Indian Handloom.</p>
+        <div class="footer-tags">
+          <span>Handloom Certified</span>
+          <span>•</span>
+          <span>Zero Machine Mimicry</span>
+          <span>•</span>
+          <span>Pure Mulberry Silk</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating Sticky WhatsApp Concierge Button -->
+  <aside class="floating-concierge" aria-label="Instant stylist chat">
+    <a href="https://wa.me/919876543210?text=Hello%20Riwaayat,%20I'm%20browsing%20the%20collection%20and%20need%20styling%20advice" target="_blank" rel="noopener" class="concierge-link">
+      <div class="concierge-pulse"></div>
+      <div class="concierge-icon"><i class="fa-brands fa-whatsapp"></i></div>
+      <div class="concierge-text">
+        <span class="concierge-status">Online Stylist</span>
+        <span class="concierge-action">Chat on WhatsApp</span>
+      </div>
+    </a>
+  </aside>
+
+  <!-- Mobile Bottom Sticky Conversion Bar -->
+  <div class="mobile-sticky-bar">
+    <a href="#collections" class="sticky-btn sticky-secondary">
+      <i class="fa-solid fa-layer-group"></i> View Vault
+    </a>
+    <a href="https://wa.me/919876543210?text=Hi%20Riwaayat,%20I%20want%20to%20inquire%20about%20your%20Indian%20dress%20collection" target="_blank" rel="noopener" class="sticky-btn sticky-primary">
+      <i class="fa-brands fa-whatsapp"></i> Stylist Consultation
+    </a>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
+`,
+  "ethnic-wear": `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RIWAAYAT | The Royal Indian Couture & Handcrafted Heirloom</title>
+  <meta name="description" content="Discover RIWAAYAT's handcrafted Banarasi silks, bridal lehengas, and royal festive ensembles. Hand-woven by master karigars with pure zari and heritage embroidery.">
+  
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for refined luxury icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+/* ==========================================================================
+   RIWAAYAT | LUXURY INDIAN ETHNIC WEAR DESIGN SYSTEM
+   Palette: Deep Royal Emerald, Antique Gold, Ruby Crimson, Sandalwood Ivory
+   STRICTLY PURPLE-FREE & ANTI-CLICHÉ EDITORIAL STYLING
+   ========================================================================== */
+
+:root {
+  /* Color Palette Tokens */
+  --color-emerald-deep: #082018;
+  --color-emerald-rich: #0e3025;
+  --color-emerald-surface: #143e31;
+  --color-emerald-light: #1e5242;
+
+  --color-gold-base: #c5a059;
+  --color-gold-light: #dfba73;
+  --color-gold-dark: #967537;
+  --color-gold-glow: rgba(197, 160, 89, 0.25);
+
+  --color-ruby-deep: #6f0f1c;
+  --color-ruby-rich: #8b1e2d;
+  --color-ruby-light: #ab2c3e;
+
+  --color-ivory-bg: #faf7f2;
+  --color-ivory-card: #ffffff;
+  --color-ivory-warm: #f3ede2;
+  --color-ivory-border: #e6decb;
+
+  --color-text-main: #19211e;
+  --color-text-muted: #5e6b66;
+  --color-text-light: #e2ece8;
+
+  /* Typography */
+  --font-serif-royal: 'Cinzel', Georgia, serif;
+  --font-serif-editorial: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Shadows & Elevations */
+  --shadow-subtle: 0 4px 20px rgba(8, 32, 24, 0.05);
+  --shadow-medium: 0 10px 30px rgba(8, 32, 24, 0.08);
+  --shadow-elevated: 0 20px 45px rgba(8, 32, 24, 0.14);
+  --shadow-gold: 0 8px 30px rgba(197, 160, 89, 0.2);
+
+  /* Layout Constants */
+  --container-max: 1240px;
+  --transition-smooth: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+}
+
+/* Base Reset & Smoothness */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-ivory-bg);
+  color: var(--color-text-main);
+  line-height: 1.65;
+  overflow-x: hidden;
+  position: relative;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+button, input, select {
+  font-family: inherit;
+  outline: none;
+  border: none;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Global Typography Helpers */
+.italic-serif {
+  font-family: var(--font-serif-editorial);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.text-accent-gold {
+  color: var(--color-gold-base);
+}
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-serif-royal);
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  color: var(--color-gold-dark);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+.section-header {
+  max-width: 700px;
+  margin: 0 auto 3.5rem;
+}
+
+.section-header.text-center {
+  text-align: center;
+}
+
+.section-title {
+  font-family: var(--font-serif-editorial);
+  font-size: 2.5rem;
+  color: var(--color-emerald-deep);
+  line-height: 1.25;
+  margin-bottom: 1rem;
+}
+
+.section-desc {
+  font-size: 1.05rem;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+/* ==========================================================================
+   Announcement Bar
+   ========================================================================== */
+.announcement-bar {
+  background-color: var(--color-emerald-deep);
+  color: var(--color-ivory-warm);
+  font-size: 0.82rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+  position: relative;
+  z-index: 100;
+}
+
+.announcement-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.announcement-badge {
+  background-color: var(--color-ruby-rich);
+  color: #ffffff;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.announcement-text {
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-align: center;
+  flex: 1;
+}
+
+.announcement-link {
+  color: var(--color-gold-light);
+  font-weight: 600;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+}
+
+.announcement-link:hover {
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+/* ==========================================================================
+   Primary Site Header
+   ========================================================================== */
+.site-header {
+  background-color: rgba(250, 247, 242, 0.94);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  border-bottom: 1px solid var(--color-ivory-border);
+  transition: var(--transition-smooth);
+}
+
+.site-header.scrolled {
+  box-shadow: var(--shadow-subtle);
+  background-color: rgba(255, 255, 255, 0.98);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 84px;
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0.5rem;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: var(--color-emerald-deep);
+  transition: var(--transition-smooth);
+}
+
+.main-nav .nav-list {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+}
+
+.nav-link {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-emerald-deep);
+  letter-spacing: 0.04em;
+  position: relative;
+  padding: 0.25rem 0;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--color-gold-base);
+  transition: var(--transition-smooth);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.brand-identity {
+  text-align: center;
+}
+
+.brand-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.brand-monogram {
+  display: none;
+}
+
+.brand-name {
+  font-family: var(--font-serif-royal);
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--color-emerald-deep);
+}
+
+.brand-tagline {
+  font-size: 0.58rem;
+  letter-spacing: 0.35em;
+  color: var(--color-gold-dark);
+  font-weight: 600;
+  margin-top: -2px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.action-btn {
+  font-size: 1.15rem;
+  color: var(--color-emerald-deep);
+  position: relative;
+  padding: 0.4rem;
+  transition: var(--transition-smooth);
+}
+
+.action-btn:hover {
+  color: var(--color-gold-base);
+  transform: translateY(-2px);
+}
+
+.action-badge {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  background-color: var(--color-ruby-rich);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Global Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1.75rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-smooth);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #c5a059 0%, #dfba73 50%, #b8914b 100%);
+  color: var(--color-emerald-deep);
+  box-shadow: var(--shadow-gold);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-gold:hover {
+  background: linear-gradient(135deg, #dfba73 0%, #ecd093 50%, #c5a059 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(197, 160, 89, 0.35);
+}
+
+.btn-secondary-emerald {
+  background-color: var(--color-emerald-surface);
+  color: #ffffff;
+  border: 1px solid var(--color-emerald-light);
+}
+
+.btn-secondary-emerald:hover {
+  background-color: var(--color-emerald-deep);
+  color: var(--color-gold-light);
+  transform: translateY(-3px);
+}
+
+.btn-outline-gold {
+  border: 1px solid var(--color-gold-base);
+  color: var(--color-emerald-deep);
+  padding: 0.55rem 1.25rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.btn-outline-gold:hover {
+  background-color: var(--color-gold-base);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.btn-lg {
+  padding: 1.1rem 2.2rem;
+  font-size: 1rem;
+}
+
+/* ==========================================================================
+   Editorial Masthead Hero (Anti-Cliché Layout)
+   ========================================================================== */
+.hero-editorial {
+  position: relative;
+  background-color: var(--color-emerald-deep);
+  color: #ffffff;
+  padding: 5rem 0 6rem;
+  overflow: hidden;
+}
+
+.hero-bg-texture {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: radial-gradient(#c5a059 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+
+.hero-container {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: 3.5rem;
+}
+
+.hero-masthead {
+  max-width: 620px;
+}
+
+.hero-label-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.9rem;
+  background: rgba(197, 160, 89, 0.12);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-family: var(--font-serif-royal);
+  letter-spacing: 0.15em;
+  color: var(--color-gold-light);
+  margin-bottom: 1.75rem;
+}
+
+.hero-label-pill .dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-gold-light);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--color-gold-light);
+}
+
+.hero-headline {
+  font-family: var(--font-serif-editorial);
+  font-size: 3.6rem;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.5rem;
+}
+
+.hero-subheading {
+  font-size: 1.12rem;
+  line-height: 1.75;
+  color: #b5c7c0;
+  margin-bottom: 2.5rem;
+  font-weight: 300;
+}
+
+.hero-cta-group {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 3.5rem;
+}
+
+.hero-trust-strip {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(197, 160, 89, 0.2);
+}
+
+.trust-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.trust-val {
+  font-family: var(--font-serif-royal);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-gold-light);
+  line-height: 1.2;
+}
+
+.trust-label {
+  font-size: 0.76rem;
+  color: #9cb1a9;
+  letter-spacing: 0.02em;
+}
+
+.trust-divider {
+  width: 1px;
+  height: 35px;
+  background-color: rgba(197, 160, 89, 0.25);
+}
+
+/* Asymmetric Visual Collage */
+.hero-visual-collage {
+  position: relative;
+  min-height: 520px;
+  display: flex;
+  justify-content: center;
+}
+
+.visual-card {
+  position: absolute;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-elevated);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border: 1px solid rgba(197, 160, 89, 0.3);
+}
+
+.card-img-wrap {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+}
+
+.visual-card:hover .card-img-wrap img {
+  transform: scale(1.04);
+}
+
+.visual-primary {
+  width: 360px;
+  height: 480px;
+  left: 10%;
+  top: 0;
+  z-index: 2;
+}
+
+.visual-secondary {
+  width: 240px;
+  height: 330px;
+  right: 0%;
+  bottom: -20px;
+  z-index: 3;
+}
+
+.card-float-tag {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 1.25rem;
+  right: 1.25rem;
+  background: rgba(8, 32, 24, 0.88);
+  backdrop-filter: blur(8px);
+  padding: 0.85rem 1.2rem;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-gold-base);
+}
+
+.tag-title {
+  display: block;
+  font-family: var(--font-serif-royal);
+  font-size: 0.92rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.tag-meta {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--color-gold-light);
+}
+
+.card-micro-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(8, 32, 24, 0.85);
+  color: var(--color-gold-light);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Rotating Craft Stamp */
+.craft-stamp {
+  position: absolute;
+  bottom: 20px;
+  left: -20px;
+  width: 110px;
+  height: 110px;
+  z-index: 4;
+}
+
+.rotating-text-stamp {
+  width: 100%;
+  height: 100%;
+  animation: rotateStamp 22s linear infinite;
+}
+
+@keyframes rotateStamp {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.stamp-icon {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 44px;
+  height: 44px;
+  background-color: var(--color-gold-base);
+  color: var(--color-emerald-deep);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+   Curated Collection Gallery
+   ========================================================================== */
+.collections-section {
+  padding: 7rem 0 6rem;
+  background-color: var(--color-ivory-bg);
+}
+
+.filter-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3.5rem;
+}
+
+.filter-tabs {
+  display: inline-flex;
+  gap: 0.5rem;
+  background-color: var(--color-ivory-warm);
+  padding: 0.4rem;
+  border-radius: 100px;
+  border: 1px solid var(--color-ivory-border);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filter-btn {
+  padding: 0.65rem 1.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+  border-radius: 100px;
+  transition: var(--transition-smooth);
+}
+
+.filter-btn:hover {
+  color: var(--color-emerald-deep);
+}
+
+.filter-btn.active {
+  background-color: var(--color-emerald-deep);
+  color: var(--color-gold-light);
+  box-shadow: var(--shadow-subtle);
+}
+
+/* Product Grid */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.25rem;
+}
+
+.product-card {
+  background-color: var(--color-ivory-card);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-ivory-border);
+  box-shadow: var(--shadow-subtle);
+  transition: var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-elevated);
+  border-color: rgba(197, 160, 89, 0.4);
+}
+
+.product-media {
+  position: relative;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  background-color: #f1ece4;
+}
+
+.product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.product-card:hover .product-img {
+  transform: scale(1.06);
+}
+
+.product-badges {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  z-index: 2;
+}
+
+.badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+}
+
+.badge-ruby {
+  background-color: var(--color-ruby-rich);
+  color: #fff;
+}
+
+.badge-gold {
+  background-color: var(--color-gold-base);
+  color: var(--color-emerald-deep);
+}
+
+.badge-silk {
+  background-color: var(--color-emerald-deep);
+  color: var(--color-gold-light);
+}
+
+.badge-ivory {
+  background-color: var(--color-ivory-warm);
+  color: var(--color-emerald-deep);
+  border: 1px solid var(--color-ivory-border);
+}
+
+.save-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--color-emerald-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: var(--transition-smooth);
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.save-btn:hover, .save-btn.saved {
+  background-color: var(--color-ruby-rich);
+  color: #ffffff;
+}
+
+.quick-action-overlay {
+  position: absolute;
+  inset: auto 1rem 1rem 1rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: var(--transition-smooth);
+  z-index: 3;
+}
+
+.product-card:hover .quick-action-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.btn-quick-view {
+  width: 100%;
+  background: rgba(8, 32, 24, 0.92);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  padding: 0.75rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  transition: var(--transition-smooth);
+}
+
+.btn-quick-view:hover {
+  background-color: var(--color-gold-base);
+  color: var(--color-emerald-deep);
+}
+
+.product-info {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.product-collection {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-gold-dark);
+  margin-bottom: 0.35rem;
+}
+
+.product-title {
+  font-family: var(--font-serif-editorial);
+  font-size: 1.28rem;
+  color: var(--color-emerald-deep);
+  line-height: 1.35;
+  margin-bottom: 0.4rem;
+}
+
+.product-craft {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1.2rem;
+  line-height: 1.45;
+}
+
+.product-pricing {
+  margin-top: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.price-current {
+  font-family: var(--font-serif-royal);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-ruby-deep);
+}
+
+.price-original {
+  font-size: 0.9rem;
+  text-decoration: line-through;
+  color: #9aa7a2;
+}
+
+.price-note {
+  font-size: 0.72rem;
+  color: var(--color-emerald-light);
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.btn-inquire-direct {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--color-ivory-warm);
+  color: var(--color-emerald-deep);
+  border: 1px solid var(--color-gold-base);
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-smooth);
+}
+
+.btn-inquire-direct:hover {
+  background-color: var(--color-emerald-deep);
+  color: var(--color-gold-light);
+}
+
+/* ==========================================================================
+   Craftsmanship & Living Tapestry Spotlight
+   ========================================================================== */
+.craft-section {
+  padding: 6.5rem 0;
+  background-color: #0b251c;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.craft-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  gap: 4.5rem;
+}
+
+.craft-title {
+  font-family: var(--font-serif-editorial);
+  font-size: 2.55rem;
+  line-height: 1.25;
+  margin-bottom: 1.5rem;
+}
+
+.craft-text {
+  font-size: 1.05rem;
+  color: #cad8d2;
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+}
+
+.craft-pillars {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  margin-bottom: 2.5rem;
+}
+
+.pillar-item {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.pillar-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(197, 160, 89, 0.15);
+  border: 1px solid var(--color-gold-base);
+  color: var(--color-gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.pillar-body h4 {
+  font-family: var(--font-serif-royal);
+  font-size: 1.05rem;
+  color: var(--color-gold-light);
+  margin-bottom: 0.35rem;
+}
+
+.pillar-body p {
+  font-size: 0.88rem;
+  color: #aebfb8;
+  line-height: 1.6;
+}
+
+.artisan-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem 1.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid var(--color-gold-base);
+}
+
+.craft-num {
+  font-family: var(--font-serif-royal);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-gold-light);
+}
+
+.craft-lbl {
+  font-size: 0.88rem;
+  color: #d1ded8;
+  max-width: 250px;
+}
+
+.craft-main-card {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  box-shadow: var(--shadow-elevated);
+}
+
+.craft-img {
+  width: 100%;
+  height: 520px;
+  object-fit: cover;
+}
+
+.craft-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem;
+  background: linear-gradient(0deg, rgba(8, 32, 24, 0.95) 0%, rgba(8, 32, 24, 0) 100%);
+}
+
+.caption-tag {
+  font-size: 0.72rem;
+  font-family: var(--font-serif-royal);
+  letter-spacing: 0.2em;
+  color: var(--color-gold-light);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.caption-quote {
+  font-family: var(--font-serif-editorial);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: #ffffff;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+}
+
+.caption-author {
+  font-size: 0.8rem;
+  color: #a6bcb4;
+}
+
+/* ==========================================================================
+   The Royal Lookbook Masonry
+   ========================================================================== */
+.lookbook-section {
+  padding: 6.5rem 0;
+  background-color: var(--color-ivory-warm);
+}
+
+.lookbook-masonry {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  grid-template-rows: repeat(2, 300px);
+  gap: 1.5rem;
+}
+
+.lookbook-item {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-medium);
+}
+
+.lookbook-item.item-large {
+  grid-row: span 2;
+}
+
+.lookbook-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+}
+
+.lookbook-item:hover img {
+  transform: scale(1.05);
+}
+
+.lookbook-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 32, 24, 0.1) 0%, rgba(8, 32, 24, 0.85) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 2rem;
+  color: #ffffff;
+  transition: var(--transition-smooth);
+}
+
+.lookbook-theme {
+  font-size: 0.75rem;
+  font-family: var(--font-serif-royal);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-gold-light);
+  margin-bottom: 0.4rem;
+}
+
+.lookbook-overlay h3 {
+  font-family: var(--font-serif-editorial);
+  font-size: 1.45rem;
+  margin-bottom: 1rem;
+}
+
+.lookbook-btn {
+  align-self: flex-start;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-emerald-deep);
+  background-color: var(--color-gold-light);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-smooth);
+}
+
+.lookbook-btn:hover {
+  background-color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Real Brides Testimonials Section
+   ========================================================================== */
+.testimonials-section {
+  padding: 6.5rem 0;
+  background-color: var(--color-ivory-bg);
+}
+
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.testimonial-card {
+  background-color: var(--color-ivory-card);
+  padding: 2.5rem 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-ivory-border);
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-smooth);
+}
+
+.testimonial-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.testimonial-card.featured-testimonial {
+  background-color: #ffffff;
+  border-color: var(--color-gold-base);
+  box-shadow: var(--shadow-medium);
+  position: relative;
+}
+
+.testimonial-card.featured-testimonial::before {
+  content: 'FEATURED BRIDE';
+  position: absolute;
+  top: -12px;
+  left: 2rem;
+  background-color: var(--color-gold-base);
+  color: var(--color-emerald-deep);
+  font-family: var(--font-serif-royal);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+}
+
+.stars {
+  color: #e09f3e;
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.quote-text {
+  font-family: var(--font-serif-editorial);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--color-emerald-deep);
+  margin-bottom: 2rem;
+  flex: 1;
+}
+
+.client-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.client-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--color-emerald-surface);
+  color: var(--color-gold-light);
+  font-family: var(--font-serif-royal);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  border: 1px solid var(--color-gold-base);
+}
+
+.client-name {
+  display: block;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-emerald-deep);
+}
+
+.client-loc {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   VIP Salon Appointment & Consultation Section
+   ========================================================================== */
+.appointment-section {
+  padding: 6.5rem 0;
+  background: linear-gradient(135deg, var(--color-emerald-deep) 0%, #0d3427 100%);
+  color: #ffffff;
+}
+
+.appointment-card {
+  background: rgba(14, 48, 37, 0.7);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 3.5rem;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 4rem;
+  box-shadow: var(--shadow-elevated);
+}
+
+.appointment-title {
+  font-family: var(--font-serif-editorial);
+  font-size: 2.4rem;
+  line-height: 1.25;
+  margin-bottom: 1.25rem;
+}
+
+.appointment-desc {
+  font-size: 1.02rem;
+  color: #c2d6ce;
+  line-height: 1.75;
+  margin-bottom: 2rem;
+}
+
+.appointment-perks {
+  list-style: none;
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.appointment-perks li {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.92rem;
+  color: #dceae5;
+}
+
+.appointment-perks li i {
+  color: var(--color-gold-light);
+  font-size: 0.9rem;
+}
+
+.appointment-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.phone-call-assist {
+  font-size: 0.88rem;
+  color: #9cb1a9;
+}
+
+.phone-call-assist a {
+  color: var(--color-gold-light);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* Consultation Form Panel */
+.appointment-form-panel {
+  background: #ffffff;
+  color: var(--color-text-main);
+  padding: 2.5rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevated);
+}
+
+.form-title {
+  font-family: var(--font-serif-editorial);
+  font-size: 1.5rem;
+  color: var(--color-emerald-deep);
+  margin-bottom: 1.5rem;
+}
+
+.consult-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-emerald-deep);
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d4ddd9;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  color: var(--color-text-main);
+  background-color: var(--color-ivory-bg);
+  transition: var(--transition-smooth);
+}
+
+.form-group input:focus, .form-group select:focus {
+  border-color: var(--color-gold-base);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.15);
+}
+
+.btn-emerald-submit {
+  width: 100%;
+  background: var(--color-emerald-deep);
+  color: var(--color-gold-light);
+  padding: 0.95rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  transition: var(--transition-smooth);
+  margin-top: 0.5rem;
+}
+
+.btn-emerald-submit:hover {
+  background: var(--color-emerald-surface);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(8, 32, 24, 0.25);
+}
+
+.form-disclaimer {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.form-success-message {
+  text-align: center;
+  padding: 2.5rem 1rem;
+}
+
+.success-icon {
+  font-size: 3rem;
+  color: var(--color-gold-base);
+  margin-bottom: 1rem;
+}
+
+.form-success-message h4 {
+  font-family: var(--font-serif-editorial);
+  font-size: 1.4rem;
+  color: var(--color-emerald-deep);
+  margin-bottom: 0.5rem;
+}
+
+.form-success-message p {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   Quick View Modal
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 32, 24, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-smooth);
+}
+
+.modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-dialog {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  max-width: 860px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+  transform: scale(0.95);
+  transition: var(--transition-smooth);
+}
+
+.modal-backdrop.active .modal-dialog {
+  transform: scale(1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--color-ivory-warm);
+  color: var(--color-emerald-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  z-index: 10;
+  transition: var(--transition-smooth);
+}
+
+.modal-close:hover {
+  background-color: var(--color-ruby-rich);
+  color: #ffffff;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+}
+
+.modal-img-wrap {
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  background-color: #f5f1eb;
+}
+
+.modal-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-content-pane {
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-category {
+  font-family: var(--font-serif-royal);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--color-gold-dark);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.modal-title {
+  font-family: var(--font-serif-editorial);
+  font-size: 1.8rem;
+  color: var(--color-emerald-deep);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+}
+
+.modal-prices {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-current-price {
+  font-family: var(--font-serif-royal);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-ruby-deep);
+}
+
+.modal-old-price {
+  font-size: 1.05rem;
+  text-decoration: line-through;
+  color: #9aa7a2;
+}
+
+.modal-specs-list {
+  list-style: none;
+  border-top: 1px solid var(--color-ivory-border);
+  border-bottom: 1px solid var(--color-ivory-border);
+  padding: 1.25rem 0;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+}
+
+.modal-specs-list li {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-specs-list .spec-label {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.modal-specs-list .spec-val {
+  color: var(--color-emerald-deep);
+  font-weight: 600;
+}
+
+.modal-cta-group {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ==========================================================================
+   Site Footer
+   ========================================================================== */
+.site-footer {
+  background-color: var(--color-emerald-deep);
+  color: #d1ded8;
+  padding: 5rem 0 2rem;
+  border-top: 2px solid var(--color-gold-dark);
+}
+
+.footer-top {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 4rem;
+}
+
+.footer-logo {
+  font-family: var(--font-serif-royal);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--color-gold-light);
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.footer-mission {
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: #a4bab0;
+  margin-bottom: 1.75rem;
+  max-width: 320px;
+}
+
+.footer-socials {
+  display: flex;
+  gap: 0.85rem;
+}
+
+.footer-socials a {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(197, 160, 89, 0.25);
+  color: var(--color-gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.92rem;
+}
+
+.footer-socials a:hover {
+  background: var(--color-gold-base);
+  color: var(--color-emerald-deep);
+  transform: translateY(-3px);
+}
+
+.col-heading {
+  font-family: var(--font-serif-royal);
+  font-size: 0.95rem;
+  letter-spacing: 0.15em;
+  color: var(--color-gold-light);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+}
+
+.footer-nav-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.footer-nav-col a {
+  font-size: 0.88rem;
+  color: #9cb1a9;
+}
+
+.footer-nav-col a:hover {
+  color: #ffffff;
+  padding-left: 4px;
+}
+
+.footer-bottom {
+  padding-top: 2rem;
+  border-top: 1px solid rgba(197, 160, 89, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.82rem;
+  color: #899e96;
+}
+
+.footer-tags {
+  display: flex;
+  gap: 0.75rem;
+  color: var(--color-gold-light);
+  font-size: 0.75rem;
+}
+
+/* ==========================================================================
+   Floating WhatsApp Concierge & Mobile Sticky Bar
+   ========================================================================== */
+.floating-concierge {
+  position: fixed;
+  bottom: 2.2rem;
+  right: 2.2rem;
+  z-index: 95;
+}
+
+.concierge-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: #25d366;
+  color: #ffffff;
+  padding: 0.75rem 1.35rem 0.75rem 0.9rem;
+  border-radius: 100px;
+  box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
+  position: relative;
+  transition: var(--transition-smooth);
+}
+
+.concierge-link:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 14px 35px rgba(37, 211, 102, 0.5);
+}
+
+.concierge-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 100px;
+  background: #25d366;
+  opacity: 0.5;
+  animation: pulsePing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  z-index: -1;
+}
+
+@keyframes pulsePing {
+  70%, 100% {
+    transform: scale(1.3, 1.6);
+    opacity: 0;
+  }
+}
+
+.concierge-icon {
+  width: 38px;
+  height: 38px;
+  background: #ffffff;
+  color: #25d366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+}
+
+.concierge-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.concierge-status {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.concierge-action {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.mobile-sticky-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-top: 1px solid var(--color-ivory-border);
+  padding: 0.75rem 1rem;
+  z-index: 90;
+  gap: 0.75rem;
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.sticky-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+}
+
+.sticky-primary {
+  background: #25d366;
+  color: #ffffff;
+}
+
+.sticky-secondary {
+  background: var(--color-emerald-deep);
+  color: var(--color-gold-light);
+}
+
+/* Mobile Drawer */
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 320px;
+  max-width: 85%;
+  height: 100vh;
+  background-color: var(--color-emerald-deep);
+  color: #ffffff;
+  z-index: 1000;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-smooth);
+  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-drawer.open {
+  left: 0;
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.25);
+  padding-bottom: 1rem;
+}
+
+.drawer-title {
+  font-family: var(--font-serif-royal);
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  color: var(--color-gold-light);
+}
+
+.drawer-close {
+  color: #ffffff;
+  font-size: 1.3rem;
+}
+
+.drawer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.drawer-link {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #d1ded8;
+  display: block;
+}
+
+.drawer-link:hover {
+  color: var(--color-gold-light);
+  transform: translateX(4px);
+}
+
+.drawer-footer {
+  margin-top: auto;
+  border-top: 1px solid rgba(197, 160, 89, 0.25);
+  padding-top: 1.5rem;
+}
+
+.drawer-contact {
+  font-size: 0.9rem;
+  color: var(--color-gold-light);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.drawer-sub {
+  font-size: 0.76rem;
+  color: #9cb1a9;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .hero-container {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+
+  .hero-masthead {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .hero-label-pill {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-cta-group {
+    justify-content: center;
+  }
+
+  .hero-trust-strip {
+    justify-content: center;
+  }
+
+  .hero-visual-collage {
+    min-height: 480px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .craft-grid {
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+  }
+
+  .appointment-card {
+    grid-template-columns: 1fr;
+    padding: 2.5rem;
+    gap: 2.5rem;
+  }
+
+  .footer-top {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .announcement-text {
+    font-size: 0.74rem;
+  }
+
+  .announcement-link {
+    display: none;
+  }
+
+  .nav-toggle {
+    display: flex;
+  }
+
+  .main-nav {
+    display: none;
+  }
+
+  .header-cta {
+    display: none;
+  }
+
+  .hero-headline {
+    font-size: 2.6rem;
+  }
+
+  .visual-primary {
+    width: 270px;
+    height: 380px;
+    left: 5%;
+  }
+
+  .visual-secondary {
+    width: 190px;
+    height: 270px;
+    right: 5%;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lookbook-masonry {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  .lookbook-item.item-large {
+    grid-row: auto;
+    height: 380px;
+  }
+
+  .lookbook-item {
+    height: 300px;
+  }
+
+  .testimonial-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-top {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .floating-concierge {
+    display: none;
+  }
+
+  .mobile-sticky-bar {
+    display: flex;
+  }
+
+  body {
+    padding-bottom: 70px;
+  }
+
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-img-wrap {
+    height: 280px;
+  }
+
+  .modal-content-pane {
+    padding: 1.5rem;
+  }
+}
+
+</style>
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <div class="container announcement-inner">
+      <span class="announcement-badge">Diwali & Wedding Season 2026</span>
+      <p class="announcement-text">Complimentary Worldwide Express Shipping & Bespoke Blouse Tailoring on Bridal Orders</p>
+      <a href="#appointment-section" class="announcement-link">Book VIP Fitting <i class="fa-solid fa-arrow-right-long"></i></a>
+    </div>
+  </div>
+
+  <!-- Primary Header & Navigation -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <button class="nav-toggle" id="menuToggle" aria-label="Open Navigation Menu">
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="main-nav" id="mainNav">
+        <ul class="nav-list">
+          <li><a href="#collections" class="nav-link">Collections</a></li>
+          <li><a href="#heirloom-craft" class="nav-link">The Craft & Karigari</a></li>
+          <li><a href="#lookbook" class="nav-link">Lookbook</a></li>
+          <li><a href="#diaries" class="nav-link">Real Brides</a></li>
+        </ul>
+      </nav>
+
+      <div class="brand-identity">
+        <a href="#" class="brand-logo">
+          <span class="brand-monogram">RW</span>
+          <span class="brand-name">RIWAAYAT</span>
+          <span class="brand-tagline">HAUTE HERITAGE • ESTD 1948</span>
+        </a>
+      </div>
+
+      <div class="header-actions">
+        <button class="action-btn search-trigger" aria-label="Search collection" id="searchBtn">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        <button class="action-btn wishlist-btn" aria-label="Saved items" id="wishlistBtn">
+          <i class="fa-regular fa-heart"></i>
+          <span class="action-badge" id="wishlistCount">0</span>
+        </button>
+        <a href="#appointment-section" class="btn btn-outline-gold header-cta">
+          <i class="fa-regular fa-calendar-check"></i> Bespoke Fitting
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Navigation -->
+  <div class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-header">
+      <span class="drawer-title">RIWAAYAT COUTURE</span>
+      <button class="drawer-close" id="drawerClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <ul class="drawer-links">
+      <li><a href="#collections" class="drawer-link">Curated Collections</a></li>
+      <li><a href="#heirloom-craft" class="drawer-link">Art of Weaving & Zardozi</a></li>
+      <li><a href="#lookbook" class="drawer-link">Royal Bridal Lookbook</a></li>
+      <li><a href="#diaries" class="drawer-link">Real Brides Diaries</a></li>
+      <li><a href="#appointment-section" class="drawer-link">Book Private Salon Visit</a></li>
+    </ul>
+    <div class="drawer-footer">
+      <p class="drawer-contact"><i class="fa-brands fa-whatsapp"></i> Concierge: +91 98765 43210</p>
+      <p class="drawer-sub">Varanasi • New Delhi • London • Dubai</p>
+    </div>
+  </div>
+
+  <main>
+    <!-- Editorial Typographic Hero (Anti-Cliché Layout) -->
+    <section class="hero-editorial">
+      <div class="hero-bg-texture"></div>
+      <div class="container hero-container">
+        
+        <div class="hero-masthead">
+          <div class="hero-label-pill">
+            <span class="dot"></span> PURE BANARASI SILK & HANDCRAFTED ZARDOZI
+          </div>
+          <h1 class="hero-headline">
+            Where Regal Heritage <br>
+            <span class="italic-serif text-accent-gold">Meets Modern Majesty</span>
+          </h1>
+          <p class="hero-subheading">
+            Heirloom bridal lehengas, hand-spun Katan silks, and majestic festive attire crafted by master karigars across Varanasi, Jaipur, and Kashmir. Woven for memories that span generations.
+          </p>
+          
+          <div class="hero-cta-group">
+            <a href="#collections" class="btn btn-gold">
+              <span>Explore The Collection</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <a href="https://wa.me/919876543210?text=Hello%20Riwaayat%20team,%20I%20would%20like%20to%20consult%20a%20bridal%20stylist" target="_blank" rel="noopener" class="btn btn-secondary-emerald">
+              <i class="fa-brands fa-whatsapp"></i>
+              <span>Connect With Stylist</span>
+            </a>
+          </div>
+
+          <div class="hero-trust-strip">
+            <div class="trust-item">
+              <span class="trust-val">100%</span>
+              <span class="trust-label">Silk Mark Certified</span>
+            </div>
+            <div class="trust-divider"></div>
+            <div class="trust-item">
+              <span class="trust-val">450+</span>
+              <span class="trust-label">Karigar Weaving Days / Outfit</span>
+            </div>
+            <div class="trust-divider"></div>
+            <div class="trust-item">
+              <span class="trust-val">Global</span>
+              <span class="trust-label">Insured Express Shipping</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Asymmetric Visual Showcase -->
+        <div class="hero-visual-collage">
+          <div class="visual-card visual-primary">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=80" alt="Royal Crimson Bridal Lehenga with Zari work" loading="eager">
+            </div>
+            <div class="card-float-tag">
+              <span class="tag-title">The Noor-e-Kashi Lehenga</span>
+              <span class="tag-meta">Hand-dyed Crimson • 24k Gold Thread</span>
+            </div>
+          </div>
+
+          <div class="visual-card visual-secondary">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80" alt="Banarasi Royal Handloom Saree" loading="eager">
+            </div>
+            <div class="card-micro-badge">
+              <i class="fa-solid fa-gem"></i> Heritage Weave
+            </div>
+          </div>
+
+          <div class="craft-stamp">
+            <svg viewBox="0 0 100 100" class="rotating-text-stamp">
+              <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="none" />
+              <text font-size="10" letter-spacing="2">
+                <textPath href="#circlePath" fill="#C5A059">
+                  • RIWAAYAT COUTURE • ROYAL INDIAN HEIRLOOM •
+                </textPath>
+              </text>
+            </svg>
+            <div class="stamp-icon"><i class="fa-solid fa-crown"></i></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Curated Collection Gallery with Filter Tabs -->
+    <section class="section collections-section" id="collections">
+      <div class="container">
+        
+        <div class="section-header text-center">
+          <span class="eyebrow">CURATED FOR THE CONNOISSEUR</span>
+          <h2 class="section-title">The Royal Ensembles</h2>
+          <p class="section-desc">Each garment is a tapestry of hand-embroidered heritage, crafted with pure silks, fine gota patti, and genuine antique zari.</p>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="filter-wrapper">
+          <div class="filter-tabs" role="tablist">
+            <button class="filter-btn active" data-category="all" role="tab">All Creations</button>
+            <button class="filter-btn" data-category="bridal" role="tab">Bridal Couture</button>
+            <button class="filter-btn" data-category="sarees" role="tab">Heirloom Sarees</button>
+            <button class="filter-btn" data-category="festive" role="tab">Royal Anarkalis & Suits</button>
+            <button class="filter-btn" data-category="contemporary" role="tab">Indo-Western & Fusion</button>
+          </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="product-grid" id="productGrid">
+          
+          <!-- Product Item 1 -->
+          <article class="product-card" data-category="bridal">
+            <div class="product-media">
+              <img src="https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80" alt="Padmavati Vermilion Red Bridal Lehenga" class="product-img">
+              <div class="product-badges">
+                <span class="badge badge-ruby">Bridal Icon</span>
+                <span class="badge badge-silk">Pure Katan</span>
+              </div>
+              <button class="save-btn" aria-label="Save to Wishlist" data-id="1">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+              <div class="quick-action-overlay">
+                <button class="btn btn-quick-view" data-product="1">Quick View & Details</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-collection">Varanasi Bridal Vault</span>
+              <h3 class="product-title">The Padmavati Vermilion Lehenga</h3>
+              <p class="product-craft">Handcrafted Zardozi, Real Gota Weave & Dabka Work</p>
+              <div class="product-pricing">
+                <span class="price-current">₹1,45,000</span>
+                <span class="price-original">₹1,75,000</span>
+                <span class="price-note">Bespoke Fit Included</span>
+              </div>
+              <button class="btn btn-inquire-direct" data-title="The Padmavati Vermilion Lehenga" data-price="₹1,45,000">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via Stylist
+              </button>
+            </div>
+          </article>
+
+          <!-- Product Item 2 -->
+          <article class="product-card" data-category="sarees">
+            <div class="product-media">
+              <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80" alt="Royal Emerald Banarasi Silk Saree" class="product-img">
+              <div class="product-badges">
+                <span class="badge badge-gold">Heritage Masterpiece</span>
+              </div>
+              <button class="save-btn" aria-label="Save to Wishlist" data-id="2">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+              <div class="quick-action-overlay">
+                <button class="btn btn-quick-view" data-product="2">Quick View & Details</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-collection">Shahi Dastakaar</span>
+              <h3 class="product-title">Shahi Emerald Shikargah Saree</h3>
+              <p class="product-craft">12-Ply Katan Silk with Antique Gold Roopa Zari Border</p>
+              <div class="product-pricing">
+                <span class="price-current">₹68,500</span>
+                <span class="price-original">₹82,000</span>
+                <span class="price-note">Silk Mark Certified</span>
+              </div>
+              <button class="btn btn-inquire-direct" data-title="Shahi Emerald Shikargah Saree" data-price="₹68,500">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via Stylist
+              </button>
+            </div>
+          </article>
+
+          <!-- Product Item 3 -->
+          <article class="product-card" data-category="festive">
+            <div class="product-media">
+              <img src="https://images.unsplash.com/photo-1583391733975-dd26487e83db?auto=format&fit=crop&w=800&q=80" alt="Chandrika Ivory & Gold Kalidar Anarkali" class="product-img">
+              <div class="product-badges">
+                <span class="badge badge-ivory">Festive Glamour</span>
+              </div>
+              <button class="save-btn" aria-label="Save to Wishlist" data-id="3">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+              <div class="quick-action-overlay">
+                <button class="btn btn-quick-view" data-product="3">Quick View & Details</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-collection">Jashn-e-Bahaar</span>
+              <h3 class="product-title">Chandrika Ivory Kalidar Anarkali</h3>
+              <p class="product-craft">Chanderi Silk with Mukaish Dusting & Organza Dupatta</p>
+              <div class="product-pricing">
+                <span class="price-current">₹48,900</span>
+                <span class="price-original">₹56,000</span>
+                <span class="price-note">Includes Pants & Dupatta</span>
+              </div>
+              <button class="btn btn-inquire-direct" data-title="Chandrika Ivory Kalidar Anarkali" data-price="₹48,900">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via Stylist
+              </button>
+            </div>
+          </article>
+
+          <!-- Product Item 4 -->
+          <article class="product-card" data-category="bridal">
+            <div class="product-media">
+              <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=80" alt="Gulaab Baagh Velvet & Tissue Lehenga" class="product-img">
+              <div class="product-badges">
+                <span class="badge badge-ruby">Limited Edition</span>
+              </div>
+              <button class="save-btn" aria-label="Save to Wishlist" data-id="4">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+              <div class="quick-action-overlay">
+                <button class="btn btn-quick-view" data-product="4">Quick View & Details</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-collection">Jaipur Rajwada</span>
+              <h3 class="product-title">Gulaab Baagh Rose Gold Lehenga</h3>
+              <p class="product-craft">Micro Velvet Base with Hand-cut Tissue Gota & Pearls</p>
+              <div class="product-pricing">
+                <span class="price-current">₹1,85,000</span>
+                <span class="price-original">₹2,20,000</span>
+                <span class="price-note">Bespoke Customization</span>
+              </div>
+              <button class="btn btn-inquire-direct" data-title="Gulaab Baagh Rose Gold Lehenga" data-price="₹1,85,000">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via Stylist
+              </button>
+            </div>
+          </article>
+
+          <!-- Product Item 5 -->
+          <article class="product-card" data-category="sarees">
+            <div class="product-media">
+              <img src="https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80" alt="Kanjeevaram Royal Mustard Saree" class="product-img">
+              <div class="product-badges">
+                <span class="badge badge-gold">Korvai Weave</span>
+              </div>
+              <button class="save-btn" aria-label="Save to Wishlist" data-id="5">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+              <div class="quick-action-overlay">
+                <button class="btn btn-quick-view" data-product="5">Quick View & Details</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-collection">Kanchipuram Heritage</span>
+              <h3 class="product-title">Swarnam Kanjeevaram Saree</h3>
+              <p class="product-craft">Pure Mulberry Silk, Temple Border & Solid Zari Pallu</p>
+              <div class="product-pricing">
+                <span class="price-current">₹74,000</span>
+                <span class="price-original">₹89,000</span>
+                <span class="price-note">With Contrast Blouse Piece</span>
+              </div>
+              <button class="btn btn-inquire-direct" data-title="Swarnam Kanjeevaram Saree" data-price="₹74,000">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via Stylist
+              </button>
+            </div>
+          </article>
+
+          <!-- Product Item 6 -->
+          <article class="product-card" data-category="contemporary">
+            <div class="product-media">
+              <img src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80" alt="Brocade Cape & Pre-Draped Sharara Set" class="product-img">
+              <div class="product-badges">
+                <span class="badge badge-silk">Sangeet Edit</span>
+              </div>
+              <button class="save-btn" aria-label="Save to Wishlist" data-id="6">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+              <div class="quick-action-overlay">
+                <button class="btn btn-quick-view" data-product="6">Quick View & Details</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-collection">Modern Riwaayat</span>
+              <h3 class="product-title">Zoya Brocade Cape & Sharara Set</h3>
+              <p class="product-craft">Structured Raw Silk Cape paired with Crushed Chiffon Sharara</p>
+              <div class="product-pricing">
+                <span class="price-current">₹52,000</span>
+                <span class="price-original">₹62,000</span>
+                <span class="price-note">Ready to Ship</span>
+              </div>
+              <button class="btn btn-inquire-direct" data-title="Zoya Brocade Cape & Sharara Set" data-price="₹52,000">
+                <i class="fa-brands fa-whatsapp"></i> Inquire via Stylist
+              </button>
+            </div>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- The Art & Craftsmanship Spotlight -->
+    <section class="section craft-section" id="heirloom-craft">
+      <div class="container">
+        <div class="craft-grid">
+          
+          <div class="craft-content">
+            <span class="eyebrow text-accent-gold">HONORING CENTURIES OF CRAFTSMANSHIP</span>
+            <h2 class="craft-title">A Living Tapestry of Pure Handloom & Hand-Zardozi</h2>
+            <p class="craft-text">
+              Every fold of a Riwaayat ensemble carries the dedication of multi-generational artisan families. From the wooden pit-looms on the banks of the Ganges in Varanasi to the regal needlework ateliers in Lucknow and Jaipur, we preserve centuries-old handcrafting traditions.
+            </p>
+
+            <div class="craft-pillars">
+              <div class="pillar-item">
+                <div class="pillar-icon"><i class="fa-solid fa-scroll"></i></div>
+                <div class="pillar-body">
+                  <h4>Authentic Silk Mark Certification</h4>
+                  <p>100% natural, tested pure Mulberry and Katan silk fibers that breathe and drape gracefully.</p>
+                </div>
+              </div>
+
+              <div class="pillar-item">
+                <div class="pillar-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <div class="pillar-body">
+                  <h4>Pure Zari & Antique Metallic Wire</h4>
+                  <p>Crafted using genuine electroplated silver & gold wires that retain their royal luster for decades.</p>
+                </div>
+              </div>
+
+              <div class="pillar-item">
+                <div class="pillar-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                <div class="pillar-body">
+                  <h4>Fair-Trade Karigar Collective</h4>
+                  <p>Direct ethical employment for over 350 weaving families, sustaining indigenous craft heritage.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="craft-signature">
+              <div class="artisan-badge">
+                <span class="craft-num">120+</span>
+                <span class="craft-lbl">Hours of Hand Embroidery per Bridal Blouse</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="craft-visuals">
+            <div class="craft-main-card">
+              <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=80" alt="Master Weaver working on wooden loom" class="craft-img">
+              <div class="craft-caption">
+                <span class="caption-tag">ATELIER SPOTLIGHT</span>
+                <p class="caption-quote">"We do not simply weave cloth; we weave the blessings and stories of our ancestors."</p>
+                <span class="caption-author">— Ustad Mohammad Rafiq, Master Weaver (4th Gen)</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Lookbook & Real Brides Diary -->
+    <section class="section lookbook-section" id="lookbook">
+      <div class="container">
+        
+        <div class="section-header text-center">
+          <span class="eyebrow">THE BRIDAL VAULT</span>
+          <h2 class="section-title">The Royal Lookbook 2026</h2>
+          <p class="section-desc">Real celebrations, regal silhouettes, and timeless Indian grace captured in high fidelity.</p>
+        </div>
+
+        <div class="lookbook-masonry">
+          
+          <div class="lookbook-item item-large">
+            <img src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=900&q=80" alt="Bride in royal crimson lehenga" loading="lazy">
+            <div class="lookbook-overlay">
+              <span class="lookbook-theme">The Royal Pheras</span>
+              <h3>Crimson Handloom Lehenga in Pure Zari</h3>
+              <a href="https://wa.me/919876543210?text=I%20loved%20the%20Crimson%20Handloom%20Lookbook%20Lehenga" target="_blank" rel="noopener" class="lookbook-btn">Styling Consultation</a>
+            </div>
+          </div>
+
+          <div class="lookbook-item">
+            <img src="https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=700&q=80" alt="Mehendi and Sangeet festive green ensemble" loading="lazy">
+            <div class="lookbook-overlay">
+              <span class="lookbook-theme">Mehendi Celebrations</span>
+              <h3>Emerald Brocade with Gotapatti Detail</h3>
+              <a href="https://wa.me/919876543210?text=I%20loved%20the%20Mehendi%20Emerald%20Lookbook%20Outfit" target="_blank" rel="noopener" class="lookbook-btn">Inquire Look</a>
+            </div>
+          </div>
+
+          <div class="lookbook-item">
+            <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=700&q=80" alt="Reception elegance in ivory and gold" loading="lazy">
+            <div class="lookbook-overlay">
+              <span class="lookbook-theme">Royal Reception</span>
+              <h3>Ivory Kalidar with Zardozi Veil</h3>
+              <a href="https://wa.me/919876543210?text=I%20loved%20the%20Ivory%20Reception%20Look" target="_blank" rel="noopener" class="lookbook-btn">Inquire Look</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Client Testimonials / Real Brides Section -->
+    <section class="section testimonials-section" id="diaries">
+      <div class="container">
+        
+        <div class="section-header text-center">
+          <span class="eyebrow">WORDS FROM OUR ROYAL CLIENTS</span>
+          <h2 class="section-title">The Riwaayat Brides</h2>
+          <p class="section-desc">Over 2,400 brides across 18 countries have chosen Riwaayat for their most sacred vows.</p>
+        </div>
+
+        <div class="testimonial-grid">
+          
+          <div class="testimonial-card">
+            <div class="stars">
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <p class="quote-text">
+              "The weight, the intricate hand-embroidered peacocks on the border, and the drape of the Katan silk made me feel like an actual queen on my wedding day in Udaipur. The custom blouse fitting was spot on!"
+            </p>
+            <div class="client-meta">
+              <div class="client-avatar">AR</div>
+              <div class="client-details">
+                <span class="client-name">Aanya Rathore</span>
+                <span class="client-loc">Destination Wedding • Udaipur, Rajasthan</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card featured-testimonial">
+            <div class="stars">
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <p class="quote-text">
+              "Ordering from London, I was nervous about measurements and fabric weight. The Riwaayat WhatsApp video concierge held three live drape sessions with me. When the parcel arrived, it took my breath away. Absolute royal craftsmanship."
+            </p>
+            <div class="client-meta">
+              <div class="client-avatar">DK</div>
+              <div class="client-details">
+                <span class="client-name">Dr. Diya Kapoor</span>
+                <span class="client-loc">Bride • Kensington, London</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <div class="stars">
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <p class="quote-text">
+              "You can instantly tell real handloom from commercial machine replicas. Riwaayat's gold zari has that soft, antique warm glow that photographed like poetry under the mandap lights."
+            </p>
+            <div class="client-meta">
+              <div class="client-avatar">MS</div>
+              <div class="client-details">
+                <span class="client-name">Meera Somani</span>
+                <span class="client-loc">Bride • South Mumbai</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIP Private Salon & Stylist Consultation Section -->
+    <section class="section appointment-section" id="appointment-section">
+      <div class="container">
+        <div class="appointment-card">
+          <div class="appointment-content">
+            <span class="eyebrow text-accent-gold">PRIVATE SALON & BESPOKE TAILORING</span>
+            <h2 class="appointment-title">Experience Your Private Bridal & Festive Consultation</h2>
+            <p class="appointment-desc">
+              Whether you wish to visit our flagship salons in Delhi or Varanasi, or prefer a private 1-on-1 virtual video styling session with our senior master drapers, we are at your service.
+            </p>
+
+            <ul class="appointment-perks">
+              <li><i class="fa-solid fa-check"></i> Custom color dye matching for family coordinating palettes</li>
+              <li><i class="fa-solid fa-check"></i> Personalized heirloom label with your wedding date embroidered inside the kali</li>
+              <li><i class="fa-solid fa-check"></i> Worldwide express doorstep delivery with zero transit risk</li>
+            </ul>
+
+            <div class="appointment-actions">
+              <a href="https://wa.me/919876543210?text=Hello,%20I%20would%20like%20to%20schedule%20a%20private%20bridal%20appointment" target="_blank" rel="noopener" class="btn btn-gold btn-lg">
+                <i class="fa-brands fa-whatsapp"></i> Chat With Senior Stylist Now
+              </a>
+              <span class="phone-call-assist">Or Call Direct: <a href="tel:+919876543210">+91 98765 43210</a></span>
+            </div>
+          </div>
+
+          <div class="appointment-form-panel">
+            <h3 class="form-title">Request Private Callback</h3>
+            <form id="appointmentForm" class="consult-form">
+              <div class="form-group">
+                <label for="userName">Your Full Name</label>
+                <input type="text" id="userName" placeholder="e.g. Priyadarshini Sharma" required>
+              </div>
+              <div class="form-group">
+                <label for="userPhone">WhatsApp / Mobile Number</label>
+                <input type="tel" id="userPhone" placeholder="+91 98765 43210" required>
+              </div>
+              <div class="form-group">
+                <label for="eventType">Occasion / Wedding Date</label>
+                <select id="eventType" required>
+                  <option value="" disabled selected>Select Your Occasion</option>
+                  <option value="Bridal Wedding Ceremony">Bridal Wedding Ceremony</option>
+                  <option value="Sangeet & Mehendi">Sangeet & Mehendi</option>
+                  <option value="Reception Gown / Ensemble">Reception Gown / Ensemble</option>
+                  <option value="Festive Heirloom Saree">Festive Heirloom Saree</option>
+                  <option value="Trousseau Shopping">Complete Trousseau Shopping</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="userCity">City / Country</label>
+                <input type="text" id="userCity" placeholder="e.g. Mumbai, New Delhi, London, NY" required>
+              </div>
+              <button type="submit" class="btn btn-emerald-submit">
+                <span>Confirm VIP Consultation</span>
+                <i class="fa-solid fa-gem"></i>
+              </button>
+              <p class="form-disclaimer"><i class="fa-solid fa-lock"></i> Your information is kept strictly private with our senior concierge.</p>
+            </form>
+            <div class="form-success-message" id="formSuccess" style="display: none;">
+              <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+              <h4>Thank You, Royal Patron!</h4>
+              <p>Your consultation request has been received. Our senior stylist will connect with you on WhatsApp within 30 minutes.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Quick View & Detail Modal -->
+  <div class="modal-backdrop" id="quickModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <button class="modal-close" id="modalClose" aria-label="Close dialog"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-body" id="modalBody">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Luxury Footer -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="footer-logo">RIWAAYAT</span>
+          <p class="footer-mission">
+            Preserving India's sacred loom heritage, zardozi masteries, and timeless couture for the discerning global patron.
+          </p>
+          <div class="footer-socials">
+            <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" aria-label="Pinterest"><i class="fa-brands fa-pinterest-p"></i></a>
+            <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-nav-col">
+          <h4 class="col-heading">Atelier Vault</h4>
+          <ul>
+            <li><a href="#collections">Bridal Lehengas</a></li>
+            <li><a href="#collections">Banarasi Katan Sarees</a></li>
+            <li><a href="#collections">Gota Patti Anarkalis</a></li>
+            <li><a href="#collections">Silk Sharara Sets</a></li>
+            <li><a href="#collections">Groom & Sherwani Edits</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-nav-col">
+          <h4 class="col-heading">Art & Heritage</h4>
+          <ul>
+            <li><a href="#heirloom-craft">The Pit Loom Story</a></li>
+            <li><a href="#heirloom-craft">Varanasi Karigar Guild</a></li>
+            <li><a href="#heirloom-craft">Silk Mark Authenticity</a></li>
+            <li><a href="#diaries">The Bride Diaries</a></li>
+            <li><a href="#appointment-section">Care & Preservation</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-nav-col">
+          <h4 class="col-heading">Client Services</h4>
+          <ul>
+            <li><a href="#appointment-section">Bespoke Video Drape</a></li>
+            <li><a href="#appointment-section">Custom Color Dyeing</a></li>
+            <li><a href="#appointment-section">Global Insured Shipping</a></li>
+            <li><a href="https://wa.me/919876543210" target="_blank" rel="noopener">WhatsApp Concierge</a></li>
+            <li><a href="#appointment-section">FAQs & Size Guide</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 RIWAAYAT Couture Ltd. All Rights Reserved. Crafted with reverence for Indian Handloom.</p>
+        <div class="footer-tags">
+          <span>Handloom Certified</span>
+          <span>•</span>
+          <span>Zero Machine Mimicry</span>
+          <span>•</span>
+          <span>Pure Mulberry Silk</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating Sticky WhatsApp Concierge Button -->
+  <aside class="floating-concierge" aria-label="Instant stylist chat">
+    <a href="https://wa.me/919876543210?text=Hello%20Riwaayat,%20I'm%20browsing%20the%20collection%20and%20need%20styling%20advice" target="_blank" rel="noopener" class="concierge-link">
+      <div class="concierge-pulse"></div>
+      <div class="concierge-icon"><i class="fa-brands fa-whatsapp"></i></div>
+      <div class="concierge-text">
+        <span class="concierge-status">Online Stylist</span>
+        <span class="concierge-action">Chat on WhatsApp</span>
+      </div>
+    </a>
+  </aside>
+
+  <!-- Mobile Bottom Sticky Conversion Bar -->
+  <div class="mobile-sticky-bar">
+    <a href="#collections" class="sticky-btn sticky-secondary">
+      <i class="fa-solid fa-layer-group"></i> View Vault
+    </a>
+    <a href="https://wa.me/919876543210?text=Hi%20Riwaayat,%20I%20want%20to%20inquire%20about%20your%20Indian%20dress%20collection" target="_blank" rel="noopener" class="sticky-btn sticky-primary">
+      <i class="fa-brands fa-whatsapp"></i> Stylist Consultation
+    </a>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
+`,
 };
