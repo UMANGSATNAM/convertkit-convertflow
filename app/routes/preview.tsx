@@ -89,6 +89,19 @@ function cleanLiquid(liquidContent: string, sectionIdx: number): string {
   html = html.replace(/{% schema %}[\s\S]*?{% endschema %}/g, "");
   html = html.replace(/{% comment %}[\s\S]*?{% endcomment %}/g, "");
 
+  // Convert Shopify style and javascript blocks to HTML tags so CSS and JS are parsed by browser
+  html = html.replace(/{%-?\s*style\s*-?%}/g, "<style>");
+  html = html.replace(/{%-?\s*endstyle\s*-?%}/g, "</style>");
+  html = html.replace(/{%-?\s*javascript\s*-?%}/g, "<script>");
+  html = html.replace(/{%-?\s*endjavascript\s*-?%}/g, "</script>");
+
+  // Translation filter {{ 'products.product.add_to_cart' | t }}
+  html = html.replace(/\{\{\s*['"]([^'"]+)['"]\s*\|\s*t\s*\}\}/g, (_m, key) => {
+    const parts = key.split(".");
+    const last = parts[parts.length - 1];
+    return last.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase());
+  });
+
   // 3. Extract and resolve all `assign` variables from `{%- liquid ... -%}` and `{% assign ... %}`
   const liquidBlockRegex = /{%-?\s*liquid([\s\S]*?)-?%}/g;
   let match: RegExpExecArray | null;

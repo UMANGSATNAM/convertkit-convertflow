@@ -79,7 +79,19 @@ export async function resolveSections(ids: string[]): Promise<Resolution> {
   const fileMissing: string[] = [];
 
   for (const id of ids) {
-    const liquidPath = registry.get(id);
+    let liquidPath = registry.get(id);
+
+    // If not in registry, check the known component categories
+    if (!liquidPath) {
+      const categories = ['announcement', 'hero', 'product-page', 'offer', 'categories', 'product-card', 'header', 'footer'];
+      for (const cat of categories) {
+        const candidate = `components/${cat}/${id}.liquid`;
+        if (existsSync(path.join(ENGINE, candidate))) {
+          liquidPath = candidate;
+          break;
+        }
+      }
+    }
 
     // The engine copy first — that is what a synced, published section looks
     // like.
