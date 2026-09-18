@@ -83,16 +83,21 @@ export async function resolveSections(ids: string[]): Promise<Resolution> {
 
     // If not in registry, check the known component categories
     if (!liquidPath) {
-      const categories = [
-        'announcement', 'hero', 'product-page', 'offer', 'categories', 'product-card',
-        'header', 'footer', 'trust', 'ugc', 'faq', 'testimonials', 'brand-story', 'newsletter',
-        'cart-drawer', 'collection', 'popup'
-      ];
-      for (const cat of categories) {
-        const candidate = `components/${cat}/${id}.liquid`;
-        if (existsSync(path.join(ENGINE, candidate))) {
-          liquidPath = candidate;
-          break;
+      if (existsSync(path.join(ENGINE, `components/${id}.liquid`))) {
+        liquidPath = `components/${id}.liquid`;
+      } else {
+        const categories = [
+          'announcement', 'hero', 'product-page', 'offer', 'categories', 'product-card',
+          'header', 'footer', 'trust', 'ugc', 'faq', 'testimonials', 'brand-story', 'newsletter',
+          'cart-drawer', 'collection', 'popup', 'caratlane-jewelry', 'fb04-streetwear',
+          'product-grid', 'bundle-builder', 'blog', 'collection-page', 'collections', 'contact', 'custom', 'page'
+        ];
+        for (const cat of categories) {
+          const candidate = `components/${cat}/${id}.liquid`;
+          if (existsSync(path.join(ENGINE, candidate))) {
+            liquidPath = candidate;
+            break;
+          }
         }
       }
     }

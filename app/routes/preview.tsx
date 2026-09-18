@@ -271,6 +271,21 @@ function cleanLiquid(liquidContent: string, sectionIdx: number, overrides?: any)
     return variables[key] || "";
   });
 
+  // 12.5. Mock snippet renders like {% render 'product-card' %} or icons
+  html = html.replace(/\{%-?\s*render\s+['"]product-card['"][^%]*?%}/g, () => {
+    const img = DEMO_IMAGES[sectionIdx % DEMO_IMAGES.length];
+    return `
+      <div style="background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid rgba(0,0,0,0.08);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,0.05);transition:transform 0.2s ease;">
+        <img src="${img}" alt="Featured Item" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;margin-bottom:12px;">
+        <div style="font-weight:700;font-size:15px;margin-bottom:4px;color:#0f172a;">Studio Core Piece</div>
+        <div style="font-weight:800;font-size:16px;color:#059669;">$68.00</div>
+      </div>
+    `;
+  });
+  html = html.replace(/\{%-?\s*render\s+['"](icon-[^'"]+|social-icons)['"][^%]*?%}/g, () => {
+    return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;"><circle cx="12" cy="12" r="9"></circle></svg>`;
+  });
+
   // 13. Strip leftover liquid tags (including unhandled for/endfor/render)
   html = html.replace(/{%-?[\s\S]*?-?%}/g, "");
 
