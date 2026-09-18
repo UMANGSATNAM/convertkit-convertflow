@@ -6,6 +6,7 @@ import { resolveSections, bundleFor, schemaOf, seedFor } from "../pagekit/regist
 import { COMPOSITIONS } from "../data/page-compositions";
 import { STORE_PAGE_TEMPLATES } from "../data/page-templates";
 import { TEMPLATE_HTMLS } from "../templatesHtml";
+import { getLandingPageById } from "../data/landing-pages-registry";
 
 let cachedBaseCss: string | null = null;
 
@@ -369,12 +370,36 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   // ── 3. Resolve Target Page Definition ─────────────────────────────────────
   let wantedSections: string[] = [];
   let pageTitle = "Store Preview";
+  let customPaletteCss = "";
 
-  const matchedPage = id ? (pageById(id) || ALL_PAGES.find(p => p.id === id)) : null;
-  const matchedComp = (!matchedPage && id) ? COMPOSITIONS.find(c => c.id === id) : null;
-  const matchedTmpl = (!matchedPage && !matchedComp && id) ? STORE_PAGE_TEMPLATES.find(t => t.id === id) : null;
+  const matchedLanding = id ? getLandingPageById(id) : null;
+  const matchedPage = (!matchedLanding && id) ? (pageById(id) || ALL_PAGES.find(p => p.id === id)) : null;
+  const matchedComp = (!matchedLanding && !matchedPage && id) ? COMPOSITIONS.find(c => c.id === id) : null;
+  const matchedTmpl = (!matchedLanding && !matchedPage && !matchedComp && id) ? STORE_PAGE_TEMPLATES.find(t => t.id === id) : null;
 
-  if (matchedPage) {
+  if (matchedLanding) {
+    pageTitle = matchedLanding.name;
+    wantedSections = [
+      ...(matchedLanding.announcement ? [matchedLanding.announcement] : []),
+      ...(matchedLanding.header ? [matchedLanding.header] : []),
+      ...matchedLanding.sections.map(s => s.componentId),
+      ...(matchedLanding.footer ? [matchedLanding.footer] : []),
+    ];
+    customPaletteCss = `
+      :root {
+        --color-background: ${matchedLanding.palette.background};
+        --color-text: ${matchedLanding.palette.text};
+        --color-primary: ${matchedLanding.palette.primary};
+        --color-accent: ${matchedLanding.palette.accent};
+        --brand-primary: ${matchedLanding.palette.primary};
+        --brand-accent: ${matchedLanding.palette.accent};
+      }
+      body {
+        background-color: ${matchedLanding.palette.background} !important;
+        color: ${matchedLanding.palette.text} !important;
+      }
+    `;
+  } else if (matchedPage) {
     pageTitle = matchedPage.name;
     wantedSections = [
       ...(matchedPage.announcement ? [matchedPage.announcement] : []),
@@ -417,7 +442,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       const extraCss = Object.entries(bundle.files)
         .filter(([k]) => k.endsWith(".css"))
         .map(([, v]) => v)
-        .join("\n");
+        .join("\n") + "\n" + customPaletteCss;
       const extraJs = Object.entries(bundle.files)
         .filter(([k]) => k.endsWith(".js"))
         .map(([, v]) => v)

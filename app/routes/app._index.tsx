@@ -23,6 +23,8 @@ import { authenticate } from "../shopify.server";
 import prisma, { getOrSyncShop } from "../db.server";
 import { installSection, describeSection } from "../services/section-install.server";
 import { ensurePreviewTheme, previewUrl } from "../services/preview-theme.server";
+import { D2C_LANDING_PAGES, type LandingPageDefinition } from "../data/landing-pages-registry";
+import { installLandingPage } from "../services/landing-page-install.server";
 
 /**
  * Pre-Made Sections Store
@@ -34,6 +36,7 @@ import { ensurePreviewTheme, previewUrl } from "../services/preview-theme.server
 
 const CATEGORIES = [
   { id: "all", label: "All Sections (37)" },
+  { id: "landing-page", label: "Landing Pages (10) 🔥" },
   { id: "announcement", label: "Announcement Bars (2)" },
   { id: "hero", label: "Hero Banners (5)" },
   { id: "product-page", label: "PDP & Sticky ATC (5)" },
@@ -51,6 +54,32 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const q = (url.searchParams.get("q") || "").trim();
 
   const shop = await getOrSyncShop(session.shop, session.accessToken);
+
+  const isLandingPageCategory = category === "landing-page";
+
+  let filteredLandingPages: LandingPageDefinition[] = [];
+  if (isLandingPageCategory) {
+    filteredLandingPages = q
+      ? D2C_LANDING_PAGES.filter(
+          (lp) =>
+            lp.name.toLowerCase().includes(q.toLowerCase()) ||
+            lp.nicheLabel.toLowerCase().includes(q.toLowerCase()) ||
+            lp.tagline.toLowerCase().includes(q.toLowerCase()) ||
+            lp.description.toLowerCase().includes(q.toLowerCase()) ||
+            lp.conversionFeatures.some((f) => f.toLowerCase().includes(q.toLowerCase()))
+        )
+      : D2C_LANDING_PAGES;
+
+    return json({
+      shopDomain: session.shop,
+      category,
+      q,
+      totalCount: filteredLandingPages.length,
+      components: [],
+      landingPages: filteredLandingPages,
+      isLandingPageCategory: true,
+    });
+  }
 
   // Build where clause according to category and search
   const where: any = { status: "PUBLISHED" };
@@ -94,6 +123,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     q,
     totalCount,
     components: described,
+    landingPages: [],
+    isLandingPageCategory: false,
   });
 }
 
@@ -221,6 +252,38 @@ export async function action({ request }: ActionFunctionArgs) {
         previewUrl: draftPreviewUrl,
         editorUrl,
         result,
+      });
+    }
+
+    if (intent === "install-landing-page") {
+      const landingPageId = String(form.get("landingPageId") || "");
+      const targetThemeChoice = String(form.get("targetThemeChoice") || "draft");
+      const useDraft = targetThemeChoice === "draft";
+      let themeToInstall = "active";
+      let themeName = "Live Store Theme";
+
+      if (useDraft) {
+        const theme = await ensurePreviewTheme(shop);
+        themeToInstall = theme.id;
+        themeName = theme.name;
+      }
+
+      const result = await installLandingPage(shop, themeToInstall, landingPageId, {
+        isDraftTheme: useDraft,
+      });
+
+      return json({
+        ok: true,
+        intent,
+        landingPageId,
+        pageName: result.templateName,
+        templateKey: result.templateKey,
+        isDraftTheme: useDraft,
+        themeName,
+        previewUrl: result.previewUrl,
+        editorUrl: result.editorUrl,
+        filesWritten: result.filesWritten,
+        sectionCount: result.sectionCount,
       });
     }
 
@@ -572,8 +635,385 @@ function BentoSectionCard({
   );
 }
 
+function LandingPageCard({
+  landingPage,
+  shopDomain,
+  isInstalling,
+  onPreview,
+  onInstallDraft,
+  onInstallLive,
+}: {
+  landingPage: LandingPageDefinition;
+  shopDomain: string;
+  isInstalling: boolean;
+  onPreview: () => void;
+  onInstallDraft: () => void;
+  onInstallLive: () => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  const [scale, setScale] = useState(0.26);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "350px" }
+    );
+    io.observe(containerRef.current);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const updateScale = () => {
+      if (containerRef.current) {
+        const w = containerRef.current.offsetWidth;
+        if (w > 0) setScale(w / 1280);
+      }
+    };
+    updateScale();
+    const ro = new ResizeObserver(updateScale);
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, []);
+
+  const previewSrc = `/preview?id=${encodeURIComponent(landingPage.id)}&shop=${encodeURIComponent(shopDomain)}&embed=1`;
+  const totalSections = landingPage.sections.length + (landingPage.announcement ? 1 : 0) + (landingPage.header ? 1 : 0) + (landingPage.footer ? 1 : 0);
+
+  return (
+    <div className="cf-landing-card">
+      {/* Top Browser Window Chrome */}
+      <div
+        style={{
+          height: 36,
+          background: "#0f172a",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 14px",
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+          userSelect: "none",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ef4444" }} />
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#f59e0b" }} />
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#10b981" }} />
+          <span style={{ fontSize: 11, color: "#94a3b8", marginLeft: 8, fontFamily: "monospace" }}>
+            templates/page.{landingPage.id.replace("landing-", "")}.json
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: "0.05em",
+              color: "#ffffff",
+              background: landingPage.accentColor,
+              padding: "2px 8px",
+              borderRadius: 12,
+              textTransform: "uppercase",
+            }}
+          >
+            {landingPage.nicheLabel}
+          </span>
+        </div>
+      </div>
+
+      {/* Mini-Browser Live Preview */}
+      <div
+        ref={containerRef}
+        style={{
+          height: 280,
+          position: "relative",
+          overflow: "hidden",
+          background: landingPage.palette.background || "#f8fafc",
+          cursor: "pointer",
+        }}
+        onClick={onPreview}
+      >
+        {inView ? (
+          <div
+            style={{
+              width: 1280,
+              height: 1280 / (scale > 0 ? scale : 0.26),
+              transform: `scale(${scale})`,
+              transformOrigin: "top left",
+              pointerEvents: "none",
+            }}
+          >
+            <iframe
+              title={`Preview ${landingPage.name}`}
+              src={previewSrc}
+              style={{
+                width: "100%",
+                height: "100%",
+                border: "none",
+                background: landingPage.palette.background || "#ffffff",
+              }}
+              loading="lazy"
+            />
+          </div>
+        ) : (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+              color: "#94a3b8",
+              fontSize: 13,
+            }}
+          >
+            <span>Loading live storefront preview...</span>
+          </div>
+        )}
+
+        {/* Hover overlay hint */}
+        <div className="cf-landing-hover-overlay">
+          <button
+            type="button"
+            style={{
+              background: "#ffffff",
+              color: "#0f172a",
+              border: "none",
+              padding: "9px 18px",
+              borderRadius: 30,
+              fontSize: 13,
+              fontWeight: 800,
+              boxShadow: "0 10px 25px rgba(0,0,0,0.3)",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            👁️ Click for Studio Preview
+          </button>
+        </div>
+      </div>
+
+      {/* Landing Page Details Body */}
+      <div
+        style={{
+          padding: "16px 18px",
+          background: "#ffffff",
+          display: "flex",
+          flexDirection: "column",
+          gap: 12,
+          flex: 1,
+        }}
+      >
+        {/* Title, Badge & Tagline */}
+        <div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                color: landingPage.accentColor,
+                background: `${landingPage.accentColor}18`,
+                padding: "3px 8px",
+                borderRadius: 6,
+                letterSpacing: "0.04em",
+              }}
+            >
+              {landingPage.badge}
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#475569" }}>
+              {totalSections} Cohesive Sections
+            </span>
+          </div>
+
+          <h3
+            onClick={onPreview}
+            style={{
+              margin: "8px 0 4px 0",
+              fontSize: 16,
+              fontWeight: 800,
+              color: "#0f172a",
+              lineHeight: 1.3,
+              cursor: "pointer",
+            }}
+          >
+            {landingPage.name}
+          </h3>
+          <p style={{ margin: 0, fontSize: 12, color: "#64748b", lineHeight: 1.4 }}>
+            {landingPage.tagline}
+          </p>
+        </div>
+
+        {/* Stats Callout Bar */}
+        <div
+          style={{
+            background: "#f8fafc",
+            border: "1px solid #e2e8f0",
+            borderRadius: 8,
+            padding: "8px 10px",
+            fontSize: 11,
+            color: "#334155",
+            fontWeight: 600,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          <span>📊</span>
+          <span>{landingPage.stats}</span>
+        </div>
+
+        {/* Conversion Features Tags */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {landingPage.conversionFeatures.slice(0, 4).map((f, i) => (
+            <span
+              key={i}
+              style={{
+                fontSize: 10,
+                fontWeight: 600,
+                color: "#1e293b",
+                background: "#f1f5f9",
+                padding: "3px 8px",
+                borderRadius: 6,
+              }}
+            >
+              ✓ {f}
+            </span>
+          ))}
+        </div>
+
+        {/* Color Palette Swatches & Storefront Note */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 4 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: 11, color: "#64748b", fontWeight: 600 }}>Palette:</span>
+            <div style={{ display: "flex", gap: 4 }}>
+              <div
+                title={`Primary: ${landingPage.palette.primary}`}
+                style={{
+                  width: 14,
+                  height: 14,
+                  borderRadius: "50%",
+                  background: landingPage.palette.primary,
+                  border: "1px solid rgba(0,0,0,0.1)",
+                }}
+              />
+              <div
+                title={`Accent: ${landingPage.palette.accent}`}
+                style={{
+                  width: 14,
+                  height: 14,
+                  borderRadius: "50%",
+                  background: landingPage.palette.accent,
+                  border: "1px solid rgba(0,0,0,0.1)",
+                }}
+              />
+              <div
+                title={`Background: ${landingPage.palette.background}`}
+                style={{
+                  width: 14,
+                  height: 14,
+                  borderRadius: "50%",
+                  background: landingPage.palette.background,
+                  border: "1px solid rgba(0,0,0,0.1)",
+                }}
+              />
+              <div
+                title={`Text: ${landingPage.palette.text}`}
+                style={{
+                  width: 14,
+                  height: 14,
+                  borderRadius: "50%",
+                  background: landingPage.palette.text,
+                  border: "1px solid rgba(0,0,0,0.1)",
+                }}
+              />
+            </div>
+          </div>
+          <span style={{ fontSize: 11, color: "#059669", fontWeight: 700 }}>
+            ⚡ 1-Click Shopify Theme Add
+          </span>
+        </div>
+
+        {/* Action Button Strip */}
+        <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+          <button
+            type="button"
+            onClick={onPreview}
+            style={{
+              flex: 1.2,
+              background: "#0284c7",
+              color: "#ffffff",
+              border: "none",
+              padding: "9px 12px",
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 4,
+            }}
+          >
+            👁️ Studio Preview
+          </button>
+          <button
+            type="button"
+            onClick={onInstallDraft}
+            disabled={isInstalling}
+            title="Safe install into private draft theme"
+            style={{
+              flex: 1,
+              background: "#f8fafc",
+              color: "#0f172a",
+              border: "1px solid #cbd5e1",
+              padding: "9px 10px",
+              borderRadius: 8,
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+            }}
+          >
+            🛡️ Add Draft
+          </button>
+          <button
+            type="button"
+            onClick={onInstallLive}
+            disabled={isInstalling}
+            title="Direct install to published live store theme"
+            style={{
+              flex: 1,
+              background: "#0f172a",
+              color: "#ffffff",
+              border: "none",
+              padding: "9px 10px",
+              borderRadius: 8,
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+            }}
+          >
+            ⚡ Add Live
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PreMadeSectionsStore() {
-  const { shopDomain, category, q, totalCount, components } = useLoaderData<typeof loader>();
+  const { shopDomain, category, q, totalCount, components, landingPages, isLandingPageCategory } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
   const fetcher = useFetcher<any>();
 
@@ -586,6 +1026,7 @@ export default function PreMadeSectionsStore() {
   const busy = fetcher.state !== "idle";
   const data = fetcher.data;
   const isInstalling = busy && fetcher.formData?.get("intent") === "install";
+  const isInstallingLanding = busy && fetcher.formData?.get("intent") === "install-landing-page";
   const isPreviewing = busy && fetcher.formData?.get("intent") === "preview";
   const installingId = isInstalling
     ? String(fetcher.formData?.get("componentId"))
@@ -642,12 +1083,33 @@ export default function PreMadeSectionsStore() {
     );
   };
 
+  const submitLandingPreview = (lp: LandingPageDefinition) => {
+    setActivePreview({
+      isLandingPage: true,
+      landingPageId: lp.id,
+      sectionName: lp.name,
+      url: `/preview?id=${encodeURIComponent(lp.id)}&shop=${encodeURIComponent(shopDomain)}`,
+    });
+    setPreviewModalOpen(true);
+  };
+
+  const submitLandingInstall = (lp: LandingPageDefinition, targetTheme: "draft" | "live" = "draft") => {
+    fetcher.submit(
+      {
+        intent: "install-landing-page",
+        landingPageId: lp.id,
+        targetThemeChoice: targetTheme,
+      },
+      { method: "post" }
+    );
+  };
+
   const themeEditorUrl = `https://${shopDomain}/admin/themes/current/editor`;
 
   return (
     <Page
       title="Section Store"
-      subtitle="Browse verified, production-grade Shopify 2.0 sections. Preview any design live and add it directly to your theme with 1 click."
+      subtitle="Browse verified, production-grade Shopify 2.0 sections & 10 complete D2C landing pages. Preview live and add directly to your theme with 1 click."
       primaryAction={{
         content: "Open Theme Editor",
         url: themeEditorUrl,
@@ -665,7 +1127,7 @@ export default function PreMadeSectionsStore() {
       ]}
     >
       <BlockStack gap="400">
-        {/* Success Banner */}
+        {/* Section Success Banner */}
         {data?.ok && data.intent === "install" && (
           <Banner
             tone="success"
@@ -686,6 +1148,35 @@ export default function PreMadeSectionsStore() {
                 </Button>
                 <Button url="/app/theme">
                   View My Added Sections
+                </Button>
+              </InlineStack>
+            </BlockStack>
+          </Banner>
+        )}
+
+        {/* Landing Page Success Banner */}
+        {data?.ok && data.intent === "install-landing-page" && (
+          <Banner
+            tone="success"
+            title={`🎉 Shopify Landing Page Installed: ${data.pageName}`}
+          >
+            <BlockStack gap="200">
+              <Text as="p">
+                {data.isDraftTheme
+                  ? `Successfully generated native Shopify template "${data.templateKey}" with ${data.sectionCount} custom sections in your safe Draft Theme (${data.themeName}). Your live store was not touched!`
+                  : `Successfully published native Shopify template "${data.templateKey}" with ${data.sectionCount} custom sections directly into your live theme.`}
+              </Text>
+              <InlineStack gap="300">
+                <Button variant="primary" url={data.editorUrl || themeEditorUrl} external>
+                  Customize in Shopify Theme Editor ↗
+                </Button>
+                {data.previewUrl && (
+                  <Button url={data.previewUrl} external>
+                    Preview Draft Page ↗
+                  </Button>
+                )}
+                <Button url="/app/theme">
+                  View Added Theme Assets
                 </Button>
               </InlineStack>
             </BlockStack>
@@ -721,9 +1212,13 @@ export default function PreMadeSectionsStore() {
             <InlineStack align="space-between" blockAlign="center" gap="400">
               <Box minWidth="320px">
                 <TextField
-                  label="Search sections"
+                  label="Search sections and landing pages"
                   labelHidden
-                  placeholder="Search by name, feature (e.g. hero, sticky, faq, reviews)..."
+                  placeholder={
+                    isLandingPageCategory
+                      ? "Search by brand, niche (e.g. skincare, streetwear, jewelry, audio)..."
+                      : "Search by name, feature (e.g. hero, sticky, faq, reviews)..."
+                  }
                   value={searchQuery}
                   onChange={handleSearchSubmit}
                   clearButton
@@ -744,6 +1239,7 @@ export default function PreMadeSectionsStore() {
                     ]}
                     value={activeTarget}
                     onChange={setActiveTarget}
+                    disabled={isLandingPageCategory}
                   />
                 </Box>
               </InlineStack>
@@ -770,20 +1266,150 @@ export default function PreMadeSectionsStore() {
           </BlockStack>
         </Card>
 
-        {/* Section Count Header */}
+        {/* Count Header */}
         <InlineStack align="space-between" blockAlign="center">
           <Text as="p" tone="subdued">
-            Showing <strong>{components.length}</strong> sections
-            {category !== "all" ? ` in ${CATEGORIES.find((c) => c.id === category)?.label}` : " in Section Store"}
-            {q && ` matching "${q}"`}
+            {isLandingPageCategory ? (
+              <span>
+                Showing <strong>{landingPages.length}</strong> Complete D2C Landing Page Stores (11-13 Cohesive Sections Each)
+                {q && ` matching "${q}"`}
+              </span>
+            ) : (
+              <span>
+                Showing <strong>{components.length}</strong> sections
+                {category !== "all" ? ` in ${CATEGORIES.find((c) => c.id === category)?.label}` : " in Section Store"}
+                {q && ` matching "${q}"`}
+              </span>
+            )}
           </Text>
           <Text as="p" tone="subdued">
             Active Store: <strong>{shopDomain}</strong>
           </Text>
         </InlineStack>
 
-        {/* Sections Grid */}
-        {components.length === 0 ? (
+        {/* CSS for Bento & Landing Page Grids */}
+        <style>{`
+          .cf-bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+          }
+          @media (max-width: 1200px) {
+            .cf-bento-grid {
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+          }
+          @media (max-width: 768px) {
+            .cf-bento-grid {
+              grid-template-columns: 1fr;
+            }
+          }
+          .cf-bento-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+            transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+          }
+          .cf-bento-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.12);
+            border-color: #0284c7;
+          }
+          .cf-bento-featured {
+            grid-column: span 2;
+          }
+          @media (max-width: 768px) {
+            .cf-bento-featured {
+              grid-column: span 1;
+            }
+          }
+
+          /* Landing Page Grid & Cards */
+          .cf-landing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 24px;
+          }
+          @media (max-width: 1024px) {
+            .cf-landing-grid {
+              grid-template-columns: 1fr;
+            }
+          }
+          .cf-landing-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+            transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.24s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+          }
+          .cf-landing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 24px 45px -10px rgba(0, 0, 0, 0.14);
+            border-color: #0284c7;
+          }
+          .cf-landing-hover-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.35);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+          }
+          .cf-landing-card:hover .cf-landing-hover-overlay {
+            opacity: 1;
+          }
+        `}</style>
+
+        {/* ── Main Content Grid ── */}
+        {isLandingPageCategory ? (
+          landingPages.length === 0 ? (
+            <Card>
+              <EmptyState
+                heading="No matching landing pages found"
+                action={{
+                  content: "Reset Search",
+                  onAction: () => {
+                    setSearchQuery("");
+                    setSearchParams({ category: "landing-page" });
+                  },
+                }}
+                image="https://cdn.shopify.com/s/files/1/0262/4071/2760/files/emptystate-files.png"
+              >
+                <p>Try searching for a different keyword like "skincare", "streetwear", "coffee", or "audio".</p>
+              </EmptyState>
+            </Card>
+          ) : (
+            <div className="cf-landing-grid">
+              {landingPages.map((lp) => {
+                const isThisInstalling = isInstallingLanding && fetcher.formData?.get("landingPageId") === lp.id;
+                return (
+                  <LandingPageCard
+                    key={lp.id}
+                    landingPage={lp}
+                    shopDomain={shopDomain}
+                    isInstalling={isThisInstalling}
+                    onPreview={() => submitLandingPreview(lp)}
+                    onInstallDraft={() => submitLandingInstall(lp, "draft")}
+                    onInstallLive={() => submitLandingInstall(lp, "live")}
+                  />
+                );
+              })}
+            </div>
+          )
+        ) : components.length === 0 ? (
           <Card>
             <EmptyState
               heading="No matching sections found"
@@ -800,71 +1426,27 @@ export default function PreMadeSectionsStore() {
             </EmptyState>
           </Card>
         ) : (
-          <div>
-            <style>{`
-              .cf-bento-grid {
-                display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 20px;
-              }
-              @media (max-width: 1200px) {
-                .cf-bento-grid {
-                  grid-template-columns: repeat(2, minmax(0, 1fr));
-                }
-              }
-              @media (max-width: 768px) {
-                .cf-bento-grid {
-                  grid-template-columns: 1fr;
-                }
-              }
-              .cf-bento-card {
-                border: 1px solid #e2e8f0;
-                border-radius: 16px;
-                overflow: hidden;
-                background: #ffffff;
-                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-                transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease;
-                display: flex;
-                flex-direction: column;
-                position: relative;
-              }
-              .cf-bento-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.12);
-                border-color: #0284c7;
-              }
-              .cf-bento-featured {
-                grid-column: span 2;
-              }
-              @media (max-width: 768px) {
-                .cf-bento-featured {
-                  grid-column: span 1;
-                }
-              }
-            `}</style>
+          <div className="cf-bento-grid">
+            {components.map((c, idx) => {
+              const isHero = c.sectionType === "hero" || c.sectionType?.includes("hero");
+              const isFeatured = isHero || (idx % 7 === 0);
+              const isThisInstalling = installingId === c.componentId;
+              const isThisPreviewing = previewingId === c.componentId;
 
-            <div className="cf-bento-grid">
-              {components.map((c, idx) => {
-                const isHero = c.sectionType === "hero" || c.sectionType?.includes("hero");
-                const isFeatured = isHero || (idx % 7 === 0);
-                const isThisInstalling = installingId === c.componentId;
-                const isThisPreviewing = previewingId === c.componentId;
-
-                return (
-                  <BentoSectionCard
-                    key={c.componentId}
-                    component={c}
-                    shopDomain={shopDomain}
-                    isFeatured={isFeatured}
-                    isInstalling={isThisInstalling}
-                    isPreviewing={isThisPreviewing}
-                    onPreview={() => submitPreview(c)}
-                    onInstallDraft={() => submitInstall(c, "draft")}
-                    onInstallLive={() => submitInstall(c, "live")}
-                  />
-                );
-              })}
-            </div>
+              return (
+                <BentoSectionCard
+                  key={c.componentId}
+                  component={c}
+                  shopDomain={shopDomain}
+                  isFeatured={isFeatured}
+                  isInstalling={isThisInstalling}
+                  isPreviewing={isThisPreviewing}
+                  onPreview={() => submitPreview(c)}
+                  onInstallDraft={() => submitInstall(c, "draft")}
+                  onInstallLive={() => submitInstall(c, "live")}
+                />
+              );
+            })}
           </div>
         )}
 
@@ -873,7 +1455,11 @@ export default function PreMadeSectionsStore() {
           <Modal
             open={previewModalOpen}
             onClose={() => setPreviewModalOpen(false)}
-            title={`Preview: ${activePreview.sectionName || activePreview.componentId}`}
+            title={
+              activePreview.isLandingPage
+                ? `Storefront Preview: ${activePreview.sectionName}`
+                : `Preview: ${activePreview.sectionName || activePreview.componentId}`
+            }
             size="large"
           >
             <Modal.Section flush>
@@ -924,40 +1510,95 @@ export default function PreMadeSectionsStore() {
                         Open Full Screen ↗
                       </Button>
 
-                      <Button
-                        size="slim"
-                        variant="primary"
-                        loading={isInstalling && fetcher.formData?.get("targetThemeChoice") === "draft"}
-                        disabled={busy}
-                        onClick={() => {
-                          const c = components.find((x) => x.componentId === activePreview.componentId);
-                          if (c) submitInstall(c, "draft");
-                        }}
-                      >
-                        🛡️ Submit to Draft Theme
-                      </Button>
+                      {activePreview?.isLandingPage ? (
+                        <>
+                          <Button
+                            size="slim"
+                            variant="primary"
+                            loading={isInstallingLanding && fetcher.formData?.get("targetThemeChoice") === "draft"}
+                            disabled={busy}
+                            onClick={() => {
+                              const lp = landingPages.find((x) => x.id === activePreview.landingPageId);
+                              if (lp) submitLandingInstall(lp, "draft");
+                            }}
+                          >
+                            🛡️ Add Page to Draft Theme
+                          </Button>
 
-                      <Button
-                        size="slim"
-                        loading={isInstalling && fetcher.formData?.get("targetThemeChoice") === "live"}
-                        disabled={busy}
-                        onClick={() => {
-                          const c = components.find((x) => x.componentId === activePreview.componentId);
-                          if (c) submitInstall(c, "live");
-                        }}
-                      >
-                        ⚡ Submit to Live Theme
-                      </Button>
+                          <Button
+                            size="slim"
+                            loading={isInstallingLanding && fetcher.formData?.get("targetThemeChoice") === "live"}
+                            disabled={busy}
+                            onClick={() => {
+                              const lp = landingPages.find((x) => x.id === activePreview.landingPageId);
+                              if (lp) submitLandingInstall(lp, "live");
+                            }}
+                          >
+                            ⚡ Add Page to Live Theme
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            size="slim"
+                            variant="primary"
+                            loading={isInstalling && fetcher.formData?.get("targetThemeChoice") === "draft"}
+                            disabled={busy}
+                            onClick={() => {
+                              const c = components.find((x) => x.componentId === activePreview.componentId);
+                              if (c) submitInstall(c, "draft");
+                            }}
+                          >
+                            🛡️ Submit to Draft Theme
+                          </Button>
+
+                          <Button
+                            size="slim"
+                            loading={isInstalling && fetcher.formData?.get("targetThemeChoice") === "live"}
+                            disabled={busy}
+                            onClick={() => {
+                              const c = components.find((x) => x.componentId === activePreview.componentId);
+                              if (c) submitInstall(c, "live");
+                            }}
+                          >
+                            ⚡ Submit to Live Theme
+                          </Button>
+                        </>
+                      )}
                     </InlineStack>
                   </InlineStack>
                 </Box>
 
-                {/* Status Feedback Banner inside Preview Modal */}
+                {/* Status Feedback Banner inside Preview Modal (Section) */}
                 {data?.ok && data.intent === "install" && data.componentId === activePreview.componentId && (
                   <Box padding="300" background="bg-surface-success">
                     <InlineStack align="space-between" blockAlign="center" wrap>
                       <Text as="p" variant="bodyMd" fontWeight="semibold">
                         🎉 Successfully installed to {data.themeName} ({data.targetLabel})!
+                      </Text>
+                      <InlineStack gap="200">
+                        {data.previewUrl && (
+                          <Button url={data.previewUrl} target="_blank" size="slim">
+                            Preview in Draft Theme
+                          </Button>
+                        )}
+                        <Button url={data.editorUrl} target="_blank" size="slim" variant="primary">
+                          Customize in Theme Editor
+                        </Button>
+                        <Button url="/app/theme" size="slim">
+                          View My Added Sections
+                        </Button>
+                      </InlineStack>
+                    </InlineStack>
+                  </Box>
+                )}
+
+                {/* Status Feedback Banner inside Preview Modal (Landing Page) */}
+                {data?.ok && data.intent === "install-landing-page" && data.landingPageId === activePreview.landingPageId && (
+                  <Box padding="300" background="bg-surface-success">
+                    <InlineStack align="space-between" blockAlign="center" wrap>
+                      <Text as="p" variant="bodyMd" fontWeight="semibold">
+                        🎉 Successfully created template "{data.templateKey}" with {data.sectionCount} custom sections on {data.themeName}!
                       </Text>
                       <InlineStack gap="200">
                         {data.previewUrl && (
