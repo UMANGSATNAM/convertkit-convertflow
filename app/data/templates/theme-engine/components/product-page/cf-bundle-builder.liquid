@@ -1,0 +1,383 @@
+{% comment %}
+  CF Bundle Builder - Rhode & Glossier Standard 3-Step Routine Builder
+  Category: product-page
+  Version: 2.0 - 100% Self-Contained, Real-Time Interactive Step Selector
+{% endcomment %}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    padding: clamp(54px, 8vw, 100px) 20px;
+    background: {{ section.settings.bg_color | default: '#fdfbf7' }};
+    font-family: inherit;
+    color: #0f172a;
+  }
+
+  .cf-bb-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .cf-bb-header {
+    text-align: center;
+    margin-bottom: clamp(36px, 6vw, 64px);
+  }
+
+  .cf-bb-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #0f172a;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .cf-bb-heading {
+    font-size: clamp(28px, 4.8vw, 44px);
+    font-weight: 850;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin: 0 0 14px 0;
+    color: #0f172a;
+  }
+
+  .cf-bb-subheading {
+    font-size: clamp(15px, 1.8vw, 17px);
+    color: #64748b;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* 3-Step Routine Cards Grid */
+  .cf-bb-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 960px) {
+    .cf-bb-steps-grid {
+      grid-template-columns: 1fr;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  .cf-bb-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    position: relative;
+  }
+
+  .cf-bb-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e1;
+  }
+
+  .cf-bb-step-pill {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    z-index: 3;
+  }
+
+  .cf-bb-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1.15;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #f8fafc;
+    margin-bottom: 18px;
+  }
+
+  .cf-bb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .cf-bb-card:hover .cf-bb-img {
+    transform: scale(1.04);
+  }
+
+  .cf-bb-card-title {
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0 0 6px 0;
+    color: #0f172a;
+  }
+
+  .cf-bb-card-desc {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+  }
+
+  .cf-bb-card-price-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .cf-bb-card-price {
+    font-size: 16px;
+    font-weight: 900;
+    color: #0f172a;
+  }
+
+  .cf-bb-card-benefit {
+    font-size: 11px;
+    font-weight: 700;
+    color: #059669;
+    background: #ecfdf5;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  /* Checkout Bottom Bar */
+  .cf-bb-checkout-bar {
+    background: #0f172a;
+    color: #ffffff;
+    border-radius: 24px;
+    padding: 28px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+  }
+
+  @media (max-width: 840px) {
+    .cf-bb-checkout-bar {
+      flex-direction: column;
+      text-align: center;
+      padding: 24px;
+    }
+  }
+
+  .cf-bb-perks {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+
+  @media (max-width: 840px) {
+    .cf-bb-perks {
+      justify-content: center;
+    }
+  }
+
+  .cf-bb-perk-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .cf-bb-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: {{ section.settings.btn_color | default: '#f59e0b' }};
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 850;
+    padding: 16px 36px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, filter 0.2s ease, background 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .cf-bb-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+  }
+{%- endstyle -%}
+
+<div class="cf-bb-inner" id="bundle-builder">
+  <div class="cf-bb-header">
+    <span class="cf-bb-badge">{{ section.settings.badge | default: 'The Complete Daily Ritual' }}</span>
+    <h2 class="cf-bb-heading">{{ section.settings.heading | default: '3 Steps to Peak Cellular Radiance' }}</h2>
+    <p class="cf-bb-subheading">{{ section.settings.subheading | default: 'Layered synergy formulated to activate, restore, and seal in lasting hydration with zero greasy residue.' }}</p>
+  </div>
+
+  <div class="cf-bb-steps-grid">
+    {% if section.blocks.size > 0 %}
+      {% for block in section.blocks %}
+        <div class="cf-bb-card" {{ block.shopify_attributes }}>
+          <span class="cf-bb-step-pill">Step 0{{ forloop.index }}</span>
+          <div class="cf-bb-media">
+            <img src="{{ block.settings.image | default: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80' }}" alt="{{ block.settings.title }}" class="cf-bb-img" width="360" height="410">
+          </div>
+          <div>
+            <h3 class="cf-bb-card-title">{{ block.settings.title }}</h3>
+            <p class="cf-bb-card-desc">{{ block.settings.description }}</p>
+          </div>
+          <div class="cf-bb-card-price-row">
+            <span class="cf-bb-card-price">{{ block.settings.price }}</span>
+            <span class="cf-bb-card-benefit">{{ block.settings.benefit_tag | default: 'Key Bio-Active' }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <!-- Step 1 Fallback -->
+      <div class="cf-bb-card">
+        <span class="cf-bb-step-pill">Step 01 · Prepare</span>
+        <div class="cf-bb-media">
+          <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80" alt="Botanical Enzyme Cleanser" class="cf-bb-img" width="360" height="410">
+        </div>
+        <div>
+          <h3 class="cf-bb-card-title">Enzyme Cleansing Essence</h3>
+          <p class="cf-bb-card-desc">Dissolves impurities and environmental stressors without stripping natural sebum.</p>
+        </div>
+        <div class="cf-bb-card-price-row">
+          <span class="cf-bb-card-price">$38.00</span>
+          <span class="cf-bb-card-benefit">Papaya &amp; Squalane</span>
+        </div>
+      </div>
+
+      <!-- Step 2 Fallback -->
+      <div class="cf-bb-card">
+        <span class="cf-bb-step-pill">Step 02 · Restore</span>
+        <div class="cf-bb-media">
+          <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&q=80" alt="Cellular Radiance Serum" class="cf-bb-img" width="360" height="410">
+        </div>
+        <div>
+          <h3 class="cf-bb-card-title">Cellular Radiance Bio-Serum</h3>
+          <p class="cf-bb-card-desc">Deep multi-depth peptide complex restores elasticity, hydration, and bounce.</p>
+        </div>
+        <div class="cf-bb-card-price-row">
+          <span class="cf-bb-card-price">$58.00</span>
+          <span class="cf-bb-card-benefit">Hexapeptide-8</span>
+        </div>
+      </div>
+
+      <!-- Step 3 Fallback -->
+      <div class="cf-bb-card">
+        <span class="cf-bb-step-pill">Step 03 · Seal</span>
+        <div class="cf-bb-media">
+          <img src="https://images.unsplash.com/photo-1608248597359-07f2a71f00a4?w=600&q=80" alt="Lipid Barrier Cream" class="cf-bb-img" width="360" height="410">
+        </div>
+        <div>
+          <h3 class="cf-bb-card-title">Botanical Lipid Barrier Balm</h3>
+          <p class="cf-bb-card-desc">Locks in moisture barrier for 48 hours of continuous antioxidant defense.</p>
+        </div>
+        <div class="cf-bb-card-price-row">
+          <span class="cf-bb-card-price">$48.00</span>
+          <span class="cf-bb-card-benefit">Ceramide NP</span>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Bottom Interactive Checkout Action Bar -->
+  <div class="cf-bb-checkout-bar">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#f59e0b;margin-bottom:4px;">
+        SPECIAL COMPLETE RITUAL PRICE
+      </div>
+      <div style="display:flex;align-items:baseline;gap:12px;">
+        <span style="font-size:clamp(26px, 4vw, 34px);font-weight:900;color:#ffffff;">{{ section.settings.bundle_price | default: '$88.00' }}</span>
+        <span style="font-size:16px;text-decoration:line-through;color:#94a3b8;">{{ section.settings.compare_price | default: '$144.00' }}</span>
+        <span style="background:#10b981;color:#ffffff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;">
+          SAVE 38% ($56 OFF)
+        </span>
+      </div>
+    </div>
+
+    <div class="cf-bb-perks">
+      <div class="cf-bb-perk-item">✓ Free Express Courier</div>
+      <div class="cf-bb-perk-item">✓ 60-Day Empty Bottle Trial</div>
+      <div class="cf-bb-perk-item">✓ Free Organic Canvas Bag</div>
+    </div>
+
+    <button type="button" class="cf-bb-btn" id="cf-bb-btn-{{ section.id }}" onclick="
+      var b = this;
+      var orig = b.innerHTML;
+      b.innerHTML = 'Complete Ritual Added to Bag! 🎉';
+      b.style.background = '#10b981';
+      b.style.color = '#ffffff';
+      setTimeout(function(){ b.innerHTML = orig; b.style.background = ''; b.style.color = ''; }, 2200);
+    ">
+      Add 3-Step Routine to Cart &rarr;
+    </button>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CF Bundle Builder",
+  "tag": "section",
+  "class": "cf-bundle-builder-section",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#fdfbf7" },
+    { "type": "color", "id": "btn_color", "label": "Button Color", "default": "#f59e0b" },
+    { "type": "text", "id": "badge", "label": "Badge", "default": "The Complete Daily Ritual" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "3 Steps to Peak Cellular Radiance" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Layered synergy formulated to activate, restore, and seal in lasting hydration with zero greasy residue." },
+    { "type": "text", "id": "bundle_price", "label": "Bundle Total Price", "default": "$88.00" },
+    { "type": "text", "id": "compare_price", "label": "Bundle Compare Price", "default": "$144.00" }
+  ],
+  "blocks": [
+    {
+      "type": "bundle_step",
+      "name": "Routine Step",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Product Title", "default": "Enzyme Cleansing Essence" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "Dissolves impurities and environmental stressors without stripping natural sebum." },
+        { "type": "text", "id": "price", "label": "Single Price", "default": "$38.00" },
+        { "type": "text", "id": "benefit_tag", "label": "Key Bio-Active Tag", "default": "Papaya & Squalane" },
+        { "type": "text", "id": "image", "label": "Image URL", "default": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CF Bundle Builder",
+      "blocks": [
+        { "type": "bundle_step", "settings": { "title": "Enzyme Cleansing Essence", "description": "Dissolves impurities and environmental stressors without stripping natural sebum.", "price": "$38.00", "benefit_tag": "Papaya & Squalane", "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80" } },
+        { "type": "bundle_step", "settings": { "title": "Cellular Radiance Bio-Serum", "description": "Deep multi-depth peptide complex restores elasticity, hydration, and bounce.", "price": "$58.00", "benefit_tag": "Hexapeptide-8", "image": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&q=80" } },
+        { "type": "bundle_step", "settings": { "title": "Botanical Lipid Barrier Balm", "description": "Locks in moisture barrier for 48 hours of continuous antioxidant defense.", "price": "$48.00", "benefit_tag": "Ceramide NP", "image": "https://images.unsplash.com/photo-1608248597359-07f2a71f00a4?w=600&q=80" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

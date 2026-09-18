@@ -4,6 +4,76 @@ export interface LandingPageSectionDef {
   title: string;
 }
 
+export interface LandingPageContentOverrides {
+  hero?: {
+    eyebrow?: string;
+    heading?: string;
+    subtext?: string;
+    image?: string;
+    pressOutlet?: string;
+    pressQuote?: string;
+    buttonLabel1?: string;
+    buttonLabel2?: string;
+    socialProof?: string;
+  };
+  bundle?: {
+    badge?: string;
+    heading?: string;
+    subtext?: string;
+    bundlePrice?: string;
+    comparePrice?: string;
+    steps?: Array<{
+      title: string;
+      description: string;
+      price: string;
+      benefitTag: string;
+      image: string;
+    }>;
+  };
+  proof?: {
+    badge?: string;
+    heading?: string;
+    subtext?: string;
+    imgBefore?: string;
+    imgAfter?: string;
+    stat1Num?: string;
+    stat1Text?: string;
+    stat2Num?: string;
+    stat2Text?: string;
+    stat3Num?: string;
+    stat3Text?: string;
+  };
+  matrix?: {
+    ourName?: string;
+    theirName?: string;
+    rows?: Array<{
+      feature: string;
+      usCheck: boolean;
+      themCheck: boolean;
+    }>;
+  };
+  ugc?: {
+    heading?: string;
+    subtext?: string;
+    cards?: Array<{
+      concernTag: string;
+      quote: string;
+      productName: string;
+      author: string;
+      location: string;
+      image: string;
+    }>;
+  };
+  sticky?: {
+    title?: string;
+    price?: string;
+    comparePrice?: string;
+    saveText?: string;
+    image?: string;
+    buttonText?: string;
+  };
+}
+
 export interface LandingPageDefinition {
   id: string;
   name: string;
@@ -26,30 +96,29 @@ export interface LandingPageDefinition {
   header: string;
   footer: string;
   sections: LandingPageSectionDef[];
+  contentOverrides?: LandingPageContentOverrides;
 }
 
 export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
-  // ── 1. LUMIÈRE · Organic Skincare & Clean Beauty ──────────────────────────
+  // ── 1. LUMIÈRE · Clean Cellular Skincare (Rhode & Glossier Standard) ───────────
   {
     id: "landing-skincare",
-    name: "LUMIÈRE · Organic Skincare & Clean Beauty",
+    name: "LUMIÈRE · Organic Cellular Skincare",
     niche: "beauty",
-    nicheLabel: "Beauty & Skincare",
-    badge: "✨ 100% ORGANIC & CLINICAL PROOF",
-    tagline: "Cellular hydration meets cold-pressed botanical oils",
-    description: "Award-winning organic skincare storefront featuring a 14-day clinical radiance proof slider, interactive category bubbles, serum bundle builder, Us vs Them comparison matrix, and verified buyer reviews.",
+    nicheLabel: "Beauty & Clean Skincare",
+    badge: "✨ 100% ORGANIC & CLINICAL TRIAL BACKED",
+    tagline: "Cellular hydration meets cold-pressed bioactive botanicals",
+    description: "Rhode-inspired clean skincare landing page featuring an editorial hero with above-the-fold social proof, 3-step routine bundle builder, 14-day clinical before/after slider, and unvarnished UGC customer proof.",
     accentColor: "#C97A63",
-    heroImg: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1200&q=85",
-    stats: "4.92★ (3,400+ Verified Reviews) · 68% Repeat Customer Rate",
+    heroImg: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1600&q=85",
+    stats: "4.95★ (14,200+ Verified Buyers) · 96% Hydration Score",
     conversionFeatures: [
-      "14-Day Clinical Before/After Proof Slider",
-      "Interactive Category Story Bubbles",
-      "Quick-Add Serum Product Cards",
-      "Morning & Evening Ritual Bundle (FBT)",
-      "Us vs Conventional Skincare Comparison Matrix",
-      "Summer Hydration Vault 25% Off Bento Offer",
-      "Sticky Dynamic Add-to-Cart Bar",
-      "Objection-Buster FAQ Accordion"
+      "Above-The-Fold Social Proof & Vogue Press Hook",
+      "3-Step Synergistic Daily Routine Builder (Save 38%)",
+      "14-Day GPU Clip-Path Clinical Proof Slider",
+      "Cold-Pressed vs Synthetic Fillers Matrix",
+      "Real Customer Concern-Tagged UGC Wall",
+      "Bottom-Docked Sticky ATC Conversion Bar"
     ],
     palette: {
       background: "#FDFBF7",
@@ -61,40 +130,65 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     header: "header-sticky-glass",
     footer: "footer-newsletter-focus",
     sections: [
-      { componentId: "hero-editorial-brand", role: "hero", title: "Botanical Cellular Radiance Hero" },
+      { componentId: "cf-hero-editorial", role: "hero", title: "Botanical Cellular Radiance Hero" },
       { componentId: "cf-trust-press-bar", role: "trust", title: "Clean Formula Pledges & Press Coverage" },
-      { componentId: "category-story-bubbles", role: "categories", title: "Shop by Botanical Concern" },
-      { componentId: "product-card-quickadd", role: "products", title: "Award-Winning Botanical Serums" },
-      { componentId: "cf-before-after-slider", role: "proof", title: "14-Day Clinical Radiance Proof" },
-      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Morning & Evening Ritual 2-Step Bundle" },
-      { componentId: "cf-comparison-matrix", role: "comparison", title: "Why Choose Lumière Over Conventional Brands" },
-      { componentId: "offer-bento-grid", role: "offer", title: "Summer Hydration Vault 25% Off" },
-      { componentId: "cf-verified-reviews", role: "reviews", title: "Verified Customer Reviews" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Purchase Bar" },
-      { componentId: "cf-faq-accordion", role: "faq", title: "Clean Ingredients & Sensitivities FAQ" }
-    ]
+      { componentId: "cf-bundle-builder", role: "bundle", title: "3-Step Daily Radiance Routine Builder" },
+      { componentId: "cf-before-after-slider", role: "proof", title: "14-Day Clinical Barrier Restoration" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Cold-Pressed Bioactives vs Synthetic Fillers" },
+      { componentId: "cf-ugc-review-wall", role: "ugc", title: "Real Customer Results & Concern Tags" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "Sensitive Skin & Formula Purity FAQ" },
+      { componentId: "cf-sticky-atc", role: "sticky-atc", title: "Sticky Instant Conversion Dock" }
+    ],
+    contentOverrides: {
+      hero: {
+        eyebrow: "CLINICAL GRADE BIO-FERMENTS",
+        heading: "Cellular Radiance Meets Cold-Pressed Botanicals.",
+        subtext: "Clinically proven to restore skin barrier hydration by 96% in 14 days. Zero synthetic fillers, zero compromises.",
+        image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1600&q=85",
+        pressOutlet: "VOGUE",
+        pressQuote: "The single most transformative botanical formula we tested all year. Results were visible within 48 hours.",
+        socialProof: "4.95★ by 14,200+ Buyers"
+      },
+      bundle: {
+        badge: "The Complete Daily Ritual",
+        heading: "3 Steps to Peak Cellular Radiance",
+        subtext: "Layered synergy formulated to activate, restore, and seal in lasting hydration with zero greasy residue.",
+        bundlePrice: "$88.00",
+        comparePrice: "$144.00",
+        steps: [
+          { title: "Cellular Bio-Active Cleanser", description: "Gentle milk cleanser removes pollutants while preserving lipid moisture.", price: "$38.00", benefitTag: "pH 5.5 Balanced", image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80" },
+          { title: "Cellular Radiance Bio-Serum", description: "Multi-depth peptide complex restores elasticity, hydration, and bounce.", price: "$58.00", benefitTag: "Hexapeptide-8", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&q=80" },
+          { title: "Botanical Lipid Barrier Balm", description: "Locks in moisture barrier for 48 hours of continuous antioxidant defense.", price: "$48.00", benefitTag: "Ceramide NP", image: "https://images.unsplash.com/photo-1608248597359-07f2a71f00a4?w=600&q=80" }
+        ]
+      },
+      sticky: {
+        title: "Cellular Radiance Complete Ritual",
+        price: "$88.00",
+        comparePrice: "$144.00",
+        saveText: "SAVE 38%",
+        image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=120&q=80"
+      }
+    }
   },
 
-  // ── 2. KINETIC · High-Performance Streetwear ──────────────────────────────
+  // ── 2. KINETIC · Heavyweight 480GSM Technical Streetwear ───────────────────
   {
     id: "landing-streetwear",
-    name: "KINETIC · Heavyweight Technical Streetwear",
+    name: "KINETIC · Heavyweight 480GSM Streetwear",
     niche: "streetwear",
-    nicheLabel: "Streetwear & Apparel",
-    badge: "🔥 480GSM FRENCH TERRY & WATERPROOF NYLON",
+    nicheLabel: "Streetwear & Technical Apparel",
+    badge: "🔥 480GSM LOOPBACK & MILL-TESTED WATERPROOF NYLON",
     tagline: "Architectural silhouettes engineered for urban exploration",
-    description: "High-voltage dark streetwear showcase with live drop countdown, technical 480GSM fabric breakdown, lookbook masonry, comparison table, and instant sticky checkout.",
+    description: "Represent Clo and Fear of God inspired luxury streetwear funnel with limited batch drop ticker, technical fabric breakdown, 3-piece layering kit, and verified fit reviews.",
     accentColor: "#22C55E",
-    heroImg: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1200&q=85",
-    stats: "Drop 07 Sold Out in 8 Minutes · 50,000+ Discord Community",
+    heroImg: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&q=85",
+    stats: "Drop 08 Sold Out in 8 Minutes · 50,000+ Discord Community",
     conversionFeatures: [
-      "Drop 08 Live Ticking Urgency Timer",
-      "Technical 480GSM Fabric Breakdown",
-      "Editorial Lookbook Masonry Gallery",
-      "Instant Hover Size-Picker Cards",
-      "Heavyweight vs Fast Fashion Comparison",
-      "Sticky Dynamic Add-to-Cart Bar",
-      "VIP Vault Drop Access Offer"
+      "Drop 08 Urgency & Limited-Batch Proof",
+      "3-Piece Complete Streetwear Layering Kit",
+      "Heavyweight 480GSM vs Fast Fashion Fleece Matrix",
+      "Real Wearer Fit UGC & Silhouette Photos",
+      "Sticky Instant Add-to-Bag Bar"
     ],
     palette: {
       background: "#09090B",
@@ -103,41 +197,68 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
       accent: "#27272A"
     },
     announcement: "announcement-countdown",
-    header: "header-megamenu",
+    header: "header-sticky-glass",
     footer: "footer-multi-column",
     sections: [
-      { componentId: "hero-split-luxury", role: "hero", title: "Drop 08 Heavyweight Technical Outerwear" },
-      { componentId: "cf-trust-press-bar", role: "trust", title: "Fabric Specs & Hypebeast Press" },
-      { componentId: "category-masonry-lookbook", role: "categories", title: "Core Disciplines & Outerwear" },
-      { componentId: "product-card-badge-sale", role: "products", title: "Limited Run 480GSM Hoodies" },
-      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Complete Streetwear Layering Kit" },
-      { componentId: "cf-comparison-matrix", role: "comparison", title: "480GSM Heavyweight vs Fast Fashion Fleece" },
-      { componentId: "offer-countdown-sale", role: "offer", title: "VIP Access Drop Countdown 30% Off" },
-      { componentId: "cf-verified-reviews", role: "reviews", title: "Verified Buyer Fit Reviews" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Purchase Bar" },
-      { componentId: "cf-faq-accordion", role: "faq", title: "Sizing & International Customs FAQ" }
-    ]
+      { componentId: "cf-hero-editorial", role: "hero", title: "Drop 08 Technical Heavyweight Outerwear" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "Fabric Specs & Hypebeast Endorsements" },
+      { componentId: "cf-bundle-builder", role: "bundle", title: "Drop 08 Layering Essentials Kit" },
+      { componentId: "cf-before-after-slider", role: "proof", title: "Zero-Shrink Wash Test & Wind Tunnel Proof" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "480GSM Loopback vs Cheap Polyester Fleece" },
+      { componentId: "cf-ugc-review-wall", role: "ugc", title: "Fit & Silhouette Reviews" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "Sizing Guide & International Customs FAQ" },
+      { componentId: "cf-sticky-atc", role: "sticky-atc", title: "Sticky Instant Drop Reservation Dock" }
+    ],
+    contentOverrides: {
+      hero: {
+        eyebrow: "DROP 08 · LIMITED BATCH OF 400",
+        heading: "Architectural Cut in 480GSM Heavyweight Cotton.",
+        subtext: "Pre-shrunk custom-milled loopback French terry designed for lifetime wear. Millimeter-accurate draping with zero synthetic blend.",
+        image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&q=85",
+        pressOutlet: "GQ MAGAZINE",
+        pressQuote: "Redefining post-luxury streetwear with uncompromising fabric weight and architectural proportions.",
+        socialProof: "4.98★ by 8,900+ Discord Members"
+      },
+      bundle: {
+        badge: "Complete Layering Kit",
+        heading: "Drop 08 Core 3-Piece Capsule",
+        subtext: "Bundle the Vintage Boxy Tee, Heavyweight Loopback Hoodie, and Waterproof Utility Pant.",
+        bundlePrice: "$240.00",
+        comparePrice: "$320.00",
+        steps: [
+          { title: "Boxy Vintage Wash Tee (280GSM)", description: "Double-needle collar stitch with drop shoulders.", price: "$55.00", benefitTag: "100% Combed Cotton", image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=80" },
+          { title: "Heavyweight Loopback Hoodie (480GSM)", description: "Double-lined architectural hood that stands up.", price: "$125.00", benefitTag: "480GSM Custom Knit", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&q=80" },
+          { title: "Modular Technical Cargo Pant", description: "Water-repellent ripstop with concealed cinch cuffs.", price: "$140.00", benefitTag: "DWR Waterproof", image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&q=80" }
+        ]
+      },
+      sticky: {
+        title: "Drop 08 Heavyweight Layering Capsule",
+        price: "$240.00",
+        comparePrice: "$320.00",
+        saveText: "SAVE 25%",
+        image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=120&q=80"
+      }
+    }
   },
 
-  // ── 3. AURELIA · Haute Horlogerie & Fine Jewellery ────────────────────────
+  // ── 3. AURELIA · Haute Horlogerie & Ethical Diamonds ──────────────────────
   {
     id: "landing-jewelry",
     name: "AURELIA · Heritage Diamonds & Swiss Horology",
     niche: "jewelry",
-    nicheLabel: "Luxury Jewelry & Watches",
+    nicheLabel: "Luxury Fine Jewelry & Watches",
     badge: "👑 GIA CERTIFIED CONFLICT-FREE DIAMONDS",
     tagline: "A century of master lapidary art and timeless luxury",
-    description: "Prestige luxury storefront with centered serif monogram navigation, macro brilliance photography, bespoke bridal concierge, white-glove armored delivery guarantee, and private appointments.",
+    description: "High-fashion fine jewelry storytelling page inspired by Cartier and Mejuri. Featuring GIA diamond brilliance proof, bespoke bridal suite, and white-glove insured courier transit.",
     accentColor: "#D4AF37",
-    heroImg: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=85",
+    heroImg: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1600&q=85",
     stats: "100% Conflict-Free Sourcing · Lifetime Lapidary Warranty",
     conversionFeatures: [
-      "Diamond Carat & Metal Selector",
-      "Private Salon Consultation Booking",
-      "White-Glove Armored Courier Assurance",
-      "Hallmark Authenticity Guarantee",
-      "Dual-Poster Bespoke Bridal Showcase",
-      "Sticky Concierge Add-to-Cart Bar"
+      "Conflict-Free GIA Certificate of Authenticity",
+      "3-Piece Diamond Bridal & Evening Suite",
+      "Solid 18K Gold vs Plated Brass Matrix",
+      "Collector Testimonial Wall",
+      "Armored Courier Transit Guarantee"
     ],
     palette: {
       background: "#0C0A09",
@@ -145,42 +266,69 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
       primary: "#D4AF37",
       accent: "#1C1917"
     },
-    announcement: "announcement-countdown",
+    announcement: "announcement-marquee",
     header: "header-centered-brand",
     footer: "footer-minimal-centered",
     sections: [
-      { componentId: "hero-split-luxury", role: "hero", title: "Heritage Solitaire & Pavé Diamond Collection" },
+      { componentId: "cf-hero-editorial", role: "hero", title: "Heritage Solitaire Diamond Hero" },
       { componentId: "cf-trust-press-bar", role: "trust", title: "GIA Conflict-Free Guarantee & Robb Report Press" },
-      { componentId: "category-minimal-tiles", role: "categories", title: "Curated High Jewellery Suites" },
-      { componentId: "product-card-minimal", role: "products", title: "Hand-Set Solitaires & Masterpieces" },
-      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Earring & Necklace Diamond Suite" },
-      { componentId: "offer-dual-poster", role: "offer", title: "Bespoke Bridal Salon Private Invitation" },
-      { componentId: "cf-comparison-matrix", role: "comparison", title: "Ethical Lab & Mined Diamonds vs Mass Market" },
-      { componentId: "cf-verified-reviews", role: "reviews", title: "Verified Collector Testimonials" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Concierge Purchase Bar" },
-      { componentId: "cf-faq-accordion", role: "faq", title: "Insured Armored Transit & Resizing FAQ" }
-    ]
+      { componentId: "cf-bundle-builder", role: "bundle", title: "The Heritage Diamond Bridal Suite" },
+      { componentId: "cf-before-after-slider", role: "proof", title: "Microscopic Diamond Facet Brilliance" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Solid 18K Gold & VVS1 Diamonds vs Plated Fashion Jewelry" },
+      { componentId: "cf-ugc-review-wall", role: "ugc", title: "Collector Stories & Bridal Moments" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "Armored Shipping & Free Resizing FAQ" },
+      { componentId: "cf-sticky-atc", role: "sticky-atc", title: "Sticky Concierge Reservation Dock" }
+    ],
+    contentOverrides: {
+      hero: {
+        eyebrow: "GIA CERTIFIED MASTER LAPIDARY",
+        heading: "A Century of Conflict-Free Brilliance.",
+        subtext: "Hand-set VVS1 diamonds in solid 18k recycled gold. Crafted by third-generation Swiss master goldsmiths.",
+        image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1600&q=85",
+        pressOutlet: "ROBB REPORT",
+        pressQuote: "A monumental achievement in sustainable high jewellery. Flawless brilliance without the historic markups.",
+        socialProof: "4.99★ by 2,800+ Fine Collectors"
+      },
+      bundle: {
+        badge: "The Signature Suite",
+        heading: "Curated 3-Piece High Jewellery Suite",
+        subtext: "Complete matching set featuring the Solitaire Pendant, Pavé Huggies, and Eternity Band.",
+        bundlePrice: "$1,150.00",
+        comparePrice: "$1,450.00",
+        steps: [
+          { title: "Aurelia Solitaire Pendant (1.2ct)", description: "Conflict-free VVS1 round brilliant cut in recycled 18k solid gold.", price: "$520.00", benefitTag: "GIA Certified", image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80" },
+          { title: "Pavé Diamond Huggies (Pair)", description: "Micro-prong set brilliant melee diamonds designed for effortless daily wear.", price: "$380.00", benefitTag: "Solid 18K Gold", image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&q=80" },
+          { title: "Flawless Eternity Band", description: "Continuous band of hand-selected diamonds offering 360-degree light refraction.", price: "$550.00", benefitTag: "Hand-Finished", image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&q=80" }
+        ]
+      },
+      sticky: {
+        title: "Aurelia Signature Diamond Suite",
+        price: "$1,150.00",
+        comparePrice: "$1,450.00",
+        saveText: "SAVE $300",
+        image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=120&q=80"
+      }
+    }
   },
 
-  // ── 4. NEXUS · Spatial Audio & Cyber Electronics ──────────────────────────
+  // ── 4. NEXUS · Next-Gen Spatial Audio & Cyber Hardware ────────────────────
   {
     id: "landing-audio-tech",
-    name: "NEXUS · Next-Gen Spatial Audio & Cyber Tech",
+    name: "NEXUS · Spatial Audio & Cyber Hardware",
     niche: "electronics",
-    nicheLabel: "Audio Tech & Electronics",
-    badge: "⚡ 48HR PLAYTIME · ZERO-LATENCY DSP",
+    nicheLabel: "Cyber Audio & Pro Hardware",
+    badge: "⚡ 0.8MS ZERO-LATENCY DSP · 48HR BATTERY",
     tagline: "Acoustic engineering tuned for audiophiles and pro creators",
-    description: "Cutting-edge dark cyber audio landing page featuring 3D driver explode views, side-by-side spec comparison table, companion mobile app showcase, developer discount, and sticky checkout.",
+    description: "Teenage Engineering inspired dark cyber audio funnel with 40mm Beryllium driver benchmarks, 3-piece audiophile desktop kit, and side-by-side codec comparison table.",
     accentColor: "#06B6D4",
-    heroImg: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&q=85",
-    stats: "50,000+ Units Shipped · 99.4% Latency-Free Audio Score",
+    heroImg: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1600&q=85",
+    stats: "50,000+ Units Shipped · 99.8% Latency-Free Audio Score",
     conversionFeatures: [
-      "Exploded 3D Acoustic Driver View",
-      "Side-by-Side Industry Spec Matrix",
-      "Instant Tech Voucher Coupon Strip",
-      "Companion iOS/Android App Portal",
-      "Multi-Point Bluetooth 5.4 Switcher",
-      "Sticky Dynamic Add-to-Cart Bar"
+      "Lossless Beryllium 40mm Driver Benchmarks",
+      "3-Piece Studio Audiophile Bundle (Headphones + Stand + DAC)",
+      "Zero-Latency Bluetooth 5.4 vs Traditional Codecs",
+      "Producer & Sound Designer UGC Wall",
+      "Sticky Dynamic Add-to-Bag Dock"
     ],
     palette: {
       background: "#0B0F19",
@@ -192,38 +340,65 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     header: "header-sticky-glass",
     footer: "footer-ecommerce-app",
     sections: [
-      { componentId: "hero-high-conversion", role: "hero", title: "Nexus Pro Wireless Over-Ear Spatial Sound" },
-      { componentId: "cf-trust-press-bar", role: "trust", title: "Lossless DSP Specs & TechRadar Recommendations" },
-      { componentId: "category-bento-cards", role: "categories", title: "Audio Ecosystem & DAC Amps" },
-      { componentId: "product-card-quickadd", role: "products", title: "Hardware Flagships & Studio Monitors" },
+      { componentId: "cf-hero-editorial", role: "hero", title: "Nexus Pro Spatial Audio Hero" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "DSP Specs & Wired Recommendation" },
+      { componentId: "cf-bundle-builder", role: "bundle", title: "Nexus Studio Pro Desktop Kit" },
+      { componentId: "cf-before-after-slider", role: "proof", title: "Active Noise Cancellation Spectrum Proof" },
       { componentId: "cf-comparison-matrix", role: "comparison", title: "Nexus Pro DSP vs Traditional Flagships" },
-      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Nexus Pro + Hard Travel Case + DAC" },
-      { componentId: "offer-coupon-strip", role: "offer", title: "Developer Promo Code: CYBER25" },
-      { componentId: "cf-verified-reviews", role: "reviews", title: "Audiophile & Producer Reviews" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Purchase Bar" },
-      { componentId: "cf-faq-accordion", role: "faq", title: "Firmware Updates & Bluetooth 5.4 FAQ" }
-    ]
+      { componentId: "cf-ugc-review-wall", role: "ugc", title: "Sound Engineers & Creator Reviews" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "Firmware Updates & Bluetooth 5.4 FAQ" },
+      { componentId: "cf-sticky-atc", role: "sticky-atc", title: "Sticky Instant Audio Dock" }
+    ],
+    contentOverrides: {
+      hero: {
+        eyebrow: "LOSSLESS 32-BIT SPATIAL DSP",
+        heading: "Studio Acoustic Fidelity Without Wires.",
+        subtext: "Custom-tuned 40mm Beryllium diaphragms deliver 0.8ms ultra-low latency and 48 hours of continuous studio playback.",
+        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1600&q=85",
+        pressOutlet: "WIRED",
+        pressQuote: "The lowest-latency wireless acoustic driver on the market today. Crushes flagships twice its price.",
+        socialProof: "4.96★ by 32,000+ Audiophiles"
+      },
+      bundle: {
+        badge: "The Creator Ecosystem",
+        heading: "Complete Studio Desktop Bundle",
+        subtext: "Nexus Pro Over-Ear Headphones + CNC Aluminum Stand + 32-Bit/384kHz Hi-Res USB-C DAC Amp.",
+        bundlePrice: "$319.00",
+        comparePrice: "$399.00",
+        steps: [
+          { title: "Nexus Pro Wireless Headphones", description: "40mm Beryllium drivers with 0.8ms ultra-low latency spatial DSP.", price: "$269.00", benefitTag: "0.8ms Latency", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80" },
+          { title: "CNC Billet Aluminum Desktop Stand", description: "Weighted anti-slip base with precision-milled headphone contour cradle.", price: "$65.00", benefitTag: "Solid Aluminum", image: "https://images.unsplash.com/photo-1584679109597-c656b19974c9?w=600&q=80" },
+          { title: "Hi-Res 32-Bit USB-C DAC Amp", description: "Lossless 384kHz decoding with dedicated discrete dual amplifier stages.", price: "$65.00", benefitTag: "32-Bit/384kHz", image: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600&q=80" }
+        ]
+      },
+      sticky: {
+        title: "Nexus Pro Studio Audio Suite",
+        price: "$319.00",
+        comparePrice: "$399.00",
+        saveText: "SAVE $80",
+        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=120&q=80"
+      }
+    }
   },
 
-  // ── 5. VERDANT · Nootropic Wellness & Botanical Adaptogens ────────────────
+  // ── 5. VERDANT · Nootropic Adaptogens & Cellular Longevity ────────────────
   {
     id: "landing-wellness",
-    name: "VERDANT · Nootropic Wellness & Botanical Health",
+    name: "VERDANT · Nootropic Wellness & Adaptogens",
     niche: "wellness",
-    nicheLabel: "Wellness & Supplements",
-    badge: "🌿 100% USDA ORGANIC & 3RD-PARTY LAB TESTED",
+    nicheLabel: "Clinical Wellness & Longevity",
+    badge: "🌿 100% USDA ORGANIC · 3RD-PARTY LAB TESTED",
     tagline: "Clinical adaptogens for deep sleep, all-day focus, and cellular longevity",
-    description: "High-trust supplement landing page with transparent sourcing maps, physician endorsements, bundle savings calculator, before/after cognitive proof, and risk-free 60-day guarantee.",
+    description: "AG1 and Seed-inspired high-trust wellness funnel featuring transparent lab certificates of analysis, morning + evening cognitive routine builder, and 60-day empty-jar guarantee.",
     accentColor: "#4A7C59",
-    heroImg: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1200&q=85",
-    stats: "Over 1.2M Daily Doses Served · 98% Bio-Availability",
+    heroImg: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1600&q=85",
+    stats: "1.2M+ Daily Doses Served · 98% Bio-Availability Score",
     conversionFeatures: [
-      "Third-Party Certificate of Analysis",
-      "Interactive Routine Quiz Builder",
-      "Morning + Night Dual Bundle Saver (FBT)",
-      "30-Day Cognitive Vitality Proof Slider",
-      "Functional Doctor Endorsements",
-      "Sticky Dynamic Subscribe & Save Bar"
+      "Third-Party Lab Certificate of Analysis",
+      "Morning Focus + Evening Sleep Synergy Kit",
+      "Organic Fruiting Body vs Mycelium Grain Matrix",
+      "Doctor & Biohacker Verified Testimonials",
+      "Sticky Dynamic Auto-Ship / Order Dock"
     ],
     palette: {
       background: "#F7F6F2",
@@ -232,24 +407,51 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
       accent: "#E8EDE0"
     },
     announcement: "announcement-marquee",
-    header: "header-promo-embedded",
+    header: "header-sticky-glass",
     footer: "footer-newsletter-focus",
     sections: [
-      { componentId: "hero-editorial-brand", role: "hero", title: "Daily Bio-Available Nootropic Tonics" },
-      { componentId: "cf-trust-press-bar", role: "trust", title: "USDA Organic & 3rd-Party Lab Certifications" },
-      { componentId: "category-story-bubbles", role: "categories", title: "Shop by Desired Health Outcome" },
-      { componentId: "product-card-trust", role: "products", title: "Clinically Validated Adaptogen Elixirs" },
-      { componentId: "cf-before-after-slider", role: "proof", title: "30-Day Cognitive Vitality & Focus Proof" },
-      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Morning Focus + Deep Sleep Duo (Save $22)" },
-      { componentId: "cf-comparison-matrix", role: "comparison", title: "Wildcrafted Botanical Extract vs Synthetic Pills" },
-      { componentId: "offer-discount-ribbon", role: "offer", title: "Complimentary Amber Jar With Starter Kit" },
-      { componentId: "cf-verified-reviews", role: "reviews", title: "Verified Customer Health Reviews" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Subscribe & Save Bar" },
-      { componentId: "cf-faq-accordion", role: "faq", title: "Dosage, Cycle Timing & Purity FAQ" }
-    ]
+      { componentId: "cf-hero-editorial", role: "hero", title: "Daily Bio-Available Nootropic Hero" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "USDA Organic & Clean Label Certifications" },
+      { componentId: "cf-bundle-builder", role: "bundle", title: "Circadian Rhythm AM/PM Synergy Kit" },
+      { componentId: "cf-before-after-slider", role: "proof", title: "30-Day Cognitive Vitality & Focus Trial" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Wildcrafted Extracts vs Synthetic Pill Fillers" },
+      { componentId: "cf-ugc-review-wall", role: "ugc", title: "Physician & Daily Ritualist Reviews" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "Dosage, Purity & Cycling Timing FAQ" },
+      { componentId: "cf-sticky-atc", role: "sticky-atc", title: "Sticky Subscribe & Save Bar" }
+    ],
+    contentOverrides: {
+      hero: {
+        eyebrow: "100% ORGANIC BIO-AVAILABLE EXTRACTS",
+        heading: "Daily Tonics for Deep Focus & Restorative Sleep.",
+        subtext: "Clinical-strength adaptogenic mushrooms and nootropic botanicals formulated to eliminate brain fog and support cellular recovery.",
+        image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1600&q=85",
+        pressOutlet: "FORBES",
+        pressQuote: "The only daily adaptogen blend that eliminated afternoon cognitive dips without caffeine crashes.",
+        socialProof: "4.96★ by 24,000+ Daily Ritualists"
+      },
+      bundle: {
+        badge: "The Circadian Routine",
+        heading: "AM Focus + PM Sleep Synergy Bundle",
+        subtext: "Morning Clarity Lions Mane Elixir + Evening Reishi Calming Tonic + UV Glass Amber Jar.",
+        bundlePrice: "$78.00",
+        comparePrice: "$120.00",
+        steps: [
+          { title: "Morning Clarity Lion's Mane Tonic", description: "Wildcrafted dual-extracted fruiting bodies to enhance alpha brainwaves.", price: "$38.00", benefitTag: "100% Fruiting Body", image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80" },
+          { title: "Evening Reishi Restorative Nectar", description: "Calming triterpenes and adaptogens for slow-wave REM sleep architecture.", price: "$42.00", benefitTag: "Red Reishi Extract", image: "https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?w=600&q=80" },
+          { title: "Miron UV Violet Glass Jar + Gold Spoon", description: "Protects delicate bio-compounds from photochemical degradation.", price: "$40.00", benefitTag: "Biophotonic Glass", image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80" }
+        ]
+      },
+      sticky: {
+        title: "Verdant AM/PM Adaptogen Kit",
+        price: "$78.00",
+        comparePrice: "$120.00",
+        saveText: "SAVE 35%",
+        image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=120&q=80"
+      }
+    }
   },
 
-  // ── 6. NORDIC LIVING · Scandinavian Furniture & Warm Decor ────────────────
+  // ── 6. NORDIC LIVING · Scandinavian Solid Hardwood Furniture ──────────────
   {
     id: "landing-nordic-home",
     name: "NORDIC LIVING · Scandinavian Furniture & Living",
@@ -257,17 +459,16 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     nicheLabel: "Home Decor & Furniture",
     badge: "🛋 FSC-CERTIFIED SOLID EUROPEAN OAK",
     tagline: "Thoughtful Scandinavian proportions crafted for mindful sanctuaries",
-    description: "Serene Scandinavian interior storefront featuring interactive 'Shop the Room' lookbooks, fabric swatch postal ordering, solid hardwood joinery, white-glove setup, and sticky reserve.",
+    description: "Ferm Living and Muuto inspired luxury interior landing page featuring solid oak joinery guarantees, free fabric swatch box, and room bundle savings.",
     accentColor: "#B88E72",
-    heroImg: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=85",
+    heroImg: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600&q=85",
     stats: "10-Year Frame Warranty · 100% OEKO-TEX Certified Fabrics",
     conversionFeatures: [
-      "Interactive 'Shop the Room' Tags",
-      "Free Fabric Swatch Home Kit Box",
-      "White-Glove Room Delivery & Assembly",
-      "Solid Hardwood Joinery Certifications",
-      "Architectural Digest Press Review",
-      "Sticky Dynamic Add-to-Cart Bar"
+      "Solid FSC-Certified European Oak Joinery",
+      "The Stockholm Modular Living Room Bundle",
+      "Hand-Joined Hardwood vs Flat-Pack Particle Board",
+      "Homeowner & Architect Reviews",
+      "White-Glove Delivery & Assembly Assurance"
     ],
     palette: {
       background: "#F9F8F6",
@@ -275,42 +476,69 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
       primary: "#B88E72",
       accent: "#EFECE6"
     },
-    announcement: "announcement-countdown",
-    header: "header-minimal-inline",
+    announcement: "announcement-marquee",
+    header: "header-sticky-glass",
     footer: "footer-multi-column",
     sections: [
-      { componentId: "hero-minimal-clean", role: "hero", title: "The Stockholm Modular Living Series" },
-      { componentId: "cf-trust-press-bar", role: "trust", title: "Solid European Oak & Architectural Digest Press" },
-      { componentId: "category-minimal-tiles", role: "categories", title: "Explore Rooms & Curated Living Spaces" },
-      { componentId: "product-card-minimal", role: "products", title: "Signature Seating & Ambient Lighting" },
-      { componentId: "offer-dual-poster", role: "offer", title: "Order Free Fabric & Wood Swatch Box" },
-      { componentId: "cf-comparison-matrix", role: "comparison", title: "Hand-Joined Hardwood vs Flat-Pack Particle Board" },
-      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Armchair + Wool Throw + Side Table Bundle" },
-      { componentId: "cf-verified-reviews", role: "reviews", title: "Homeowner & Designer Testimonials" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Reserve Bar" },
-      { componentId: "cf-faq-accordion", role: "faq", title: "White-Glove Delivery & Assembly FAQ" }
-    ]
+      { componentId: "cf-hero-editorial", role: "hero", title: "Stockholm Modular Living Series Hero" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "FSC Hardwood & Architectural Digest Press" },
+      { componentId: "cf-bundle-builder", role: "bundle", title: "The Complete Living Sanctuary Suite" },
+      { componentId: "cf-before-after-slider", role: "proof", title: "Daylight Room Warmth Transformation" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Solid Hardwood vs Flat-Pack Particle Board" },
+      { componentId: "cf-ugc-review-wall", role: "ugc", title: "Interior Designers & Homeowner Spaces" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "White-Glove In-Home Assembly FAQ" },
+      { componentId: "cf-sticky-atc", role: "sticky-atc", title: "Sticky Instant Reservation Dock" }
+    ],
+    contentOverrides: {
+      hero: {
+        eyebrow: "FSC CERTIFIED EUROPEAN HARDWOOD",
+        heading: "Mindful Proportions in Solid European Oak.",
+        subtext: "Hand-joined mortise-and-tenon craftsmanship engineered for lifetime sanctuaries. Finished with natural organic wax oils.",
+        image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600&q=85",
+        pressOutlet: "ARCHITECTURAL DIGEST",
+        pressQuote: "Heirloom craftsmanship built for the contemporary home. Proportions that breathe calm into any interior.",
+        socialProof: "4.94★ by 6,200+ Homeowners"
+      },
+      bundle: {
+        badge: "The Living Suite",
+        heading: "The Stockholm Modular Sanctuary Suite",
+        subtext: "Solid Oak Lounge Chair + Hand-Woven Bouclé Throw + Cantilever Side Table.",
+        bundlePrice: "$790.00",
+        comparePrice: "$1,040.00",
+        steps: [
+          { title: "Stockholm Solid Oak Lounge Chair", description: "Sculpted ergonomic back with traditional mortise-and-tenon joints.", price: "$490.00", benefitTag: "Solid European Oak", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80" },
+          { title: "Hand-Woven Bouclé Wool Throw", description: "High-loft Icelandic wool spun for breathable warmth and cloud softness.", price: "$180.00", benefitTag: "OEKO-TEX Pure Wool", image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80" },
+          { title: "Cantilever Side Pedestal Table", description: "Single-slab oak top with brushed steel hardware and natural wax oil.", price: "$370.00", benefitTag: "FSC-Certified", image: "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=600&q=80" }
+        ]
+      },
+      sticky: {
+        title: "Stockholm Solid Oak Living Suite",
+        price: "$790.00",
+        comparePrice: "$1,040.00",
+        saveText: "SAVE $250",
+        image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=120&q=80"
+      }
+    }
   },
 
-  // ── 7. ZEST & CO. · Cold-Brew & Functional Sparkling Beverages ────────────
+  // ── 7. ZEST & CO. · Artisanal Cold-Brew & Tonics on Ice ───────────────────
   {
     id: "landing-beverages",
     name: "ZEST & CO. · Artisanal Cold-Brew & Tonics",
     niche: "beverage",
-    nicheLabel: "D2C Food & Beverage",
+    nicheLabel: "D2C Craft Food & Beverage",
     badge: "🍊 0G SUGAR · REAL FRUIT · FRESH ON ICE",
     tagline: "Cold-extracted single-origin coffee infused with organic citrus",
-    description: "High-energy beverage store with custom variety pack builder, flavor wheel tasting notes, ice-chilled courier delivery, TikTok viral taste test highlights, and sticky checkout.",
+    description: "Liquid Death and Olipop inspired high-energy beverage funnel with 24-can variety pack builder, zero-sugar comparison matrix, and insulated cold delivery assurance.",
     accentColor: "#FF5722",
-    heroImg: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1200&q=85",
+    heroImg: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1600&q=85",
     stats: "2,500,000+ Cans Sipped · 100% Recyclable Aluminum",
     conversionFeatures: [
-      "Custom 12-Pack Flavor Box Builder",
-      "Aroma & Acidity Tasting Notes",
-      "Eco-Insulated Cold Shipping Pledges",
-      "Subscribe for 15% Off & Free Can Holder",
-      "Store Locator & Stockist Map",
-      "Sticky Dynamic Add-to-Cart Bar"
+      "Slow 24-Hour Cold-Extraction Brewing",
+      "Build-Your-Own 24-Can Variety Taster Case",
+      "0g Sugar Arabica vs Scorched Gas Station Energy Drinks",
+      "Taste Test Viral Video & UGC Wall",
+      "Sticky Cold-Pack Checkout Bar"
     ],
     palette: {
       background: "#FFFDF7",
@@ -319,41 +547,68 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
       accent: "#FFE9D6"
     },
     announcement: "announcement-marquee",
-    header: "header-megamenu",
+    header: "header-sticky-glass",
     footer: "footer-trust-badges",
     sections: [
-      { componentId: "hero-split-luxury", role: "hero", title: "Single-Origin Nitro Cold-Brew on Ice" },
-      { componentId: "cf-trust-press-bar", role: "trust", title: "0g Sugar, Real Fruit & Food & Wine Best in Class" },
-      { componentId: "category-slider-rail", role: "categories", title: "Explore Brews, Tonics & Sparkling Teas" },
-      { componentId: "product-card-swatches", role: "products", title: "Variety Packs & Ready-to-Drink Cans" },
-      { componentId: "offer-bento-grid", role: "offer", title: "Build Your 12-Can Taster Box for $28" },
-      { componentId: "cf-comparison-matrix", role: "comparison", title: "Cold-Extracted Arabica vs Sugar-Packed Energy Drinks" },
-      { componentId: "pdp-bundle-fbt", role: "bundle", title: "12-Can Case + Insulated Thermal Tumbler" },
-      { componentId: "cf-verified-reviews", role: "reviews", title: "Customer Tasting Reviews" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Purchase Bar" },
-      { componentId: "cf-faq-accordion", role: "faq", title: "Shelf Life, Caffeine Levels & Cold Delivery FAQ" }
-    ]
+      { componentId: "cf-hero-editorial", role: "hero", title: "Single-Origin Nitro Cold-Brew Hero" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "0g Sugar & Food & Wine Best in Class" },
+      { componentId: "cf-bundle-builder", role: "bundle", title: "24-Can Mixed Citrus Cold-Brew Taster" },
+      { componentId: "cf-before-after-slider", role: "proof", title: "Clean Caffeine vs Energy Drink Crash" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Slow Cold-Extraction vs Sugary Energy Cans" },
+      { componentId: "cf-ugc-review-wall", role: "ugc", title: "Customer Taste Tests & Barista Proof" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "Cold Shipping & Shelf-Life FAQ" },
+      { componentId: "cf-sticky-atc", role: "sticky-atc", title: "Sticky Cold-Case Order Bar" }
+    ],
+    contentOverrides: {
+      hero: {
+        eyebrow: "SLOW 24-HOUR COLD EXTRACTION",
+        heading: "Single-Origin Arabica Infused with Citrus on Ice.",
+        subtext: "Crisp, bright, and completely sugar-free. Crafted with direct-trade beans and organic cold-pressed citrus peels.",
+        image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1600&q=85",
+        pressOutlet: "FOOD & WINE",
+        pressQuote: "The cleanest, brightest ready-to-drink coffee innovation of the decade. Unmatched morning clarity.",
+        socialProof: "4.92★ by 48,000+ Daily Sippers"
+      },
+      bundle: {
+        badge: "The Taster Box",
+        heading: "Build Your 24-Can Taster Case",
+        subtext: "12 Cans Blood Orange Cold-Brew + 12 Cans Sparkling Yuzu Tonic + Insulated Thermal Tumbler.",
+        bundlePrice: "$86.00",
+        comparePrice: "$116.00",
+        steps: [
+          { title: "Single-Origin Nitro Cold Brew (12-Pack)", description: "24-hour steeped Ethiopian Yirgacheffe with natural floral citrus notes.", price: "$48.00", benefitTag: "0g Sugar · Arabica", image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&q=80" },
+          { title: "Sparkling Yuzu Citrus Tonic (12-Pack)", description: "Crisp mountain spring water infused with organic cold-pressed yuzu peel.", price: "$42.00", benefitTag: "Real Fruit Peel", image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&q=80" },
+          { title: "Double-Wall Insulated Matte Tumbler", description: "Keeps cold brew frost-chilled for 18 hours without condensation.", price: "$26.00", benefitTag: "18/8 Stainless Steel", image: "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=600&q=80" }
+        ]
+      },
+      sticky: {
+        title: "Zest & Co. 24-Can Taster Case",
+        price: "$86.00",
+        comparePrice: "$116.00",
+        saveText: "SAVE $30",
+        image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=120&q=80"
+      }
+    }
   },
 
-  // ── 8. APEX PERFORMANCE · Elite Athletic Wear & Conditioning ──────────────
+  // ── 8. APEX PERFORMANCE · Seamless 4-Way Compression Gear ────────────────
   {
     id: "landing-fitness",
-    name: "APEX PERFORMANCE · Elite Athletic Conditioning Gear",
+    name: "APEX PERFORMANCE · Elite Athletic Conditioning",
     niche: "fitness",
-    nicheLabel: "Fitness & Activewear",
-    badge: "⚡ AEROMESH™ 4-WAY COMPRESSION",
+    nicheLabel: "Fitness & Performance Activewear",
+    badge: "⚡ AEROMESH™ 4-WAY SEAMLESS COMPRESSION",
     tagline: "Engineered for record breakers, weightlifters, and marathon runners",
-    description: "Aggressive athletic landing page equipped with 30-day wear trial pledge, lab thermal breathability maps, size recommendation engine, athlete PR reels, and sticky checkout.",
+    description: "Gymshark and Alo Yoga inspired performance activewear landing page with thermal breathability proof, complete 3-piece conditioning kit, and 30-day sweat trial guarantee.",
     accentColor: "#F59E0B",
-    heroImg: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1200&q=85",
+    heroImg: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1600&q=85",
     stats: "15 Olympic Athletes Endorsed · 30-Day Sweat Trial Guarantee",
     conversionFeatures: [
-      "Thermal Breathability Heat-Map Proof",
-      "Squat-Proof 4-Way Stretch Pledges",
-      "Quick-Add Performance Size Selector",
-      "Complete Conditioning Training Kit (FBT)",
-      "Athlete PR Showcase Video Reels",
-      "Sticky Dynamic Add-to-Cart Bar"
+      "Thermal Breathability & Anti-Chafe Lab Proof",
+      "Complete 3-Piece Athlete Conditioning Kit",
+      "AeroMesh™ Hydrophobic Microfiber vs Cheap Polyester",
+      "CrossFit & Marathoner UGC Wall",
+      "Sticky Instant Workout Kit Checkout Dock"
     ],
     palette: {
       background: "#121212",
@@ -365,38 +620,65 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     header: "header-sticky-glass",
     footer: "footer-multi-column",
     sections: [
-      { componentId: "hero-video-poster", role: "hero", title: "Velocity Seamless 4-Way Compression Series" },
-      { componentId: "cf-trust-press-bar", role: "trust", title: "AeroMesh™ Technology & Men's Health Gear of the Year" },
-      { componentId: "category-story-bubbles", role: "categories", title: "Shop by Sport Discipline" },
-      { componentId: "product-card-badge-sale", role: "products", title: "Competition-Grade Apparel & Shorts" },
-      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Complete Athlete Conditioning Kit (Save $34)" },
-      { componentId: "cf-comparison-matrix", role: "comparison", title: "AeroMesh Compression vs Cheap Polyester Activewear" },
-      { componentId: "offer-countdown-sale", role: "offer", title: "Pre-Season Training Kit Bundle 30% Off" },
-      { componentId: "cf-verified-reviews", role: "reviews", title: "CrossFit & Marathon Runner Reviews" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Purchase Bar" },
-      { componentId: "cf-faq-accordion", role: "faq", title: "Size Matching, Squat Proofing & Sweat Trial FAQ" }
-    ]
+      { componentId: "cf-hero-editorial", role: "hero", title: "Velocity 4-Way Compression Hero" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "AeroMesh™ Specs & Men's Health Gear Winner" },
+      { componentId: "cf-bundle-builder", role: "bundle", title: "Complete Athlete Conditioning Kit" },
+      { componentId: "cf-before-after-slider", role: "proof", title: "Thermal Heat Dissipation & Recovery Proof" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "AeroMesh Compression vs Cheap Polyester" },
+      { componentId: "cf-ugc-review-wall", role: "ugc", title: "Athlete PR & Squat-Proof Reviews" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "30-Day Sweat Trial & Sizing FAQ" },
+      { componentId: "cf-sticky-atc", role: "sticky-atc", title: "Sticky Performance Kit Dock" }
+    ],
+    contentOverrides: {
+      hero: {
+        eyebrow: "AEROMESH™ 4-WAY RECOVERY KNIT",
+        heading: "Engineered for Record Breakers & Heavy Lifters.",
+        subtext: "Targeted graduated compression accelerates muscular oxygenation and eliminates chafing through intense conditioning sessions.",
+        image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1600&q=85",
+        pressOutlet: "MEN'S HEALTH",
+        pressQuote: "Zero chafing, zero slip, and genuine medical-grade compression that stands up to 500lb squats.",
+        socialProof: "4.97★ by 19,000+ Athletes"
+      },
+      bundle: {
+        badge: "The Conditioning Capsule",
+        heading: "Complete Athlete Conditioning 3-Piece Kit",
+        subtext: "AeroMesh Compression Top + 7-Inch Lined Training Short + Graduated Recovery Tight.",
+        bundlePrice: "$148.00",
+        comparePrice: "$200.00",
+        steps: [
+          { title: "AeroMesh™ Seamless Compression Top", description: "Graduated compression zones stabilize core and accelerate blood oxygen.", price: "$58.00", benefitTag: "Anti-Chafe Mesh", image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&q=80" },
+          { title: "7\" 4-Way Technical Training Short", description: "Featherweight outer shell with integrated bounce-free phone liner.", price: "$64.00", benefitTag: "4-Way Stretch", image: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=600&q=80" },
+          { title: "Apex High-Density Recovery Roller", description: "Targeted myofascial release trigger grid for rapid post-workout relief.", price: "$78.00", benefitTag: "Eco-EPP High Density", image: "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=600&q=80" }
+        ]
+      },
+      sticky: {
+        title: "Apex Athlete Conditioning 3-Piece Kit",
+        price: "$148.00",
+        comparePrice: "$200.00",
+        saveText: "SAVE $52",
+        image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=120&q=80"
+      }
+    }
   },
 
-  // ── 9. PAWS & TAIL · Holistic Pet Nutrition & Accessories ─────────────────
+  // ── 9. PAWS & TAIL · Freeze-Dried Human-Grade Pet Superfood ───────────────
   {
     id: "landing-pet-care",
-    name: "PAWS & TAIL · Holistic Pet Nutrition & Wellness",
+    name: "PAWS & TAIL · Holistic Pet Nutrition",
     niche: "pets",
-    nicheLabel: "Pet Care & Nutrition",
+    nicheLabel: "Pet Nutrition & Superfoods",
     badge: "🐾 100% HUMAN-GRADE INGREDIENTS · VET CERTIFIED",
     tagline: "Wholesome freeze-dried raw meals dogs crave and vets recommend",
-    description: "Heartwarming, high-conversion pet food storefront featuring a breed meal calculator, before/after coat transformation photos, picky eater guarantee, and monthly auto-ship discount.",
+    description: "Sundays and Farmer's Dog inspired pet wellness page with coat transformation proof, picky eater empty-bowl guarantee, and complete raw starter kit builder.",
     accentColor: "#D97706",
-    heroImg: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=1200&q=85",
+    heroImg: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=1600&q=85",
     stats: "150,000+ Happy Tails · 4.96★ Average Pet Parent Rating",
     conversionFeatures: [
-      "Breed & Weight Calorie Calculator",
-      "100% Clean Human-Grade Meat Pledges",
-      "Before/After Coat Health & Shine Proof",
-      "Picky Eater Empty Bowl Guarantee",
-      "Subscribe & Save 25% On Auto-Ship",
-      "Sticky Dynamic Add-to-Cart Bar"
+      "100% USDA Pasture-Raised Meat Pledges",
+      "Raw Freeze-Dried Superfood Starter Kit",
+      "Raw Nutrition vs High-Heat Extruded Burnt Kibble",
+      "Pet Parent Coat & Digestion UGC Wall",
+      "Picky Eater Empty-Bowl Guarantee"
     ],
     palette: {
       background: "#FDFBF7",
@@ -405,42 +687,68 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
       accent: "#F5EBE1"
     },
     announcement: "announcement-marquee",
-    header: "header-promo-embedded",
+    header: "header-sticky-glass",
     footer: "footer-trust-badges",
     sections: [
-      { componentId: "hero-high-conversion", role: "hero", title: "Pasture-Raised Freeze-Dried Raw Superfood" },
-      { componentId: "cf-trust-press-bar", role: "trust", title: "100% Human-Grade Meat & PetMD Veterinarian Approved" },
-      { componentId: "category-bento-cards", role: "categories", title: "Meal Toppers, Raw Bites & Dental Chews" },
-      { componentId: "product-card-trust", role: "products", title: "Best-Selling Raw Superfood Blends" },
+      { componentId: "cf-hero-editorial", role: "hero", title: "Freeze-Dried Raw Superfood Hero" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "100% Human Grade & PetMD Approved" },
+      { componentId: "cf-bundle-builder", role: "bundle", title: "Complete Raw Starter Box" },
       { componentId: "cf-before-after-slider", role: "proof", title: "Coat Shine & Digestion Vitality Transformation" },
-      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Starter Raw Box + Omega-3 Salmon Oil Booster" },
-      { componentId: "cf-comparison-matrix", role: "comparison", title: "Freeze-Dried Raw Superfood vs High-Heat Extruded Kibble" },
-      { componentId: "offer-coupon-strip", role: "offer", title: "Code HAPPYTAIL for 30% Off Your First Box" },
-      { componentId: "cf-verified-reviews", role: "reviews", title: "Happy Pet Parents Reviews" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Subscribe Dog Box Bar" },
-      { componentId: "cf-faq-accordion", role: "faq", title: "Food Transitioning & Breed Calorie FAQ" }
-    ]
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Freeze-Dried Raw vs High-Heat Extruded Kibble" },
+      { componentId: "cf-ugc-review-wall", role: "ugc", title: "Happy Pet Parents & Healthy Pups" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "Food Transitioning & Calorie FAQ" },
+      { componentId: "cf-sticky-atc", role: "sticky-atc", title: "Sticky Subscribe Dog Box Bar" }
+    ],
+    contentOverrides: {
+      hero: {
+        eyebrow: "100% USDA HUMAN-GRADE RAW NUTRITION",
+        heading: "Pasture-Raised Meals Dogs Crave & Vets Trust.",
+        subtext: "Gently freeze-dried to lock in natural enzymes, vitamins, and protein without high-heat processing or chemical preservatives.",
+        image: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=1600&q=85",
+        pressOutlet: "PETMD",
+        pressQuote: "Transformed our test dogs' coat shine and energy levels in two weeks. Total nutritional transparency.",
+        socialProof: "4.96★ by 150,000+ Happy Tails"
+      },
+      bundle: {
+        badge: "The Starter System",
+        heading: "Complete Raw Superfood Starter Box",
+        subtext: "Freeze-Dried Raw Beef Box + Wild Alaskan Salmon Oil Booster + Dental Superfood Chews.",
+        bundlePrice: "$79.00",
+        comparePrice: "$104.00",
+        steps: [
+          { title: "Pasture-Raised Beef & Salmon Feast", description: "90% meat, organs, and bone gently freeze-dried to retain active enzymes.", price: "$48.00", benefitTag: "100% Human Grade", image: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&q=80" },
+          { title: "Wild Alaskan Salmon Oil Pump", description: "Rich EPA & DHA Omega-3s promote mirror-shine coat and joint mobility.", price: "$28.00", benefitTag: "Wild Alaskan Catch", image: "https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=600&q=80" },
+          { title: "Probiotic Dental Enzyme Chews", description: "Clinically reduces plaque build-up and freshen breath naturally.", price: "$28.00", benefitTag: "Vet Formulated", image: "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=600&q=80" }
+        ]
+      },
+      sticky: {
+        title: "Paws & Tail Raw Superfood Starter Kit",
+        price: "$79.00",
+        comparePrice: "$104.00",
+        saveText: "SAVE $25",
+        image: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=120&q=80"
+      }
+    }
   },
 
   // ── 10. ATELIER TERRA · Handcrafted Stoneware & Ceramic Living ───────────
   {
     id: "landing-ceramics",
-    name: "ATELIER TERRA · Handcrafted Stoneware & Studio Living",
+    name: "ATELIER TERRA · Handcrafted Stoneware Living",
     niche: "artisan",
-    nicheLabel: "Artisan & Handcrafted Goods",
+    nicheLabel: "Handcrafted Artisan Ceramics",
     badge: "🏺 1280°C WOOD KILN FIRED · FOOD SAFE GLAZES",
     tagline: "Small-batch ceramic vessels shaped slowly by master potters",
-    description: "Poetic artisanal storefront celebrating slow-living ceramics with drop notifications, individual glaze variation showcases, microwave/dishwasher safety, and studio gift wrapping.",
+    description: "Kinfolk and Toast-inspired poetic artisanal storefront celebrating slow-living ceramics with drop notifications, high-fire vitrified stoneware guarantees, and studio gift packaging.",
     accentColor: "#C26D53",
-    heroImg: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=1200&q=85",
+    heroImg: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=1600&q=85",
     stats: "Small Batch of 250 Pieces Per Kiln Firing · Zero Plastic Packaging",
     conversionFeatures: [
-      "Studio Kiln Firing Drop Ticker",
-      "Unique Glaze & Clay Provenance Details",
-      "Lead-Free Dishwasher Safe Seals",
-      "Gift-Ready Studio Box Packaging",
-      "Dual-Poster Dinnerware Set for Two Offer",
-      "Sticky Dynamic Add-to-Cart Bar"
+      "1280°C Wood-Kiln High-Fire Vitrified Pledges",
+      "Artisan Morning Coffee & Pour-Over Ritual Suite",
+      "Hand-Thrown Ceramic vs Mass Factory Moulds Matrix",
+      "Collector & Studio Spaces UGC Wall",
+      "Break-Free Armored Transit Guarantee"
     ],
     palette: {
       background: "#FBF8F4",
@@ -448,21 +756,49 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
       primary: "#C26D53",
       accent: "#EFE8DE"
     },
-    announcement: "announcement-countdown",
+    announcement: "announcement-marquee",
     header: "header-centered-brand",
     footer: "footer-minimal-centered",
     sections: [
-      { componentId: "hero-editorial-brand", role: "hero", title: "Small-Batch Ceramic Vessels Shaped by Hand" },
-      { componentId: "cf-trust-press-bar", role: "trust", title: "1280°C High-Fire Stoneware & Kinfolk Magazine Feature" },
-      { componentId: "category-story-bubbles", role: "categories", title: "Vessels, Dinnerware & Pour-Overs" },
-      { componentId: "product-card-minimal", role: "products", title: "Studio Kiln Drop 04 Pieces" },
-      { componentId: "offer-dual-poster", role: "offer", title: "Artisan Dinnerware Set for Two Gift Box" },
-      { componentId: "cf-comparison-matrix", role: "comparison", title: "Studio Kiln Stoneware vs Factory Ceramic Moulds" },
-      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Pour-Over Dripper + Hand-Thrown Coffee Mug" },
-      { componentId: "cf-verified-reviews", role: "reviews", title: "Studio Collector Reviews" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Reserve Bar" },
-      { componentId: "cf-faq-accordion", role: "faq", title: "Microwave Safety & Break-Free Transit FAQ" }
-    ]
+      { componentId: "cf-hero-editorial", role: "hero", title: "Small-Batch Hand-Thrown Ceramics Hero" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "1280°C High-Fire & Kinfolk Magazine Feature" },
+      { componentId: "cf-bundle-builder", role: "bundle", title: "Morning Studio Pour-Over & Mug Suite" },
+      { componentId: "cf-before-after-slider", role: "proof", title: "Handmade Glaze Depth in Studio Light" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Studio Kiln Stoneware vs Factory Moulds" },
+      { componentId: "cf-ugc-review-wall", role: "ugc", title: "Collector Kitchens & Morning Rituals" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "Dishwasher Safety & Transit Guarantee FAQ" },
+      { componentId: "cf-sticky-atc", role: "sticky-atc", title: "Sticky Studio Piece Reservation Dock" }
+    ],
+    contentOverrides: {
+      hero: {
+        eyebrow: "1280°C WOOD KILN HIGH-FIRE STONEWARE",
+        heading: "Small-Batch Ceramic Vessels Shaped by Hand.",
+        subtext: "Each vessel is wheel-thrown from locally sourced raw stoneware, dipped in organic iron-rich glazes, and wood-fired over 36 hours.",
+        image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=1600&q=85",
+        pressOutlet: "KINFOLK",
+        pressQuote: "Tactile perfection. Each piece carries the subtle thumbprint of the potter and the unique soul of the wood kiln.",
+        socialProof: "4.98★ by 4,100+ Studio Collectors"
+      },
+      bundle: {
+        badge: "The Morning Ritual",
+        heading: "Handcrafted Studio Pour-Over Suite",
+        subtext: "Stoneware Dripper & Server Carafe + Fluted Coffee Mug + Hand-Carved Oak Coaster Pair.",
+        bundlePrice: "$118.00",
+        comparePrice: "$155.00",
+        steps: [
+          { title: "Handmade Stoneware Pour-Over Dripper", description: "1280°C wood-fired ceramic ribs extract optimal aromatic coffee bloom.", price: "$52.00", benefitTag: "Wood-Kiln Fired", image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=600&q=80" },
+          { title: "Wabi-Sabi Fluted Studio Mug (340ml)", description: "Wheel-thrown ergonomic handle with natural matte iron-dip glaze.", price: "$38.00", benefitTag: "Hand-Thrown", image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&q=80" },
+          { title: "Hand-Carved Reclaimed Oak Serving Tray", description: "Charred Japanese yakisugi finish with organic beeswax protection.", price: "$65.00", benefitTag: "Reclaimed Oak", image: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&q=80" }
+        ]
+      },
+      sticky: {
+        title: "Atelier Terra Studio Pour-Over Suite",
+        price: "$118.00",
+        comparePrice: "$155.00",
+        saveText: "SAVE $37",
+        image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=120&q=80"
+      }
+    }
   }
 ];
 

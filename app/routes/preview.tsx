@@ -46,7 +46,7 @@ const DEMO_IMAGES = [
 /**
  * Universal Liquid AST & variable resolver for 100% pixel-perfect HTML rendering
  */
-function cleanLiquid(liquidContent: string, sectionIdx: number): string {
+function cleanLiquid(liquidContent: string, sectionIdx: number, overrides?: any): string {
   let html = liquidContent;
 
   // 1. Read schema and preset seed settings
@@ -82,6 +82,26 @@ function cleanLiquid(liquidContent: string, sectionIdx: number): string {
         variables[`section.settings.${k}`] = val;
         variables[`settings.${k}`] = val;
         variables[k] = val;
+      }
+    }
+  }
+
+  // Populate from explicit niche content overrides
+  if (overrides && typeof overrides === "object") {
+    for (const [k, v] of Object.entries(overrides)) {
+      if (v !== undefined && v !== null && typeof v !== "object") {
+        const val = String(v);
+        variables[`section.settings.${k}`] = val;
+        variables[`settings.${k}`] = val;
+        variables[k] = val;
+        const snakeKey = k.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+        const snakeKeyWithNum = k.replace(/([A-Z]|\d+)/g, "_$1").toLowerCase().replace(/^_/, "");
+        variables[`section.settings.${snakeKey}`] = val;
+        variables[`section.settings.${snakeKeyWithNum}`] = val;
+        variables[`settings.${snakeKey}`] = val;
+        variables[`settings.${snakeKeyWithNum}`] = val;
+        variables[snakeKey] = val;
+        variables[snakeKeyWithNum] = val;
       }
     }
   }
@@ -135,6 +155,22 @@ function cleanLiquid(liquidContent: string, sectionIdx: number): string {
   // 4. Resolve `{% for block in section.blocks %}` loops
   const forBlockRegex = /\{%-?\s*for\s+block\s+in\s+section\.blocks\s*-?%\}([\s\S]*?)\{%-?\s*endfor\s*-?%\}/g;
   html = html.replace(forBlockRegex, (_match, blockBody) => {
+    // If overrides provide custom blocks (e.g. steps, cards, rows)
+    const customItems = overrides?.steps || overrides?.cards || overrides?.rows;
+    if (Array.isArray(customItems) && customItems.length > 0) {
+      return customItems.map((item: any, bIdx: number) => {
+        let renderedBlock = blockBody;
+        renderedBlock = renderedBlock.replace(/\{\{\s*block\.id\s*\}\}/g, `b_${sectionIdx}_${bIdx}`);
+        renderedBlock = renderedBlock.replace(/\{\{\s*forloop\.index\s*\}\}/g, String(bIdx + 1));
+        for (const [key, val] of Object.entries(item)) {
+          const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+          renderedBlock = renderedBlock.replace(new RegExp(`\\{\\{\\s*block\\.settings\\.${key}\\s*(\\|[^}]+)?\\s*\\}\\}`, "g"), String(val));
+          renderedBlock = renderedBlock.replace(new RegExp(`\\{\\{\\s*block\\.settings\\.${snakeKey}\\s*(\\|[^}]+)?\\s*\\}\\}`, "g"), String(val));
+        }
+        return renderedBlock;
+      }).join("\n");
+    }
+
     const blocksOrder = seed?.block_order || [];
     const seedBlocks = seed?.blocks || {};
     
@@ -454,9 +490,20 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         .map(([, v]) => v)
         .join("\n");
 
+      const roleMap: Record<string, string> = {
+        "cf-hero-editorial": "hero",
+        "cf-bundle-builder": "bundle",
+        "cf-before-after-slider": "proof",
+        "cf-comparison-matrix": "matrix",
+        "cf-ugc-review-wall": "ugc",
+        "cf-sticky-atc": "sticky",
+      };
+
       let bodyHtml = "";
       resolution.resolved.forEach((sec, idx) => {
-        bodyHtml += `\n<!-- SECTION ${idx + 1}: ${sec.id} -->\n` + cleanLiquid(sec.source, idx + 1) + "\n";
+        const role = roleMap[sec.id] || sec.id;
+        const secOverrides = (matchedLanding?.contentOverrides as any)?.[role] || (matchedLanding?.contentOverrides as any)?.[sec.id];
+        bodyHtml += `\n<!-- SECTION ${idx + 1}: ${sec.id} -->\n` + cleanLiquid(sec.source, idx + 1, secOverrides) + "\n";
       });
 
       const html = wrapHtmlDocument(pageTitle, bodyHtml, extraCss, extraJs, isEmbed);

@@ -1,0 +1,204 @@
+{% comment %}
+  CF Sticky ATC Bar - High-Converting Bottom Conversion Dock
+  Category: product-page
+  Version: 2.0 - 100% Self-Contained, Zero Snippet Dependency
+{% endcomment %}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+    padding: 12px 24px;
+    font-family: inherit;
+    color: #ffffff;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .cf-dock-container {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .cf-dock-product {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .cf-dock-thumb {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
+  }
+
+  .cf-dock-meta {
+    min-width: 0;
+  }
+
+  .cf-dock-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cf-dock-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .cf-dock-price {
+    font-size: 15px;
+    font-weight: 900;
+    color: #ffffff;
+  }
+
+  .cf-dock-comp {
+    font-size: 12px;
+    text-decoration: line-through;
+    color: #94a3b8;
+  }
+
+  .cf-dock-save-badge {
+    font-size: 10px;
+    font-weight: 800;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.15);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .cf-dock-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .cf-dock-guarantee {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  @media (max-width: 768px) {
+    .cf-dock-guarantee {
+      display: none;
+    }
+    .cf-dock-title {
+      max-width: 150px;
+    }
+    #shopify-section-{{ section.id }} {
+      padding: 10px 16px;
+    }
+  }
+
+  .cf-dock-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: {{ section.settings.btn_color | default: '#f59e0b' }};
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 850;
+    padding: 12px 28px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s ease, filter 0.2s ease, background-color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .cf-dock-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+  }
+{%- endstyle -%}
+
+<div class="cf-dock-container">
+  <div class="cf-dock-product">
+    <img
+      src="{{ section.settings.image | default: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=120&q=80' }}"
+      alt="{{ section.settings.product_title | default: 'Cellular Radiance Ritual' }}"
+      class="cf-dock-thumb"
+      width="46"
+      height="46"
+    >
+    <div class="cf-dock-meta">
+      <h4 class="cf-dock-title">{{ section.settings.product_title | default: 'Cellular Radiance Complete Ritual' }}</h4>
+      <div class="cf-dock-price-row">
+        <span class="cf-dock-price">{{ section.settings.price | default: '$88.00' }}</span>
+        {% if section.settings.compare_price != blank %}
+          <span class="cf-dock-comp">{{ section.settings.compare_price | default: '$144.00' }}</span>
+        {% endif %}
+        <span class="cf-dock-save-badge">{{ section.settings.save_text | default: 'SAVE 38%' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cf-dock-actions">
+    <div class="cf-dock-guarantee">
+      <span>🛡️</span>
+      <span>60-Day Risk-Free Trial</span>
+    </div>
+
+    <button type="button" class="cf-dock-btn" id="cf-dock-btn-{{ section.id }}" onclick="
+      var b = this;
+      var orig = b.innerHTML;
+      b.innerHTML = 'Added to Bag! ✓';
+      b.style.background = '#10b981';
+      b.style.color = '#ffffff';
+      setTimeout(function(){ b.innerHTML = orig; b.style.background = ''; b.style.color = ''; }, 2200);
+    ">
+      {{ section.settings.button_text | default: 'Add to Cart — $88' }} &rarr;
+    </button>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CF Sticky ATC",
+  "tag": "section",
+  "class": "cf-sticky-atc-section",
+  "settings": [
+    { "type": "color", "id": "btn_color", "label": "Button Color", "default": "#f59e0b" },
+    { "type": "text", "id": "product_title", "label": "Product Title", "default": "Cellular Radiance Complete Ritual" },
+    { "type": "text", "id": "price", "label": "Price", "default": "$88.00" },
+    { "type": "text", "id": "compare_price", "label": "Compare At Price", "default": "$144.00" },
+    { "type": "text", "id": "save_text", "label": "Savings Pill Text", "default": "SAVE 38%" },
+    { "type": "text", "id": "button_text", "label": "Button Text", "default": "Add to Cart — $88" },
+    { "type": "text", "id": "image", "label": "Thumbnail URL", "default": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=120&q=80" }
+  ],
+  "presets": [
+    {
+      "name": "CF Sticky ATC"
+    }
+  ]
+}
+{% endschema %}

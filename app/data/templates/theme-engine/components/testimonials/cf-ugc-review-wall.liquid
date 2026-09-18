@@ -1,0 +1,309 @@
+{% comment %}
+  CF UGC Review Wall - Glossier & Rhode Standard Real Customer Photo & Video Proof
+  Category: testimonials
+  Version: 2.0 - 100% Self-Contained, Shopify 2.0 Dynamic Blocks
+{% endcomment %}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    padding: clamp(54px, 8vw, 100px) 20px;
+    background: {{ section.settings.bg_color | default: '#ffffff' }};
+    font-family: inherit;
+    color: #0f172a;
+  }
+
+  .cf-ugc-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  .cf-ugc-header {
+    text-align: center;
+    margin-bottom: clamp(36px, 6vw, 60px);
+  }
+
+  .cf-ugc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #059669;
+    background: #ecfdf5;
+    border: 1px solid rgba(5, 150, 105, 0.2);
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+
+  .cf-ugc-heading {
+    font-size: clamp(28px, 4.8vw, 44px);
+    font-weight: 850;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin: 0 0 14px 0;
+  }
+
+  .cf-ugc-subheading {
+    font-size: clamp(15px, 1.8vw, 17px);
+    color: #64748b;
+    max-width: 580px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* 3-Column UGC Cards Grid */
+  .cf-ugc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  @media (max-width: 960px) {
+    .cf-ugc-grid {
+      grid-template-columns: 1fr;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+  }
+
+  .cf-ugc-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.05);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .cf-ugc-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.1);
+  }
+
+  .cf-ugc-media-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3.4;
+    background: #f1f5f9;
+    overflow: hidden;
+  }
+
+  .cf-ugc-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .cf-ugc-card:hover .cf-ugc-img {
+    transform: scale(1.04);
+  }
+
+  .cf-ugc-concern-tag {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: rgba(15, 23, 42, 0.85);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    border-radius: 999px;
+    backdrop-filter: blur(8px);
+    z-index: 2;
+  }
+
+  .cf-ugc-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+  }
+
+  .cf-ugc-stars {
+    color: #f59e0b;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+
+  .cf-ugc-quote {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.45;
+    color: #0f172a;
+    margin: 0 0 16px 0;
+  }
+
+  .cf-ugc-product-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #0f766e;
+    background: #f0fdfa;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    width: fit-content;
+  }
+
+  .cf-ugc-author-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .cf-ugc-author-name {
+    font-size: 13px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+  }
+
+  .cf-ugc-verified {
+    font-size: 11px;
+    color: #059669;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+{%- endstyle -%}
+
+<div class="cf-ugc-inner">
+  <div class="cf-ugc-header">
+    <span class="cf-ugc-badge">{{ section.settings.badge | default: 'Real Stories, No Filters' }}</span>
+    <h2 class="cf-ugc-heading">{{ section.settings.heading | default: 'Loved by 40,000+ Daily Ritualists' }}</h2>
+    <p class="cf-ugc-subheading">{{ section.settings.subheading | default: 'Unfiltered experiences from real customers who made the switch to clean cellular formulations.' }}</p>
+  </div>
+
+  <div class="cf-ugc-grid">
+    {% if section.blocks.size > 0 %}
+      {% for block in section.blocks %}
+        <div class="cf-ugc-card" {{ block.shopify_attributes }}>
+          <div class="cf-ugc-media-wrap">
+            <span class="cf-ugc-concern-tag">{{ block.settings.concern_tag | default: 'Verified Result' }}</span>
+            <img src="{{ block.settings.image | default: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80' }}" alt="{{ block.settings.author }}" class="cf-ugc-img" width="400" height="340">
+          </div>
+          <div class="cf-ugc-body">
+            <div>
+              <div class="cf-ugc-stars">★★★★★</div>
+              <p class="cf-ugc-quote">"{{ block.settings.quote }}"</p>
+              <div class="cf-ugc-product-pill">✦ Used: {{ block.settings.product_name }}</div>
+            </div>
+            <div class="cf-ugc-author-footer">
+              <span class="cf-ugc-author-name">{{ block.settings.author }} ({{ block.settings.location }})</span>
+              <span class="cf-ugc-verified">✓ Verified Buyer</span>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <!-- Fallback Card 1 -->
+      <div class="cf-ugc-card">
+        <div class="cf-ugc-media-wrap">
+          <span class="cf-ugc-concern-tag">Dry Barrier &amp; Redness</span>
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80" alt="Maya C." class="cf-ugc-img" width="400" height="340">
+        </div>
+        <div class="cf-ugc-body">
+          <div>
+            <div class="cf-ugc-stars">★★★★★</div>
+            <p class="cf-ugc-quote">"My dry winter flakiness stopped in exactly 4 days. It leaves the most natural glazed finish without feeling heavy or sticky under SPF."</p>
+            <div class="cf-ugc-product-pill">✦ Used: Cellular Radiance Bio-Serum</div>
+          </div>
+          <div class="cf-ugc-author-footer">
+            <span class="cf-ugc-author-name">Maya C. (Brooklyn, NY)</span>
+            <span class="cf-ugc-verified">✓ Verified Buyer</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fallback Card 2 -->
+      <div class="cf-ugc-card">
+        <div class="cf-ugc-media-wrap">
+          <span class="cf-ugc-concern-tag">Sensitive &amp; Reactive</span>
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80" alt="Julian T." class="cf-ugc-img" width="400" height="340">
+        </div>
+        <div class="cf-ugc-body">
+          <div>
+            <div class="cf-ugc-stars">★★★★★</div>
+            <p class="cf-ugc-quote">"Everything else in the clean beauty space broke me out. This 3-step routine calmed my skin barrier down completely. Won't use anything else."</p>
+            <div class="cf-ugc-product-pill">✦ Used: 3-Step Daily Ritual Bundle</div>
+          </div>
+          <div class="cf-ugc-author-footer">
+            <span class="cf-ugc-author-name">Julian T. (Austin, TX)</span>
+            <span class="cf-ugc-verified">✓ Verified Buyer</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fallback Card 3 -->
+      <div class="cf-ugc-card">
+        <div class="cf-ugc-media-wrap">
+          <span class="cf-ugc-concern-tag">Dull Tone &amp; Elasticity</span>
+          <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80" alt="Claire V." class="cf-ugc-img" width="400" height="340">
+        </div>
+        <div class="cf-ugc-body">
+          <div>
+            <div class="cf-ugc-stars">★★★★★</div>
+            <p class="cf-ugc-quote">"People at work literally asked what foundation I was wearing when I had zero makeup on. The dewiness is completely next level."</p>
+            <div class="cf-ugc-product-pill">✦ Used: Botanical Lipid Barrier Balm</div>
+          </div>
+          <div class="cf-ugc-author-footer">
+            <span class="cf-ugc-author-name">Claire V. (London, UK)</span>
+            <span class="cf-ugc-verified">✓ Verified Buyer</span>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CF UGC Review Wall",
+  "tag": "section",
+  "class": "cf-ugc-wall-section",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#ffffff" },
+    { "type": "text", "id": "badge", "label": "Badge", "default": "Real Stories, No Filters" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Loved by 40,000+ Daily Ritualists" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Unfiltered experiences from real customers who made the switch to clean cellular formulations." }
+  ],
+  "blocks": [
+    {
+      "type": "ugc_card",
+      "name": "Customer Story",
+      "settings": [
+        { "type": "text", "id": "concern_tag", "label": "Concern / Benefit Tag", "default": "Dry Barrier & Redness" },
+        { "type": "text", "id": "quote", "label": "Review Quote", "default": "My dry winter flakiness stopped in exactly 4 days. It leaves the most natural glazed finish without feeling heavy or sticky under SPF." },
+        { "type": "text", "id": "product_name", "label": "Product Used", "default": "Cellular Radiance Bio-Serum" },
+        { "type": "text", "id": "author", "label": "Customer Name", "default": "Maya C." },
+        { "type": "text", "id": "location", "label": "City / Location", "default": "Brooklyn, NY" },
+        { "type": "text", "id": "image", "label": "Customer Photo URL", "default": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CF UGC Review Wall",
+      "blocks": [
+        { "type": "ugc_card", "settings": { "concern_tag": "Dry Barrier & Redness", "quote": "My dry winter flakiness stopped in exactly 4 days. It leaves the most natural glazed finish without feeling heavy or sticky under SPF.", "product_name": "Cellular Radiance Bio-Serum", "author": "Maya C.", "location": "Brooklyn, NY", "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80" } },
+        { "type": "ugc_card", "settings": { "concern_tag": "Sensitive & Reactive", "quote": "Everything else in the clean beauty space broke me out. This 3-step routine calmed my skin barrier down completely. Won't use anything else.", "product_name": "3-Step Daily Ritual Bundle", "author": "Julian T.", "location": "Austin, TX", "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80" } },
+        { "type": "ugc_card", "settings": { "concern_tag": "Dull Tone & Elasticity", "quote": "People at work literally asked what foundation I was wearing when I had zero makeup on. The dewiness is completely next level.", "product_name": "Botanical Lipid Barrier Balm", "author": "Claire V.", "location": "London, UK", "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -61,14 +61,68 @@ export async function installLandingPage(
   const templateSections: Record<string, any> = {};
   const order: string[] = [];
 
+  const roleMap: Record<string, string> = {
+    "cf-hero-editorial": "hero",
+    "cf-bundle-builder": "bundle",
+    "cf-before-after-slider": "proof",
+    "cf-comparison-matrix": "matrix",
+    "cf-ugc-review-wall": "ugc",
+    "cf-sticky-atc": "sticky",
+  };
+
   resolution.resolved.forEach((sec, idx) => {
     const key = `section_${idx + 1}_${sec.id.replace(/[^a-zA-Z0-9_]/g, "_")}`;
     const seed = seedFor(sec.source);
+
+    const mergedSettings: Record<string, any> = { ...(seed.settings || {}) };
+    let mergedBlocks = { ...(seed.blocks || {}) };
+    let mergedBlockOrder = [...(seed.block_order || [])];
+
+    const role = roleMap[sec.id] || sec.id;
+    const overrides = (lp.contentOverrides as any)?.[role] || (lp.contentOverrides as any)?.[sec.id];
+
+    if (overrides && typeof overrides === "object") {
+      for (const [k, v] of Object.entries(overrides)) {
+        if (v !== undefined && v !== null && typeof v !== "object") {
+          const snakeKey = k.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+          const snakeKeyWithNum = k.replace(/([A-Z]|\d+)/g, "_$1").toLowerCase().replace(/^_/, "");
+          mergedSettings[k] = v;
+          mergedSettings[snakeKey] = v;
+          mergedSettings[snakeKeyWithNum] = v;
+        }
+      }
+
+      const customItems = (overrides as any).steps || (overrides as any).cards || (overrides as any).rows;
+      if (Array.isArray(customItems) && customItems.length > 0) {
+        mergedBlocks = {};
+        mergedBlockOrder = [];
+        customItems.forEach((item: any, bIdx: number) => {
+          const blockId = `block_${idx + 1}_${bIdx + 1}`;
+          const blockSettings: Record<string, any> = {};
+          for (const [bk, bv] of Object.entries(item)) {
+            const bSnake = bk.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+            blockSettings[bk] = bv;
+            blockSettings[bSnake] = bv;
+          }
+          let blockType = "step";
+          if (role === "ugc") blockType = "review";
+          else if (role === "matrix") blockType = "row";
+          else if (role === "bundle") blockType = "step";
+
+          mergedBlocks[blockId] = {
+            type: blockType,
+            settings: blockSettings,
+          };
+          mergedBlockOrder.push(blockId);
+        });
+      }
+    }
+
     templateSections[key] = {
       type: sec.id,
-      settings: seed.settings || {},
-      ...(seed.blocks ? { blocks: seed.blocks } : {}),
-      ...(seed.block_order ? { block_order: seed.block_order } : {})
+      settings: mergedSettings,
+      ...(Object.keys(mergedBlocks).length ? { blocks: mergedBlocks } : {}),
+      ...(mergedBlockOrder.length ? { block_order: mergedBlockOrder } : {}),
     };
     order.push(key);
   });
