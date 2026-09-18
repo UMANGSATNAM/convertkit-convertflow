@@ -1,34 +1,57 @@
 {% comment %}
   PDP Frequently Bought Together (FBT) Bundle
   Category: product-page
-  Version: 2.0
+  Version: 2.0 - Shopify 2.0 Dynamic Blocks with Real-Time Totaling
 {% endcomment %}
 
 {%- style -%}
   #shopify-section-{{ section.id }} {
     --fbt-bg: {{ section.settings.bg_color | default: '#f8fafc' }};
     --fbt-text: {{ section.settings.text_color | default: '#0f172a' }};
-    --fbt-accent: {{ section.settings.accent_color | default: '#2563eb' }};
+    --fbt-accent: {{ section.settings.accent_color | default: '#0284c7' }};
     background: var(--fbt-bg);
     color: var(--fbt-text);
-    padding: clamp(32px, 5vw, 60px) 24px;
+    padding: clamp(36px, 6vw, 68px) 24px;
     border-radius: 24px;
     font-family: inherit;
-    margin: 30px auto;
-    max-width: 1100px;
+    margin: 40px auto;
+    max-width: 1140px;
     border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.05);
+  }
+
+  .cf-fbt-header {
+    margin-bottom: clamp(24px, 4vw, 36px);
+  }
+
+  .cf-fbt-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #0284c7;
+    background: #e0f2fe;
+    border: 1px solid rgba(2, 132, 199, 0.2);
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 12px;
   }
 
   .cf-fbt-title {
-    font-size: 22px;
-    font-weight: 800;
+    font-size: clamp(22px, 3.5vw, 32px);
+    font-weight: 850;
     margin: 0 0 6px 0;
+    letter-spacing: -0.02em;
   }
 
   .cf-fbt-sub {
     font-size: 14px;
     color: #64748b;
-    margin: 0 0 28px 0;
+    margin: 0;
+    line-height: 1.5;
   }
 
   .cf-fbt-grid {
@@ -44,6 +67,7 @@
     align-items: center;
     gap: 16px;
     flex-wrap: wrap;
+    flex: 1;
   }
 
   .cf-fbt-card {
@@ -58,11 +82,12 @@
     position: relative;
     width: 120px;
     height: 120px;
-    border-radius: 16px;
+    border-radius: 18px;
     overflow: hidden;
     background: #ffffff;
     border: 1px solid #e2e8f0;
     margin-bottom: 10px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
   }
 
   .cf-fbt-img {
@@ -75,41 +100,43 @@
     position: absolute;
     top: 8px;
     left: 8px;
-    width: 18px;
-    height: 18px;
-    accent-color: var(--fbt-accent);
+    width: 20px;
+    height: 20px;
+    accent-color: #0f172a;
     cursor: pointer;
+    z-index: 2;
   }
 
   .cf-fbt-item-title {
     font-size: 13px;
     font-weight: 700;
-    line-height: 1.3;
+    line-height: 1.35;
     margin: 0 0 4px 0;
+    color: #0f172a;
   }
 
   .cf-fbt-item-price {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 800;
-    color: var(--fbt-accent);
+    color: #0f172a;
   }
 
   .cf-fbt-plus {
     font-size: 24px;
-    font-weight: 800;
+    font-weight: 900;
     color: #94a3b8;
   }
 
   .cf-fbt-summary {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 24px;
-    min-width: 260px;
+    border-radius: 20px;
+    padding: 28px;
+    min-width: 280px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    gap: 16px;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06);
   }
 
   .cf-fbt-total-row {
@@ -119,100 +146,180 @@
   }
 
   .cf-fbt-total-price {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 900;
     color: #0f172a;
+    letter-spacing: -0.02em;
   }
 
   .cf-fbt-save-pill {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     background: #dcfce7;
     color: #15803d;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
-    padding: 3px 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 4px 10px;
     border-radius: 999px;
+    width: fit-content;
   }
 
   .cf-fbt-btn {
-    background: var(--fbt-accent);
+    background: #0f172a;
     color: #ffffff;
     border: none;
-    border-radius: 10px;
-    padding: 14px;
+    border-radius: 12px;
+    padding: 16px 20px;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 800;
     cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
+    transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
     width: 100%;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
   }
 
   .cf-fbt-btn:hover {
-    opacity: 0.92;
+    background: #1e293b;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
   }
 
-  .cf-fbt-btn:active {
-    transform: scale(0.98);
+  @media (max-width: 768px) {
+    .cf-fbt-summary {
+      width: 100%;
+    }
   }
 {%- endstyle -%}
 
-<div class="cf-fbt-container">
-  <h2 class="cf-fbt-title">{{ section.settings.heading | default: 'Frequently Bought Together' }}</h2>
-  <p class="cf-fbt-sub">{{ section.settings.subheading | default: 'Bundle up these matching essentials and get an instant 15% discount.' }}</p>
+<div class="cf-fbt-inner">
+  <div class="cf-fbt-header">
+    <span class="cf-fbt-badge">{{ section.settings.badge | default: 'Frequently Bought Together' }}</span>
+    <h2 class="cf-fbt-title">{{ section.settings.heading | default: 'Complete the Synergy Ritual' }}</h2>
+    <p class="cf-fbt-sub">{{ section.settings.subheading | default: 'Bundle these complementary bestsellers and save an extra 15% automatically at checkout.' }}</p>
+  </div>
 
   <div class="cf-fbt-grid">
-    <div class="cf-fbt-items">
-      <div class="cf-fbt-card">
-        <div class="cf-fbt-img-wrap">
-          <input type="checkbox" class="cf-fbt-checkbox" checked disabled>
-          <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200&q=80" alt="Main item" class="cf-fbt-img" width="120" height="120">
+    <div class="cf-fbt-items" id="cf-fbt-items-{{ section.id }}">
+      {% if section.blocks.size > 0 %}
+        {% for block in section.blocks %}
+          {% if forloop.index > 1 %}<span class="cf-fbt-plus">+</span>{% endif %}
+          <div class="cf-fbt-card" {{ block.shopify_attributes }}>
+            <div class="cf-fbt-img-wrap">
+              <input type="checkbox" class="cf-fbt-checkbox" checked data-price="{{ block.settings.price | remove: '$' | default: '45' }}" data-title="{{ block.settings.title | escape }}">
+              <img src="{{ block.settings.image_url | default: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&q=80' }}" alt="{{ block.settings.title }}" class="cf-fbt-img" width="120" height="120">
+            </div>
+            <div class="cf-fbt-item-title">{{ block.settings.title }}</div>
+            <div class="cf-fbt-item-price">${{ block.settings.price | remove: '$' }}</div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <!-- Item 1 -->
+        <div class="cf-fbt-card">
+          <div class="cf-fbt-img-wrap">
+            <input type="checkbox" class="cf-fbt-checkbox" checked data-price="58" data-title="Cellular Radiance Serum">
+            <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&q=80" alt="Cellular Radiance Serum" class="cf-fbt-img" width="120" height="120">
+          </div>
+          <div class="cf-fbt-item-title">Cellular Radiance Serum</div>
+          <div class="cf-fbt-item-price">$58.00</div>
         </div>
-        <div class="cf-fbt-item-title">Classic Heavy Tee</div>
-        <div class="cf-fbt-item-price">$45.00</div>
-      </div>
 
-      <span class="cf-fbt-plus">+</span>
+        <span class="cf-fbt-plus">+</span>
 
-      <div class="cf-fbt-card">
-        <div class="cf-fbt-img-wrap">
-          <input type="checkbox" class="cf-fbt-checkbox" checked>
-          <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=200&q=80" alt="Hoodie" class="cf-fbt-img" width="120" height="120">
+        <!-- Item 2 -->
+        <div class="cf-fbt-card">
+          <div class="cf-fbt-img-wrap">
+            <input type="checkbox" class="cf-fbt-checkbox" checked data-price="64" data-title="Barrier Defense Cream">
+            <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=200&q=80" alt="Barrier Defense Cream" class="cf-fbt-img" width="120" height="120">
+          </div>
+          <div class="cf-fbt-item-title">Barrier Defense Cream</div>
+          <div class="cf-fbt-item-price">$64.00</div>
         </div>
-        <div class="cf-fbt-item-title">Vintage Oversized Hoodie</div>
-        <div class="cf-fbt-item-price">$78.00</div>
-      </div>
 
-      <span class="cf-fbt-plus">+</span>
+        <span class="cf-fbt-plus">+</span>
 
-      <div class="cf-fbt-card">
-        <div class="cf-fbt-img-wrap">
-          <input type="checkbox" class="cf-fbt-checkbox" checked>
-          <img src="https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=200&q=80" alt="Cap" class="cf-fbt-img" width="120" height="120">
+        <!-- Item 3 -->
+        <div class="cf-fbt-card">
+          <div class="cf-fbt-img-wrap">
+            <input type="checkbox" class="cf-fbt-checkbox" checked data-price="44" data-title="Cold-Pressed Enzyme Cleanser">
+            <img src="https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=200&q=80" alt="Enzyme Cleanser" class="cf-fbt-img" width="120" height="120">
+          </div>
+          <div class="cf-fbt-item-title">Enzyme Cleanser</div>
+          <div class="cf-fbt-item-price">$44.00</div>
         </div>
-        <div class="cf-fbt-item-title">Embroidered Dad Cap</div>
-        <div class="cf-fbt-item-price">$28.00</div>
-      </div>
+      {% endif %}
     </div>
 
     <div class="cf-fbt-summary">
       <div class="cf-fbt-save-pill">BUNDLE &amp; SAVE 15%</div>
       <div class="cf-fbt-total-row">
-        <span style="font-size:13px;color:#64748b;">Total Price:</span>
-        <div>
-          <span style="text-decoration:line-through;color:#94a3b8;font-size:14px;margin-right:6px;">$151.00</span>
-          <span class="cf-fbt-total-price">$128.00</span>
+        <span style="font-size:13px;color:#64748b;font-weight:600;">Total Bundle:</span>
+        <div style="text-align:right;">
+          <div style="text-decoration:line-through;color:#94a3b8;font-size:13px;" id="cf-fbt-comp-{{ section.id }}">$166.00</div>
+          <span class="cf-fbt-total-price" id="cf-fbt-total-{{ section.id }}">$141.00</span>
         </div>
       </div>
-      <button type="button" class="cf-fbt-btn" onclick="
-        var b = this;
-        b.innerText = 'Bundle Added to Bag! 🎉';
-        setTimeout(function(){ b.innerText = 'Add All 3 to Cart'; }, 2000);
-      ">
-        Add All 3 to Cart
+      <button type="button" class="cf-fbt-btn" id="cf-fbt-btn-{{ section.id }}">
+        Add Bundle to Cart
       </button>
     </div>
   </div>
 </div>
+
+<script>
+  (function() {
+    var sec = document.getElementById('shopify-section-{{ section.id }}');
+    if (!sec) return;
+    var checkboxes = sec.querySelectorAll('.cf-fbt-checkbox');
+    var totalEl = sec.querySelector('#cf-fbt-total-{{ section.id }}');
+    var compEl = sec.querySelector('#cf-fbt-comp-{{ section.id }}');
+    var btn = sec.querySelector('#cf-fbt-btn-{{ section.id }}');
+
+    function calculate() {
+      var sum = 0;
+      var count = 0;
+      checkboxes.forEach(function(cb) {
+        if (cb.checked) {
+          sum += parseFloat(cb.dataset.price || 0);
+          count++;
+        }
+      });
+      var discounted = (sum * 0.85).toFixed(2);
+      if (compEl) compEl.innerText = '$' + sum.toFixed(2);
+      if (totalEl) totalEl.innerText = '$' + discounted;
+      if (btn) {
+        if (count === 0) {
+          btn.innerText = 'Select At Least 1 Item';
+          btn.disabled = true;
+          btn.style.opacity = '0.5';
+        } else {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.innerText = 'Add ' + count + ' ' + (count === 1 ? 'Item' : 'Items') + ' to Cart — $' + discounted;
+        }
+      }
+    }
+
+    checkboxes.forEach(function(cb) {
+      cb.addEventListener('change', calculate);
+    });
+    calculate();
+
+    if (btn) {
+      btn.addEventListener('click', function() {
+        var orig = btn.innerText;
+        btn.innerText = 'Bundle Added to Bag! 🎉';
+        btn.style.background = '#10b981';
+        setTimeout(function() {
+          btn.innerText = orig;
+          btn.style.background = '';
+        }, 2200);
+      });
+    }
+  })();
+</script>
 
 {% schema %}
 {
@@ -220,43 +327,32 @@
   "tag": "section",
   "class": "cf-pdp-bundle-section",
   "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background color", "default": "#f8fafc" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#0f172a" },
+    { "type": "color", "id": "accent_color", "label": "Accent color", "default": "#0284c7" },
+    { "type": "text", "id": "badge", "label": "Badge", "default": "Frequently Bought Together" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Complete the Synergy Ritual" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Bundle these complementary bestsellers and save an extra 15% automatically at checkout." }
+  ],
+  "blocks": [
     {
-      "type": "color",
-      "id": "bg_color",
-      "label": "Background color",
-      "default": "#f8fafc"
-    },
-    {
-      "type": "color",
-      "id": "text_color",
-      "label": "Text color",
-      "default": "#0f172a"
-    },
-    {
-      "type": "color",
-      "id": "accent_color",
-      "label": "Accent / Button color",
-      "default": "#2563eb"
-    },
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading",
-      "default": "Frequently Bought Together"
-    },
-    {
-      "type": "text",
-      "id": "subheading",
-      "label": "Subheading",
-      "default": "Bundle up these matching essentials and get an instant 15% discount."
+      "type": "bundle_product",
+      "name": "Bundle Product",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Product Title", "default": "Cellular Radiance Serum" },
+        { "type": "text", "id": "price", "label": "Price (e.g. 58)", "default": "58" },
+        { "type": "text", "id": "image_url", "label": "Image URL", "default": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&q=80" }
+      ]
     }
   ],
   "presets": [
     {
       "name": "PDP Bundle FBT",
-      "settings": {
-        "heading": "Frequently Bought Together"
-      }
+      "blocks": [
+        { "type": "bundle_product", "settings": { "title": "Cellular Radiance Serum", "price": "58", "image_url": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&q=80" } },
+        { "type": "bundle_product", "settings": { "title": "Barrier Defense Cream", "price": "64", "image_url": "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=200&q=80" } },
+        { "type": "bundle_product", "settings": { "title": "Cold-Pressed Enzyme Cleanser", "price": "44", "image_url": "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=200&q=80" } }
+      ]
     }
   ]
 }

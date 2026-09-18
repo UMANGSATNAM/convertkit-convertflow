@@ -1,0 +1,292 @@
+{% comment %}
+  CF Trust & Press Bar - High-converting CRO trust pillars + media publication logos
+  Category: trust
+  Version: 2.0 - Shopify 2.0 Dynamic Blocks with Fallback
+{% endcomment %}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    background: {{ section.settings.bg_color | default: '#ffffff' }};
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding: clamp(28px, 4.5vw, 44px) 20px;
+    font-family: inherit;
+  }
+
+  .cf-trust-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  /* 4 Key Value Pillars */
+  .cf-trust-pillars {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 960px) {
+    .cf-trust-pillars {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 520px) {
+    .cf-trust-pillars {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
+
+  .cf-pillar-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cf-pillar-item:hover {
+    transform: translateY(-2px);
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+  }
+
+  .cf-pillar-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #0f172a;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+  }
+
+  .cf-pillar-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .cf-pillar-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 2px 0;
+    line-height: 1.25;
+  }
+
+  .cf-pillar-subtitle {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.35;
+    font-weight: 500;
+  }
+
+  /* Press Logos Strip */
+  .cf-press-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding-top: 24px;
+    border-top: 1px dashed rgba(0, 0, 0, 0.08);
+  }
+
+  .cf-press-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #94a3b8;
+  }
+
+  .cf-press-logos-row {
+    display: flex;
+    align-items: center;
+    gap: clamp(24px, 5vw, 54px);
+    flex-wrap: wrap;
+  }
+
+  .cf-press-logo-text {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: clamp(16px, 2.5vw, 20px);
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #475569;
+    opacity: 0.82;
+    transition: opacity 0.2s ease, color 0.2s ease;
+  }
+
+  .cf-press-logo-text:hover {
+    opacity: 1;
+    color: #0f172a;
+  }
+{%- endstyle -%}
+
+<div class="cf-trust-inner">
+  <!-- 4 Pillars -->
+  <div class="cf-trust-pillars">
+    {% assign pillar_count = 0 %}
+    {% for block in section.blocks %}
+      {% if block.type == 'pillar' %}
+        {% assign pillar_count = pillar_count | plus: 1 %}
+        <div class="cf-pillar-item" {{ block.shopify_attributes }}>
+          <div class="cf-pillar-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+          </div>
+          <div>
+            <h4 class="cf-pillar-title">{{ block.settings.title }}</h4>
+            <p class="cf-pillar-subtitle">{{ block.settings.subtitle }}</p>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    {% if pillar_count == 0 %}
+      <div class="cf-pillar-item">
+        <div class="cf-pillar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13"></rect>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+        </div>
+        <div>
+          <h4 class="cf-pillar-title">{{ section.settings.pillar_1_title | default: 'Free Express Shipping' }}</h4>
+          <p class="cf-pillar-subtitle">{{ section.settings.pillar_1_sub | default: 'On all orders over $65' }}</p>
+        </div>
+      </div>
+
+      <div class="cf-pillar-item">
+        <div class="cf-pillar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="m9 12 2 2 4-4"></path>
+          </svg>
+        </div>
+        <div>
+          <h4 class="cf-pillar-title">{{ section.settings.pillar_2_title | default: '60-Day Money-Back' }}</h4>
+          <p class="cf-pillar-subtitle">{{ section.settings.pillar_2_sub | default: '100% Risk-Free Guarantee' }}</p>
+        </div>
+      </div>
+
+      <div class="cf-pillar-item">
+        <div class="cf-pillar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </div>
+        <div>
+          <h4 class="cf-pillar-title">{{ section.settings.pillar_3_title | default: 'Award-Winning Quality' }}</h4>
+          <p class="cf-pillar-subtitle">{{ section.settings.pillar_3_sub | default: 'Rated 4.9/5 by 3,500+ Buyers' }}</p>
+        </div>
+      </div>
+
+      <div class="cf-pillar-item">
+        <div class="cf-pillar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div>
+          <h4 class="cf-pillar-title">{{ section.settings.pillar_4_title | default: 'Secure Encrypted Checkout' }}</h4>
+          <p class="cf-pillar-subtitle">{{ section.settings.pillar_4_sub | default: '256-Bit SSL Protection' }}</p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Press Strip -->
+  <div class="cf-press-strip">
+    <span class="cf-press-label">{{ section.settings.press_label | default: 'As Endorsed In' }}</span>
+    <div class="cf-press-logos-row">
+      {% assign logo_count = 0 %}
+      {% for block in section.blocks %}
+        {% if block.type == 'press_logo' %}
+          {% assign logo_count = logo_count | plus: 1 %}
+          <span class="cf-press-logo-text" {{ block.shopify_attributes }}>{{ block.settings.name }}</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if logo_count == 0 %}
+        <span class="cf-press-logo-text">VOGUE</span>
+        <span class="cf-press-logo-text">Forbes</span>
+        <span class="cf-press-logo-text">GQ</span>
+        <span class="cf-press-logo-text">WIRED</span>
+        <span class="cf-press-logo-text">ELLE</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CF Trust & Press Bar",
+  "tag": "section",
+  "class": "cf-trust-press-section",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "text", "id": "pillar_1_title", "label": "Fallback Pillar 1 Title", "default": "Free Express Shipping" },
+    { "type": "text", "id": "pillar_1_sub", "label": "Fallback Pillar 1 Subtitle", "default": "On all orders over $65" },
+    { "type": "text", "id": "pillar_2_title", "label": "Fallback Pillar 2 Title", "default": "60-Day Money-Back" },
+    { "type": "text", "id": "pillar_2_sub", "label": "Fallback Pillar 2 Subtitle", "default": "100% Risk-Free Guarantee" },
+    { "type": "text", "id": "pillar_3_title", "label": "Fallback Pillar 3 Title", "default": "Award-Winning Quality" },
+    { "type": "text", "id": "pillar_3_sub", "label": "Fallback Pillar 3 Subtitle", "default": "Rated 4.9/5 by 3,500+ Buyers" },
+    { "type": "text", "id": "pillar_4_title", "label": "Fallback Pillar 4 Title", "default": "Secure Encrypted Checkout" },
+    { "type": "text", "id": "pillar_4_sub", "label": "Fallback Pillar 4 Subtitle", "default": "256-Bit SSL Protection" },
+    { "type": "text", "id": "press_label", "label": "Press Label", "default": "As Endorsed In" }
+  ],
+  "blocks": [
+    {
+      "type": "pillar",
+      "name": "Trust Pillar",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Free Express Shipping" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "On all orders over $65" }
+      ]
+    },
+    {
+      "type": "press_logo",
+      "name": "Press Publication",
+      "settings": [
+        { "type": "text", "id": "name", "label": "Publication Name", "default": "VOGUE" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CF Trust & Press Bar",
+      "blocks": [
+        { "type": "pillar", "settings": { "title": "Free Express Shipping", "subtitle": "On all orders over $65" } },
+        { "type": "pillar", "settings": { "title": "60-Day Money-Back", "subtitle": "100% Risk-Free Guarantee" } },
+        { "type": "pillar", "settings": { "title": "Award-Winning Quality", "subtitle": "Rated 4.9/5 by 3,500+ Buyers" } },
+        { "type": "pillar", "settings": { "title": "Secure Encrypted Checkout", "subtitle": "256-Bit SSL Protection" } },
+        { "type": "press_logo", "settings": { "name": "VOGUE" } },
+        { "type": "press_logo", "settings": { "name": "Forbes" } },
+        { "type": "press_logo", "settings": { "name": "GQ" } },
+        { "type": "press_logo", "settings": { "name": "WIRED" } },
+        { "type": "press_logo", "settings": { "name": "ELLE" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

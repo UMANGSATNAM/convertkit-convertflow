@@ -1,5 +1,5 @@
 import { getLandingPageById } from "../data/landing-pages-registry";
-import { resolveSections, bundleFor } from "../pagekit/registry.server";
+import { resolveSections, bundleFor, seedFor } from "../pagekit/registry.server";
 import { upsertThemeFilesBatched } from "./theme-engine/index";
 import { previewUrl } from "./preview-theme.server";
 
@@ -15,8 +15,9 @@ export interface LandingPageInstallResult {
 }
 
 /**
- * Installs a complete 11-section D2C landing page into the merchant's theme as a
- * native Shopify JSON page template (`templates/page.{niche}.json`).
+ * Installs a complete 11-13 section D2C landing page into the merchant's theme as a
+ * native Shopify JSON page template (`templates/page.{niche}.json`) with fully populated
+ * settings, blocks, and block orders conforming to Shopify Online Store 2.0 standards.
  */
 export async function installLandingPage(
   shop: any,
@@ -62,9 +63,12 @@ export async function installLandingPage(
 
   resolution.resolved.forEach((sec, idx) => {
     const key = `section_${idx + 1}_${sec.id.replace(/[^a-zA-Z0-9_]/g, "_")}`;
+    const seed = seedFor(sec.source);
     templateSections[key] = {
       type: sec.id,
-      settings: {}
+      settings: seed.settings || {},
+      ...(seed.blocks ? { blocks: seed.blocks } : {}),
+      ...(seed.block_order ? { block_order: seed.block_order } : {})
     };
     order.push(key);
   });

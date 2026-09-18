@@ -37,7 +37,7 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     nicheLabel: "Beauty & Skincare",
     badge: "✨ 100% ORGANIC & CLINICAL PROOF",
     tagline: "Cellular hydration meets cold-pressed botanical oils",
-    description: "Award-winning organic skincare storefront featuring a 14-day clinical radiance proof slider, interactive category bubbles, serum bundle builder, viral UGC reels, and verified buyer reviews.",
+    description: "Award-winning organic skincare storefront featuring a 14-day clinical radiance proof slider, interactive category bubbles, serum bundle builder, Us vs Them comparison matrix, and verified buyer reviews.",
     accentColor: "#C97A63",
     heroImg: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1200&q=85",
     stats: "4.92★ (3,400+ Verified Reviews) · 68% Repeat Customer Rate",
@@ -46,10 +46,10 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
       "Interactive Category Story Bubbles",
       "Quick-Add Serum Product Cards",
       "Morning & Evening Ritual Bundle (FBT)",
-      "Bento Flash-Sale Summer Vault Offer",
-      "Viral Customer Routine UGC Reels",
+      "Us vs Conventional Skincare Comparison Matrix",
+      "Summer Hydration Vault 25% Off Bento Offer",
       "Sticky Dynamic Add-to-Cart Bar",
-      "Skin-Type Review Filter & FAQ"
+      "Objection-Buster FAQ Accordion"
     ],
     palette: {
       background: "#FDFBF7",
@@ -61,16 +61,17 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     header: "header-sticky-glass",
     footer: "footer-newsletter-focus",
     sections: [
-      { componentId: "hero-editorial-brand", role: "hero", title: "Botanical Radiance Hero Banner" },
-      { componentId: "hp1-usp", role: "trust", title: "Clean Formula Pledges & Certifications" },
-      { componentId: "category-story-bubbles", role: "categories", title: "Shop by Botanical Routine & Skin Concern" },
-      { componentId: "product-card-quickadd", role: "product-grid", title: "Clinical Award-Winning Serums" },
-      { componentId: "trust-before-after-luxury-v1", role: "proof", title: "14-Day Cellular Radiance Proof Slider" },
+      { componentId: "hero-editorial-brand", role: "hero", title: "Botanical Cellular Radiance Hero" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "Clean Formula Pledges & Press Coverage" },
+      { componentId: "category-story-bubbles", role: "categories", title: "Shop by Botanical Concern" },
+      { componentId: "product-card-quickadd", role: "products", title: "Award-Winning Botanical Serums" },
+      { componentId: "cf-before-after-slider", role: "proof", title: "14-Day Clinical Radiance Proof" },
       { componentId: "pdp-bundle-fbt", role: "bundle", title: "Morning & Evening Ritual 2-Step Bundle" },
-      { componentId: "offer-bento-grid", role: "offer", title: "Summer Hydration Vault 25% Off Bento" },
-      { componentId: "hp1-ugc-reels", role: "ugc", title: "Customer Glowing Skin Video Routines" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Why Choose Lumière Over Conventional Brands" },
+      { componentId: "offer-bento-grid", role: "offer", title: "Summer Hydration Vault 25% Off" },
+      { componentId: "cf-verified-reviews", role: "reviews", title: "Verified Customer Reviews" },
       { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Purchase Bar" },
-      { componentId: "hp1-faq", role: "faq", title: "Clean Ingredients & Sensitivity FAQ" }
+      { componentId: "cf-faq-accordion", role: "faq", title: "Clean Ingredients & Sensitivities FAQ" }
     ]
   },
 
@@ -82,7 +83,7 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     nicheLabel: "Streetwear & Apparel",
     badge: "🔥 480GSM FRENCH TERRY & WATERPROOF NYLON",
     tagline: "Architectural silhouettes engineered for urban exploration",
-    description: "High-voltage dark streetwear showcase with live drop countdown, technical 480GSM fabric breakdown, lookbook masonry, community UGC fit-check wall, and instant sticky checkout.",
+    description: "High-voltage dark streetwear showcase with live drop countdown, technical 480GSM fabric breakdown, lookbook masonry, comparison table, and instant sticky checkout.",
     accentColor: "#22C55E",
     heroImg: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1200&q=85",
     stats: "Drop 07 Sold Out in 8 Minutes · 50,000+ Discord Community",
@@ -91,7 +92,7 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
       "Technical 480GSM Fabric Breakdown",
       "Editorial Lookbook Masonry Gallery",
       "Instant Hover Size-Picker Cards",
-      "Community Fit-Check Video Reels",
+      "Heavyweight vs Fast Fashion Comparison",
       "Sticky Dynamic Add-to-Cart Bar",
       "VIP Vault Drop Access Offer"
     ],
@@ -101,19 +102,20 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
       primary: "#22C55E",
       accent: "#27272A"
     },
-    announcement: "announcement-marquee",
+    announcement: "announcement-countdown",
     header: "header-megamenu",
     footer: "footer-multi-column",
     sections: [
       { componentId: "hero-split-luxury", role: "hero", title: "Drop 08 Heavyweight Technical Outerwear" },
-      { componentId: "hp2-press-logos", role: "press", title: "Highsnobiety & Hypebeast Feature Coverage" },
-      { componentId: "category-masonry-lookbook", role: "categories", title: "Core Disciplines & Outerwear Lookbook" },
-      { componentId: "product-card-badge-sale", role: "product-grid", title: "Limited Run Drops & 480GSM Hoodies" },
-      { componentId: "hp2-usp", role: "features", title: "Reinforced Seam & Waterproof Tech Specs" },
-      { componentId: "offer-countdown-sale", role: "offer", title: "VIP Access Vault Countdown Flash Offer" },
-      { componentId: "hp2-ugc-reels", role: "ugc", title: "Community Fit-Check Video Showcase" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "Fabric Specs & Hypebeast Press" },
+      { componentId: "category-masonry-lookbook", role: "categories", title: "Core Disciplines & Outerwear" },
+      { componentId: "product-card-badge-sale", role: "products", title: "Limited Run 480GSM Hoodies" },
+      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Complete Streetwear Layering Kit" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "480GSM Heavyweight vs Fast Fashion Fleece" },
+      { componentId: "offer-countdown-sale", role: "offer", title: "VIP Access Drop Countdown 30% Off" },
+      { componentId: "cf-verified-reviews", role: "reviews", title: "Verified Buyer Fit Reviews" },
       { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Purchase Bar" },
-      { componentId: "hp2-faq", role: "faq", title: "Sizing & International Customs Dispatch" }
+      { componentId: "cf-faq-accordion", role: "faq", title: "Sizing & International Customs FAQ" }
     ]
   },
 
@@ -147,15 +149,16 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     header: "header-centered-brand",
     footer: "footer-minimal-centered",
     sections: [
-      { componentId: "hero-split-luxury", role: "hero", title: "Heritage Solitaire & Pavé Collection" },
-      { componentId: "hp3-usp", role: "trust", title: "GIA Certified Lapidary Guarantees" },
+      { componentId: "hero-split-luxury", role: "hero", title: "Heritage Solitaire & Pavé Diamond Collection" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "GIA Conflict-Free Guarantee & Robb Report Press" },
       { componentId: "category-minimal-tiles", role: "categories", title: "Curated High Jewellery Suites" },
-      { componentId: "product-card-minimal", role: "product-grid", title: "Solitaires, Pavé & Masterpieces" },
-      { componentId: "trust-badges-v1", role: "trust-badges", title: "White-Glove Armored Transit & Lifetime Warranty" },
+      { componentId: "product-card-minimal", role: "products", title: "Hand-Set Solitaires & Masterpieces" },
+      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Earring & Necklace Diamond Suite" },
       { componentId: "offer-dual-poster", role: "offer", title: "Bespoke Bridal Salon Private Invitation" },
-      { componentId: "hp3-press-logos", role: "social-proof", title: "Praised by Robb Report & Forbes Luxury" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Purchase Bar" },
-      { componentId: "hp3-faq", role: "faq", title: "Insured Armored Transit & Resizing" }
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Ethical Lab & Mined Diamonds vs Mass Market" },
+      { componentId: "cf-verified-reviews", role: "reviews", title: "Verified Collector Testimonials" },
+      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Concierge Purchase Bar" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "Insured Armored Transit & Resizing FAQ" }
     ]
   },
 
@@ -190,14 +193,15 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     footer: "footer-ecommerce-app",
     sections: [
       { componentId: "hero-high-conversion", role: "hero", title: "Nexus Pro Wireless Over-Ear Spatial Sound" },
-      { componentId: "hp10-usp", role: "features", title: "Lossless DSP & Hybrid ANC 2.0 Specs" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "Lossless DSP Specs & TechRadar Recommendations" },
       { componentId: "category-bento-cards", role: "categories", title: "Audio Ecosystem & DAC Amps" },
-      { componentId: "hp10-comparison-table", role: "comparison", title: "Nexus Pro vs Traditional Flagships" },
-      { componentId: "product-card-quickadd", role: "product-grid", title: "Hardware Flagships & Studio Monitors" },
+      { componentId: "product-card-quickadd", role: "products", title: "Hardware Flagships & Studio Monitors" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Nexus Pro DSP vs Traditional Flagships" },
+      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Nexus Pro + Hard Travel Case + DAC" },
       { componentId: "offer-coupon-strip", role: "offer", title: "Developer Promo Code: CYBER25" },
+      { componentId: "cf-verified-reviews", role: "reviews", title: "Audiophile & Producer Reviews" },
       { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Purchase Bar" },
-      { componentId: "hp10-press-logos", role: "press", title: "TechRadar & Wired Recommended" },
-      { componentId: "hp10-faq", role: "faq", title: "Firmware Updates & Spatial Audio Setup" }
+      { componentId: "cf-faq-accordion", role: "faq", title: "Firmware Updates & Bluetooth 5.4 FAQ" }
     ]
   },
 
@@ -232,14 +236,16 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     footer: "footer-newsletter-focus",
     sections: [
       { componentId: "hero-editorial-brand", role: "hero", title: "Daily Bio-Available Nootropic Tonics" },
-      { componentId: "hp4-usp", role: "trust", title: "Zero Synthetic Fillers · Non-GMO Lab Tests" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "USDA Organic & 3rd-Party Lab Certifications" },
       { componentId: "category-story-bubbles", role: "categories", title: "Shop by Desired Health Outcome" },
-      { componentId: "product-card-trust", role: "product-grid", title: "Clinically Validated Formulations" },
-      { componentId: "trust-before-after-luxury-v1", role: "proof", title: "30-Day Cognitive Vitality Proof Slider" },
-      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Focus & Deep Sleep Duo (Save $22)" },
-      { componentId: "offer-discount-ribbon", role: "offer", title: "Complimentary Amber Jar with Starter Kit" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Subscribe Bar" },
-      { componentId: "hp4-faq", role: "faq", title: "Dosage, Cycle Timing & Purity FAQ" }
+      { componentId: "product-card-trust", role: "products", title: "Clinically Validated Adaptogen Elixirs" },
+      { componentId: "cf-before-after-slider", role: "proof", title: "30-Day Cognitive Vitality & Focus Proof" },
+      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Morning Focus + Deep Sleep Duo (Save $22)" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Wildcrafted Botanical Extract vs Synthetic Pills" },
+      { componentId: "offer-discount-ribbon", role: "offer", title: "Complimentary Amber Jar With Starter Kit" },
+      { componentId: "cf-verified-reviews", role: "reviews", title: "Verified Customer Health Reviews" },
+      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Subscribe & Save Bar" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "Dosage, Cycle Timing & Purity FAQ" }
     ]
   },
 
@@ -274,14 +280,15 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     footer: "footer-multi-column",
     sections: [
       { componentId: "hero-minimal-clean", role: "hero", title: "The Stockholm Modular Living Series" },
-      { componentId: "hp5-usp", role: "trust", title: "Solid Oak Joinery & Non-Toxic Finishes" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "Solid European Oak & Architectural Digest Press" },
       { componentId: "category-minimal-tiles", role: "categories", title: "Explore Rooms & Curated Living Spaces" },
-      { componentId: "product-card-minimal", role: "product-grid", title: "Signature Seating & Ambient Lighting" },
+      { componentId: "product-card-minimal", role: "products", title: "Signature Seating & Ambient Lighting" },
       { componentId: "offer-dual-poster", role: "offer", title: "Order Free Fabric & Wood Swatch Box" },
-      { componentId: "trust-badges-v1", role: "trust-badges", title: "10-Year Frame Guarantee & White-Glove Setup" },
-      { componentId: "hp5-press-logos", role: "press", title: "Architectural Digest & Wallpaper* Features" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Purchase Bar" },
-      { componentId: "hp5-faq", role: "faq", title: "Delivery Lead Times & Assembly Help" }
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Hand-Joined Hardwood vs Flat-Pack Particle Board" },
+      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Armchair + Wool Throw + Side Table Bundle" },
+      { componentId: "cf-verified-reviews", role: "reviews", title: "Homeowner & Designer Testimonials" },
+      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Reserve Bar" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "White-Glove Delivery & Assembly FAQ" }
     ]
   },
 
@@ -316,13 +323,15 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     footer: "footer-trust-badges",
     sections: [
       { componentId: "hero-split-luxury", role: "hero", title: "Single-Origin Nitro Cold-Brew on Ice" },
-      { componentId: "hp7-usp", role: "features", title: "Real Fruit Juices & Zero Artificial Sweeteners" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "0g Sugar, Real Fruit & Food & Wine Best in Class" },
       { componentId: "category-slider-rail", role: "categories", title: "Explore Brews, Tonics & Sparkling Teas" },
-      { componentId: "product-card-swatches", role: "product-grid", title: "Variety Packs & Ready-to-Drink Cans" },
+      { componentId: "product-card-swatches", role: "products", title: "Variety Packs & Ready-to-Drink Cans" },
       { componentId: "offer-bento-grid", role: "offer", title: "Build Your 12-Can Taster Box for $28" },
-      { componentId: "hp7-press-logos", role: "press", title: "Bon Appétit & Food & Wine Best in Class" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Cold-Extracted Arabica vs Sugar-Packed Energy Drinks" },
+      { componentId: "pdp-bundle-fbt", role: "bundle", title: "12-Can Case + Insulated Thermal Tumbler" },
+      { componentId: "cf-verified-reviews", role: "reviews", title: "Customer Tasting Reviews" },
       { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Purchase Bar" },
-      { componentId: "hp7-faq", role: "faq", title: "Shelf Life, Caffeine Levels & Chill Shipping" }
+      { componentId: "cf-faq-accordion", role: "faq", title: "Shelf Life, Caffeine Levels & Cold Delivery FAQ" }
     ]
   },
 
@@ -356,15 +365,16 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     header: "header-sticky-glass",
     footer: "footer-multi-column",
     sections: [
-      { componentId: "hero-video-poster", role: "hero", title: "Velocity Seamless Compression Series" },
-      { componentId: "hp6-usp", role: "features", title: "Anti-Chafing Silver Microfibers & AeroMesh" },
+      { componentId: "hero-video-poster", role: "hero", title: "Velocity Seamless 4-Way Compression Series" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "AeroMesh™ Technology & Men's Health Gear of the Year" },
       { componentId: "category-story-bubbles", role: "categories", title: "Shop by Sport Discipline" },
-      { componentId: "product-card-badge-sale", role: "product-grid", title: "Competition-Grade Apparel & Shorts" },
+      { componentId: "product-card-badge-sale", role: "products", title: "Competition-Grade Apparel & Shorts" },
       { componentId: "pdp-bundle-fbt", role: "bundle", title: "Complete Athlete Conditioning Kit (Save $34)" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "AeroMesh Compression vs Cheap Polyester Activewear" },
       { componentId: "offer-countdown-sale", role: "offer", title: "Pre-Season Training Kit Bundle 30% Off" },
-      { componentId: "hp6-ugc-reels", role: "ugc", title: "CrossFit Athlete PR Workout Reels" },
+      { componentId: "cf-verified-reviews", role: "reviews", title: "CrossFit & Marathon Runner Reviews" },
       { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Purchase Bar" },
-      { componentId: "hp6-faq", role: "faq", title: "Size Matching, Squat Proofing & Wash Care" }
+      { componentId: "cf-faq-accordion", role: "faq", title: "Size Matching, Squat Proofing & Sweat Trial FAQ" }
     ]
   },
 
@@ -399,14 +409,16 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     footer: "footer-trust-badges",
     sections: [
       { componentId: "hero-high-conversion", role: "hero", title: "Pasture-Raised Freeze-Dried Raw Superfood" },
-      { componentId: "hp8-usp", role: "trust", title: "Zero Wheat, Corn, Soy or Artificial Preservatives" },
-      { componentId: "category-bento-cards", role: "categories", title: "Meal Toppers, Raw Bites & Chews" },
-      { componentId: "product-card-trust", role: "product-grid", title: "Best-Selling Superfood Blends" },
-      { componentId: "trust-before-after-luxury-v1", role: "proof", title: "Coat Shine & Energy Vitality Transformation" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "100% Human-Grade Meat & PetMD Veterinarian Approved" },
+      { componentId: "category-bento-cards", role: "categories", title: "Meal Toppers, Raw Bites & Dental Chews" },
+      { componentId: "product-card-trust", role: "products", title: "Best-Selling Raw Superfood Blends" },
+      { componentId: "cf-before-after-slider", role: "proof", title: "Coat Shine & Digestion Vitality Transformation" },
+      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Starter Raw Box + Omega-3 Salmon Oil Booster" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Freeze-Dried Raw Superfood vs High-Heat Extruded Kibble" },
       { componentId: "offer-coupon-strip", role: "offer", title: "Code HAPPYTAIL for 30% Off Your First Box" },
-      { componentId: "hp8-press-logos", role: "press", title: "Featured in PetMD & Modern Dog Magazine" },
-      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Subscribe Bar" },
-      { componentId: "hp8-faq", role: "faq", title: "Transitioning Food, Digestion & Auto-Ship FAQ" }
+      { componentId: "cf-verified-reviews", role: "reviews", title: "Happy Pet Parents Reviews" },
+      { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Subscribe Dog Box Bar" },
+      { componentId: "cf-faq-accordion", role: "faq", title: "Food Transitioning & Breed Calorie FAQ" }
     ]
   },
 
@@ -441,14 +453,15 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
     footer: "footer-minimal-centered",
     sections: [
       { componentId: "hero-editorial-brand", role: "hero", title: "Small-Batch Ceramic Vessels Shaped by Hand" },
-      { componentId: "hp9-usp", role: "trust", title: "1280°C High-Fire Stoneware & Non-Toxic Glazes" },
+      { componentId: "cf-trust-press-bar", role: "trust", title: "1280°C High-Fire Stoneware & Kinfolk Magazine Feature" },
       { componentId: "category-story-bubbles", role: "categories", title: "Vessels, Dinnerware & Pour-Overs" },
-      { componentId: "product-card-minimal", role: "product-grid", title: "Studio Kiln Drop 04 Pieces" },
+      { componentId: "product-card-minimal", role: "products", title: "Studio Kiln Drop 04 Pieces" },
       { componentId: "offer-dual-poster", role: "offer", title: "Artisan Dinnerware Set for Two Gift Box" },
-      { componentId: "trust-badges-v1", role: "trust-badges", title: "Dishwasher/Microwave Safe & Plastic-Free" },
-      { componentId: "hp9-press-logos", role: "press", title: "Praised by Kinfolk & Cereal Magazine" },
+      { componentId: "cf-comparison-matrix", role: "comparison", title: "Studio Kiln Stoneware vs Factory Ceramic Moulds" },
+      { componentId: "pdp-bundle-fbt", role: "bundle", title: "Pour-Over Dripper + Hand-Thrown Coffee Mug" },
+      { componentId: "cf-verified-reviews", role: "reviews", title: "Studio Collector Reviews" },
       { componentId: "pdp-sticky-atc", role: "sticky-atc", title: "Sticky Instant Reserve Bar" },
-      { componentId: "hp9-faq", role: "faq", title: "Care Instructions, Microwave Safety & Break-Free Shipping" }
+      { componentId: "cf-faq-accordion", role: "faq", title: "Microwave Safety & Break-Free Transit FAQ" }
     ]
   }
 ];

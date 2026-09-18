@@ -1,15 +1,53 @@
 {% comment %}
   Product Card Quick Add - Secondary Hover Flip & Instant Size Selector
   Category: product-grid
-  Version: 2.0
+  Version: 2.0 - Shopify 2.0 Dynamic Blocks with Toast Feedback
 {% endcomment %}
 
 {%- style -%}
   #shopify-section-{{ section.id }} {
     max-width: 1280px;
     margin: 0 auto;
-    padding: clamp(36px, 6vw, 72px) 24px;
+    padding: clamp(48px, 7vw, 96px) 20px;
     font-family: inherit;
+  }
+
+  .cf-pcqa-header {
+    margin-bottom: clamp(32px, 5vw, 54px);
+    text-align: center;
+  }
+
+  .cf-pcqa-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #0f766e;
+    background: #ccfbf1;
+    border: 1px solid rgba(15, 118, 110, 0.2);
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+
+  .cf-pcqa-heading {
+    font-size: clamp(26px, 4.5vw, 42px);
+    font-weight: 850;
+    color: #0f172a;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px 0;
+  }
+
+  .cf-pcqa-subheading {
+    font-size: clamp(14px, 1.6vw, 16px);
+    color: #64748b;
+    max-width: 580px;
+    margin: 0 auto;
+    line-height: 1.6;
   }
 
   .cf-pcqa-grid {
@@ -27,6 +65,7 @@
   @media (max-width: 540px) {
     .cf-pcqa-grid {
       grid-template-columns: 1fr;
+      gap: 20px;
     }
   }
 
@@ -40,11 +79,13 @@
 
   .cf-pcqa-media {
     position: relative;
-    border-radius: 18px;
+    border-radius: 20px;
     overflow: hidden;
     background: #f1f5f9;
     aspect-ratio: 1 / 1.25;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03);
   }
 
   .cf-pcqa-img-main,
@@ -63,14 +104,14 @@
 
   .cf-pcqa-card:hover .cf-pcqa-img-hover {
     opacity: 1;
-    transform: scale(1.03);
+    transform: scale(1.04);
   }
 
   .cf-pcqa-card:hover .cf-pcqa-img-main {
-    transform: scale(1.03);
+    transform: scale(1.04);
   }
 
-  .cf-pcqa-badge {
+  .cf-pcqa-tag-badge {
     position: absolute;
     top: 12px;
     left: 12px;
@@ -81,8 +122,9 @@
     padding: 4px 10px;
     border-radius: 999px;
     z-index: 3;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 
   .cf-pcqa-quick-drawer {
@@ -90,8 +132,9 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 12px;
     display: flex;
     justify-content: center;
@@ -99,7 +142,7 @@
     transform: translateY(100%);
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 4;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
   }
 
   .cf-pcqa-card:hover .cf-pcqa-quick-drawer {
@@ -110,11 +153,12 @@
     border: 1px solid #cbd5e1;
     background: #ffffff;
     padding: 6px 12px;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 11px;
     font-weight: 800;
+    color: #0f172a;
     cursor: pointer;
-    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
   }
 
   .cf-pcqa-size-btn:hover {
@@ -125,9 +169,10 @@
 
   .cf-pcqa-title {
     font-size: 15px;
-    font-weight: 700;
-    line-height: 1.3;
+    font-weight: 800;
+    line-height: 1.35;
     margin: 0 0 6px 0;
+    color: #0f172a;
   }
 
   .cf-pcqa-price-row {
@@ -137,8 +182,8 @@
   }
 
   .cf-pcqa-price {
-    font-size: 15px;
-    font-weight: 800;
+    font-size: 16px;
+    font-weight: 900;
     color: #0f172a;
   }
 
@@ -146,101 +191,181 @@
     font-size: 13px;
     text-decoration: line-through;
     color: #94a3b8;
+    font-weight: 600;
   }
 {%- endstyle -%}
 
 <div class="cf-pcqa-wrap">
-  <div style="margin-bottom: 28px; text-align: center;">
-    <h2 style="font-size: clamp(24px, 3.2vw, 36px); font-weight: 850; margin: 0 0 6px 0;">Trending Products</h2>
-    <p style="color: #64748b; font-size: 14px; margin: 0;">Hover any product card to select your size and quick-add.</p>
+  <div class="cf-pcqa-header">
+    <span class="cf-pcqa-badge">{{ section.settings.badge | default: 'Curated Essentials' }}</span>
+    <h2 class="cf-pcqa-heading">{{ section.settings.heading | default: 'Award-Winning Botanical Serums' }}</h2>
+    <p class="cf-pcqa-subheading">{{ section.settings.subheading | default: 'Hover any product card to preview options and add instantly to your bag.' }}</p>
   </div>
 
   <div class="cf-pcqa-grid">
-    <!-- Card 1 -->
-    <div class="cf-pcqa-card">
-      <div class="cf-pcqa-media">
-        <span class="cf-pcqa-badge">BESTSELLER</span>
-        <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&q=80" alt="Heavyweight Tee" class="cf-pcqa-img-main" width="300" height="375">
-        <img src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=500&q=80" alt="Heavyweight Tee Hover" class="cf-pcqa-img-hover" width="300" height="375">
-        <div class="cf-pcqa-quick-drawer">
-          <button type="button" class="cf-pcqa-size-btn" onclick="alert('Added Size S to Cart!')">S</button>
-          <button type="button" class="cf-pcqa-size-btn" onclick="alert('Added Size M to Cart!')">M</button>
-          <button type="button" class="cf-pcqa-size-btn" onclick="alert('Added Size L to Cart!')">L</button>
-          <button type="button" class="cf-pcqa-size-btn" onclick="alert('Added Size XL to Cart!')">XL</button>
+    {% if section.blocks.size > 0 %}
+      {% for block in section.blocks %}
+        <div class="cf-pcqa-card" {{ block.shopify_attributes }}>
+          <div class="cf-pcqa-media">
+            {% if block.settings.badge != blank %}
+              <span class="cf-pcqa-tag-badge">{{ block.settings.badge }}</span>
+            {% endif %}
+            <img src="{{ block.settings.image_main | default: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&q=80' }}" alt="{{ block.settings.title }}" class="cf-pcqa-img-main" width="300" height="375">
+            <img src="{{ block.settings.image_hover | default: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500&q=80' }}" alt="{{ block.settings.title }} Hover" class="cf-pcqa-img-hover" width="300" height="375">
+            <div class="cf-pcqa-quick-drawer">
+              <button type="button" class="cf-pcqa-size-btn" onclick="cfQuickAdd(this, '{{ block.settings.title | escape }}', '30ml', '{{ block.settings.price }}')">30ml</button>
+              <button type="button" class="cf-pcqa-size-btn" onclick="cfQuickAdd(this, '{{ block.settings.title | escape }}', '50ml', '{{ block.settings.price }}')">50ml</button>
+            </div>
+          </div>
+          <h3 class="cf-pcqa-title">{{ block.settings.title }}</h3>
+          <div class="cf-pcqa-price-row">
+            <span class="cf-pcqa-price">{{ block.settings.price }}</span>
+            {% if block.settings.compare_price != blank %}
+              <span class="cf-pcqa-comp">{{ block.settings.compare_price }}</span>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <!-- Fallback Card 1 -->
+      <div class="cf-pcqa-card">
+        <div class="cf-pcqa-media">
+          <span class="cf-pcqa-tag-badge">BESTSELLER</span>
+          <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&q=80" alt="Cellular Radiance Serum" class="cf-pcqa-img-main" width="300" height="375">
+          <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500&q=80" alt="Cellular Radiance Serum Hover" class="cf-pcqa-img-hover" width="300" height="375">
+          <div class="cf-pcqa-quick-drawer">
+            <button type="button" class="cf-pcqa-size-btn" onclick="cfQuickAdd(this, 'Cellular Radiance Serum', '30ml', '$58.00')">30ml</button>
+            <button type="button" class="cf-pcqa-size-btn" onclick="cfQuickAdd(this, 'Cellular Radiance Serum', '50ml', '$82.00')">50ml</button>
+          </div>
+        </div>
+        <h3 class="cf-pcqa-title">Cellular Radiance Bio-Serum</h3>
+        <div class="cf-pcqa-price-row">
+          <span class="cf-pcqa-price">$58.00</span>
+          <span class="cf-pcqa-comp">$78.00</span>
         </div>
       </div>
-      <h3 class="cf-pcqa-title">Relaxed Heavyweight Tee</h3>
-      <div class="cf-pcqa-price-row">
-        <span class="cf-pcqa-price">$48.00</span>
-        <span class="cf-pcqa-comp">$60.00</span>
-      </div>
-    </div>
 
-    <!-- Card 2 -->
-    <div class="cf-pcqa-card">
-      <div class="cf-pcqa-media">
-        <span class="cf-pcqa-badge" style="background:#dc2626;">SAVE 20%</span>
-        <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&q=80" alt="Oversized Hoodie" class="cf-pcqa-img-main" width="300" height="375">
-        <img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500&q=80" alt="Oversized Hoodie Hover" class="cf-pcqa-img-hover" width="300" height="375">
-        <div class="cf-pcqa-quick-drawer">
-          <button type="button" class="cf-pcqa-size-btn" onclick="alert('Added Size S to Cart!')">S</button>
-          <button type="button" class="cf-pcqa-size-btn" onclick="alert('Added Size M to Cart!')">M</button>
-          <button type="button" class="cf-pcqa-size-btn" onclick="alert('Added Size L to Cart!')">L</button>
+      <!-- Fallback Card 2 -->
+      <div class="cf-pcqa-card">
+        <div class="cf-pcqa-media">
+          <span class="cf-pcqa-tag-badge" style="background:#059669;">AWARD WINNER</span>
+          <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=500&q=80" alt="Hydra Barrier Cream" class="cf-pcqa-img-main" width="300" height="375">
+          <img src="https://images.unsplash.com/photo-1608248597359-07f2a71f00a4?w=500&q=80" alt="Hydra Barrier Cream Hover" class="cf-pcqa-img-hover" width="300" height="375">
+          <div class="cf-pcqa-quick-drawer">
+            <button type="button" class="cf-pcqa-size-btn" onclick="cfQuickAdd(this, 'Hydra Barrier Cream', '50ml', '$64.00')">50ml</button>
+            <button type="button" class="cf-pcqa-size-btn" onclick="cfQuickAdd(this, 'Hydra Barrier Cream', '100ml', '$98.00')">100ml</button>
+          </div>
+        </div>
+        <h3 class="cf-pcqa-title">Botanical Lipid Barrier Cream</h3>
+        <div class="cf-pcqa-price-row">
+          <span class="cf-pcqa-price">$64.00</span>
+          <span class="cf-pcqa-comp">$80.00</span>
         </div>
       </div>
-      <h3 class="cf-pcqa-title">Vintage French Terry Hoodie</h3>
-      <div class="cf-pcqa-price-row">
-        <span class="cf-pcqa-price">$88.00</span>
-        <span class="cf-pcqa-comp">$110.00</span>
-      </div>
-    </div>
 
-    <!-- Card 3 -->
-    <div class="cf-pcqa-card">
-      <div class="cf-pcqa-media">
-        <img src="https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=500&q=80" alt="Pleated Trouser" class="cf-pcqa-img-main" width="300" height="375">
-        <img src="https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=500&q=80" alt="Pleated Trouser Hover" class="cf-pcqa-img-hover" width="300" height="375">
-        <div class="cf-pcqa-quick-drawer">
-          <button type="button" class="cf-pcqa-size-btn" onclick="alert('Added Size 30 to Cart!')">30</button>
-          <button type="button" class="cf-pcqa-size-btn" onclick="alert('Added Size 32 to Cart!')">32</button>
-          <button type="button" class="cf-pcqa-size-btn" onclick="alert('Added Size 34 to Cart!')">34</button>
+      <!-- Fallback Card 3 -->
+      <div class="cf-pcqa-card">
+        <div class="cf-pcqa-media">
+          <img src="https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=500&q=80" alt="Enzyme Cleansing Elixir" class="cf-pcqa-img-main" width="300" height="375">
+          <img src="https://images.unsplash.com/photo-1512290900672-1f021743d5c9?w=500&q=80" alt="Enzyme Cleansing Elixir Hover" class="cf-pcqa-img-hover" width="300" height="375">
+          <div class="cf-pcqa-quick-drawer">
+            <button type="button" class="cf-pcqa-size-btn" onclick="cfQuickAdd(this, 'Enzyme Cleansing Elixir', '150ml', '$44.00')">150ml</button>
+          </div>
+        </div>
+        <h3 class="cf-pcqa-title">Cold-Pressed Enzyme Cleanser</h3>
+        <div class="cf-pcqa-price-row">
+          <span class="cf-pcqa-price">$44.00</span>
         </div>
       </div>
-      <h3 class="cf-pcqa-title">Relaxed Wool-Blend Trouser</h3>
-      <div class="cf-pcqa-price-row">
-        <span class="cf-pcqa-price">$120.00</span>
-      </div>
-    </div>
 
-    <!-- Card 4 -->
-    <div class="cf-pcqa-card">
-      <div class="cf-pcqa-media">
-        <span class="cf-pcqa-badge" style="background:#0f766e;">NEW IN</span>
-        <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=500&q=80" alt="Leather Derby" class="cf-pcqa-img-main" width="300" height="375">
-        <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&q=80" alt="Leather Derby Hover" class="cf-pcqa-img-hover" width="300" height="375">
-        <div class="cf-pcqa-quick-drawer">
-          <button type="button" class="cf-pcqa-size-btn" onclick="alert('Added Size 41 to Cart!')">41</button>
-          <button type="button" class="cf-pcqa-size-btn" onclick="alert('Added Size 42 to Cart!')">42</button>
-          <button type="button" class="cf-pcqa-size-btn" onclick="alert('Added Size 43 to Cart!')">43</button>
+      <!-- Fallback Card 4 -->
+      <div class="cf-pcqa-card">
+        <div class="cf-pcqa-media">
+          <span class="cf-pcqa-tag-badge" style="background:#d97706;">NEW FORMULA</span>
+          <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&q=80" alt="Overnight Recovery Oil" class="cf-pcqa-img-main" width="300" height="375">
+          <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&q=80" alt="Overnight Recovery Oil Hover" class="cf-pcqa-img-hover" width="300" height="375">
+          <div class="cf-pcqa-quick-drawer">
+            <button type="button" class="cf-pcqa-size-btn" onclick="cfQuickAdd(this, 'Overnight Recovery Oil', '30ml', '$72.00')">30ml</button>
+          </div>
+        </div>
+        <h3 class="cf-pcqa-title">Bakuchiol Overnight Recovery Oil</h3>
+        <div class="cf-pcqa-price-row">
+          <span class="cf-pcqa-price">$72.00</span>
+          <span class="cf-pcqa-comp">$95.00</span>
         </div>
       </div>
-      <h3 class="cf-pcqa-title">Italian Calfskin Derby Shoe</h3>
-      <div class="cf-pcqa-price-row">
-        <span class="cf-pcqa-price">$220.00</span>
-      </div>
-    </div>
+    {% endif %}
   </div>
 </div>
+
+<script>
+  function cfQuickAdd(btn, title, size, price) {
+    var original = btn.innerText;
+    btn.innerText = '✓ ' + size;
+    btn.style.background = '#10b981';
+    btn.style.color = '#ffffff';
+    btn.style.borderColor = '#10b981';
+
+    var toast = document.getElementById('cf-quick-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'cf-quick-toast';
+      toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#ffffff;padding:12px 24px;border-radius:999px;font-size:13px;font-weight:700;z-index:99999;box-shadow:0 10px 30px rgba(0,0,0,0.25);display:flex;align-items:center;gap:8px;pointer-events:none;opacity:0;transition:opacity 0.25s ease, transform 0.25s ease;';
+      document.body.appendChild(toast);
+    }
+    toast.innerHTML = '<span>🎉 Added <strong>' + title + ' (' + size + ')</strong> to Bag</span>';
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+
+    setTimeout(function() {
+      btn.innerText = original;
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 1800);
+
+    setTimeout(function() {
+      if (toast) {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(10px)';
+      }
+    }, 2400);
+  }
+</script>
 
 {% schema %}
 {
   "name": "Product Card Quick Add",
   "tag": "section",
   "class": "cf-product-quickadd-section",
-  "settings": [],
+  "settings": [
+    { "type": "text", "id": "badge", "label": "Badge", "default": "Curated Essentials" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Award-Winning Botanical Serums" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Hover any product card to preview options and add instantly to your bag." }
+  ],
+  "blocks": [
+    {
+      "type": "product_item",
+      "name": "Product Card",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Product Title", "default": "Cellular Radiance Bio-Serum" },
+        { "type": "text", "id": "price", "label": "Price", "default": "$58.00" },
+        { "type": "text", "id": "compare_price", "label": "Original Price", "default": "$78.00" },
+        { "type": "text", "id": "badge", "label": "Badge Pill", "default": "BESTSELLER" },
+        { "type": "text", "id": "image_main", "label": "Primary Image URL", "default": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&q=80" },
+        { "type": "text", "id": "image_hover", "label": "Hover Image URL", "default": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500&q=80" }
+      ]
+    }
+  ],
   "presets": [
     {
-      "name": "Product Card Quick Add"
+      "name": "Product Card Quick Add",
+      "blocks": [
+        { "type": "product_item", "settings": { "title": "Cellular Radiance Bio-Serum", "price": "$58.00", "compare_price": "$78.00", "badge": "BESTSELLER", "image_main": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&q=80", "image_hover": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500&q=80" } },
+        { "type": "product_item", "settings": { "title": "Botanical Lipid Barrier Cream", "price": "$64.00", "compare_price": "$80.00", "badge": "AWARD WINNER", "image_main": "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=500&q=80", "image_hover": "https://images.unsplash.com/photo-1608248597359-07f2a71f00a4?w=500&q=80" } },
+        { "type": "product_item", "settings": { "title": "Cold-Pressed Enzyme Cleanser", "price": "$44.00", "compare_price": "", "badge": "", "image_main": "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=500&q=80", "image_hover": "https://images.unsplash.com/photo-1512290900672-1f021743d5c9?w=500&q=80" } },
+        { "type": "product_item", "settings": { "title": "Bakuchiol Overnight Recovery Oil", "price": "$72.00", "compare_price": "$95.00", "badge": "NEW FORMULA", "image_main": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&q=80", "image_hover": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&q=80" } }
+      ]
     }
   ]
 }

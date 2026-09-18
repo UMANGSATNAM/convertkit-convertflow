@@ -1,0 +1,290 @@
+{% comment %}
+  CF FAQ Accordion - Ultra-Smooth, Zero-Error Objection Buster Accordion
+  Category: faq
+  Version: 2.0 - Shopify 2.0 Dynamic Blocks with Fallback
+{% endcomment %}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    padding: clamp(48px, 7vw, 96px) 20px;
+    background: {{ section.settings.bg_color | default: '#ffffff' }};
+    font-family: inherit;
+  }
+
+  .cf-faq-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .cf-faq-header {
+    text-align: center;
+    margin-bottom: clamp(36px, 5vw, 56px);
+  }
+
+  .cf-faq-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #475569;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+
+  .cf-faq-heading {
+    font-size: clamp(26px, 4.5vw, 42px);
+    font-weight: 850;
+    color: #0f172a;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px 0;
+  }
+
+  .cf-faq-subheading {
+    font-size: clamp(14px, 1.6vw, 16px);
+    color: #64748b;
+    max-width: 580px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Accordion List */
+  .cf-faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .cf-faq-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.02);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cf-faq-item[open] {
+    border-color: #0284c7;
+    box-shadow: 0 10px 25px rgba(2, 132, 199, 0.08);
+  }
+
+  .cf-faq-summary {
+    list-style: none;
+    padding: 20px 24px;
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    transition: color 0.15s ease;
+  }
+
+  .cf-faq-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .cf-faq-summary:hover {
+    color: #0284c7;
+  }
+
+  .cf-faq-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 900;
+    color: #0f172a;
+    flex-shrink: 0;
+    margin-left: 16px;
+    transition: transform 0.25s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .cf-faq-item[open] .cf-faq-icon {
+    transform: rotate(45deg);
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #0284c7;
+  }
+
+  .cf-faq-content {
+    padding: 0 24px 22px 24px;
+    font-size: 14px;
+    color: #475569;
+    line-height: 1.7;
+    border-top: 1px solid rgba(0, 0, 0, 0.03);
+    padding-top: 14px;
+  }
+
+  .cf-faq-content p {
+    margin: 0;
+  }
+
+  .cf-faq-help-box {
+    margin-top: 40px;
+    text-align: center;
+    padding: 22px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    font-size: 14px;
+    color: #64748b;
+  }
+
+  .cf-faq-help-link {
+    color: #0284c7;
+    font-weight: 800;
+    text-decoration: none;
+    margin-left: 4px;
+  }
+
+  .cf-faq-help-link:hover {
+    text-decoration: underline;
+  }
+{%- endstyle -%}
+
+<div class="cf-faq-inner">
+  <div class="cf-faq-header">
+    <span class="cf-faq-badge">{{ section.settings.badge | default: 'Got Questions?' }}</span>
+    <h2 class="cf-faq-heading">{{ section.settings.heading | default: 'Frequently Asked Questions' }}</h2>
+    <p class="cf-faq-subheading">{{ section.settings.subheading | default: 'Everything you need to know about our standards, shipping, and guarantees.' }}</p>
+  </div>
+
+  <div class="cf-faq-list">
+    {% if section.blocks.size > 0 %}
+      {% for block in section.blocks %}
+        <details class="cf-faq-item" {% if block.settings.open_by_default %}open{% endif %} {{ block.shopify_attributes }}>
+          <summary class="cf-faq-summary">
+            <span>{{ block.settings.question }}</span>
+            <span class="cf-faq-icon">+</span>
+          </summary>
+          <div class="cf-faq-content">
+            <p>{{ block.settings.answer }}</p>
+          </div>
+        </details>
+      {% endfor %}
+    {% else %}
+      <!-- Q1 -->
+      <details class="cf-faq-item" open>
+        <summary class="cf-faq-summary">
+          <span>{{ section.settings.q1_q | default: 'How soon will my order ship?' }}</span>
+          <span class="cf-faq-icon">+</span>
+        </summary>
+        <div class="cf-faq-content">
+          <p>{{ section.settings.q1_a | default: 'All orders placed before 2 PM EST are dispatched on the same business day. Delivery typically takes 2-4 business days via tracked priority courier.' }}</p>
+        </div>
+      </details>
+
+      <!-- Q2 -->
+      <details class="cf-faq-item">
+        <summary class="cf-faq-summary">
+          <span>{{ section.settings.q2_q | default: 'What is your 60-day return policy?' }}</span>
+          <span class="cf-faq-icon">+</span>
+        </summary>
+        <div class="cf-faq-content">
+          <p>{{ section.settings.q2_a | default: 'We offer a 100% risk-free 60-day trial. If you are not completely delighted with your experience, contact our support team and we will issue a full refund immediately—no hassle or return postage fees.' }}</p>
+        </div>
+      </details>
+
+      <!-- Q3 -->
+      <details class="cf-faq-item">
+        <summary class="cf-faq-summary">
+          <span>{{ section.settings.q3_q | default: 'Are your products safe for sensitive skin / daily use?' }}</span>
+          <span class="cf-faq-icon">+</span>
+        </summary>
+        <div class="cf-faq-content">
+          <p>{{ section.settings.q3_a | default: 'Yes, every batch is dermatologist and third-party laboratory tested for zero irritation, heavy metals, pesticides, or endocrine disruptors. Safe and gentle for everyday use.' }}</p>
+        </div>
+      </details>
+
+      <!-- Q4 -->
+      <details class="cf-faq-item">
+        <summary class="cf-faq-summary">
+          <span>{{ section.settings.q4_q | default: 'How do I track my shipment?' }}</span>
+          <span class="cf-faq-icon">+</span>
+        </summary>
+        <div class="cf-faq-content">
+          <p>{{ section.settings.q4_a | default: 'Once your parcel departs our warehouse, you will receive an automated email and SMS notification containing live GPS tracking details from carrier pickup to doorstep.' }}</p>
+        </div>
+      </details>
+
+      <!-- Q5 -->
+      <details class="cf-faq-item">
+        <summary class="cf-faq-summary">
+          <span>{{ section.settings.q5_q | default: 'Can I cancel or pause my subscription?' }}</span>
+          <span class="cf-faq-icon">+</span>
+        </summary>
+        <div class="cf-faq-content">
+          <p>{{ section.settings.q5_a | default: 'Absolutely. Subscriptions can be paused, modified, or canceled at any time with a single click from your member account portal with zero penalties.' }}</p>
+        </div>
+      </details>
+    {% endif %}
+  </div>
+
+  <div class="cf-faq-help-box">
+    Still have questions? We are here to help.
+    <a href="{{ section.settings.contact_url | default: '/pages/contact' }}" class="cf-faq-help-link">Chat with our team 24/7 &rarr;</a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CF FAQ Accordion",
+  "tag": "section",
+  "class": "cf-faq-accordion-section",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "text", "id": "badge", "label": "Badge", "default": "Got Questions?" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Frequently Asked Questions" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Everything you need to know about our standards, shipping, and guarantees." },
+    { "type": "url", "id": "contact_url", "label": "Contact Page Link" },
+    { "type": "text", "id": "q1_q", "label": "Fallback Q1 Question", "default": "How soon will my order ship?" },
+    { "type": "textarea", "id": "q1_a", "label": "Fallback Q1 Answer", "default": "All orders placed before 2 PM EST are dispatched on the same business day. Delivery typically takes 2-4 business days via tracked priority courier." },
+    { "type": "text", "id": "q2_q", "label": "Fallback Q2 Question", "default": "What is your 60-day return policy?" },
+    { "type": "textarea", "id": "q2_a", "label": "Fallback Q2 Answer", "default": "We offer a 100% risk-free 60-day trial. If you are not completely delighted with your experience, contact our support team and we will issue a full refund immediately—no hassle or return postage fees." },
+    { "type": "text", "id": "q3_q", "label": "Fallback Q3 Question", "default": "Are your products safe for sensitive skin / daily use?" },
+    { "type": "textarea", "id": "q3_a", "label": "Fallback Q3 Answer", "default": "Yes, every batch is dermatologist and third-party laboratory tested for zero irritation, heavy metals, pesticides, or endocrine disruptors. Safe and gentle for everyday use." },
+    { "type": "text", "id": "q4_q", "label": "Fallback Q4 Question", "default": "How do I track my shipment?" },
+    { "type": "textarea", "id": "q4_a", "label": "Fallback Q4 Answer", "default": "Once your parcel departs our warehouse, you will receive an automated email and SMS notification containing live GPS tracking details from carrier pickup to doorstep." },
+    { "type": "text", "id": "q5_q", "label": "Fallback Q5 Question", "default": "Can I cancel or pause my subscription?" },
+    { "type": "textarea", "id": "q5_a", "label": "Fallback Q5 Answer", "default": "Absolutely. Subscriptions can be paused, modified, or canceled at any time with a single click from your member account portal with zero penalties." }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "FAQ Item",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "How soon will my order ship?" },
+        { "type": "textarea", "id": "answer", "label": "Answer", "default": "All orders placed before 2 PM EST are dispatched on the same business day. Delivery typically takes 2-4 business days via tracked priority courier." },
+        { "type": "checkbox", "id": "open_by_default", "label": "Open by Default", "default": false }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CF FAQ Accordion",
+      "blocks": [
+        { "type": "faq_item", "settings": { "question": "How soon will my order ship?", "answer": "All orders placed before 2 PM EST are dispatched on the same business day. Delivery typically takes 2-4 business days via tracked priority courier.", "open_by_default": true } },
+        { "type": "faq_item", "settings": { "question": "What is your 60-day return policy?", "answer": "We offer a 100% risk-free 60-day trial. If you are not completely delighted with your experience, contact our support team and we will issue a full refund immediately—no hassle or return postage fees.", "open_by_default": false } },
+        { "type": "faq_item", "settings": { "question": "Are your products safe for sensitive skin / daily use?", "answer": "Yes, every batch is dermatologist and third-party laboratory tested for zero irritation, heavy metals, pesticides, or endocrine disruptors. Safe and gentle for everyday use.", "open_by_default": false } },
+        { "type": "faq_item", "settings": { "question": "How do I track my shipment?", "answer": "Once your parcel departs our warehouse, you will receive an automated email and SMS notification containing live GPS tracking details from carrier pickup to doorstep.", "open_by_default": false } },
+        { "type": "faq_item", "settings": { "question": "Can I cancel or pause my subscription?", "answer": "Absolutely. Subscriptions can be paused, modified, or canceled at any time with a single click from your member account portal with zero penalties.", "open_by_default": false } }
+      ]
+    }
+  ]
+}
+{% endschema %}

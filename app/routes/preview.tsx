@@ -203,7 +203,12 @@ function cleanLiquid(liquidContent: string, sectionIdx: number): string {
   html = html.replace(/{%-?\s*if\s+[^%]+\s*-?%}([\s\S]*?)(?:{%-?\s*else\s*-?%}[\s\S]*?)?{%-?\s*endif\s*-?%}/g, "$1");
   html = html.replace(/{%-?\s*unless\s+[^%]+\s*-?%}([\s\S]*?){%-?\s*endunless\s*-?%}/g, "$1");
 
-  // 7. Replace {{ variable }} using our resolved variables map
+  // 7. Replace placeholder_svg_tag with real demo images
+  html = html.replace(/\{\{\s*['"][^'"]+['"]\s*\|\s*placeholder_svg_tag:[^}]+\}\}/g, (_match) => {
+    return `<img src="${DEMO_IMAGES[sectionIdx % DEMO_IMAGES.length]}" alt="Placeholder" style="width:100%;height:100%;object-fit:cover;">`;
+  });
+
+  // 8. Replace {{ variable }} using our resolved variables map
   for (const [vName, vVal] of Object.entries(variables)) {
     if (!vVal) continue;
     const escapedName = vName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -211,25 +216,26 @@ function cleanLiquid(liquidContent: string, sectionIdx: number): string {
     html = html.replace(vRegex, vVal);
   }
 
-  // 8. Replace standard default filters: {{ ... | default: 'val' }}
+  // 9. Replace standard default filters: {{ ... | default: 'val' }}
   html = html.replace(/\{\{\s*[^|}]+\|\s*default:\s*"([^"]+)"\s*\}\}/g, "$1");
   html = html.replace(/\{\{\s*[^|}]+\|\s*default:\s*'([^']+)'\s*\}\}/g, "$1");
 
-  // 9. Dates
+  // 10. Dates & Currency
   html = html.replace(/\{\{\s*'now'\s*\|\s*date:\s*['"]%Y['"]\s*\}\}/g, new Date().getFullYear().toString());
+  html = html.replace(/\{\{\s*([0-9.]+)\s*\|\s*money[^\}]*\}\}/g, "$$$1");
 
-  // 10. Replace images & assets
+  // 11. Replace images & assets
   html = html.replace(/\{\{\s*[^|}]+\|\s*image_url[^}]*\}\}/g, (_match) => {
     return DEMO_IMAGES[sectionIdx % DEMO_IMAGES.length];
   });
   html = html.replace(/\{\{\s*[^|}]+\|\s*asset_url[^}]*\}\}/g, "");
 
-  // 11. Clean remaining {{ ... }} tags with fallback
+  // 12. Clean remaining {{ ... }} tags with fallback
   html = html.replace(/\{\{\s*([a-zA-Z0-9_.-]+)(\s*\|[^\}]*)?\s*\}\}/g, (_full, key) => {
     return variables[key] || "";
   });
 
-  // 12. Strip leftover liquid tags (including unhandled for/endfor/render)
+  // 13. Strip leftover liquid tags (including unhandled for/endfor/render)
   html = html.replace(/{%-?[\s\S]*?-?%}/g, "");
 
   return html.trim();
