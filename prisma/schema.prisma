@@ -52,6 +52,7 @@ model Shop {
   usage             UsageCounter[]
   integrations      Integration[]
   storeBlueprints   StoreBlueprint[]
+  pages             Page[]
 }
 
 model Niche {
@@ -297,5 +298,40 @@ model RegistryMeta {
   seededAt     DateTime @default(now())
 }
 
+enum PageType {
+  LANDING
+  PRODUCT
+  COLLECTION
+  HOME
+  CUSTOM
+}
 
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
 
+model Page {
+  id             String     @id @default(cuid())
+  shopId         String
+  shop           Shop       @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  title          String
+  handle         String
+  pageType       PageType   @default(LANDING)
+  status         PageStatus @default(DRAFT)
+  layoutMode     String     @default("FULL_PAGE_NO_CHROME") // FULL_PAGE_NO_CHROME | THEME_CHROME
+  sections       Json       // [{ id, componentId, role, title, settings, blocks }]
+  styles         Json?      // Typography, palette, spacing overrides
+  seoTitle       String?
+  seoDesc        String?
+  shopifyPageId  String?    // ID of the online store Page object on Shopify
+  templateSuffix String?    // e.g. "cf-landing-handle"
+  views          Int        @default(0)
+  publishedAt    DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@unique([shopId, handle])
+  @@index([shopId, status])
+}

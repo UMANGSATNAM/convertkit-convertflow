@@ -772,6 +772,53 @@ export const D2C_LANDING_PAGES: LandingPageDefinition[] = [
         socialProof: "4.98★ by 2,400+ Real Brides"
       }
     }
+  },
+
+  // ── 12. DEWIA · Cellular Glass Skin Routine & Bio-Peptides (Rhode & Glossier Funnel) ──
+  {
+    id: "landing-beauty-dew",
+    name: "DEWIA · Cellular Glass Skin Routine & Bio-Peptides",
+    niche: "beauty",
+    nicheLabel: "Clean Beauty & Cellular Skincare",
+    badge: "✨ 100% VEGAN & CLINICALLY TRIAL PROVEN",
+    tagline: "The 3-Step Dewy Glaze That Changed Everything",
+    description: "Rhode and Glossier inspired new-age beauty landing page. Featuring interactive 3-step routine bundle builder with live AOV savings calculator, 14-day GPU before/after glow slider, bioactive macro breakdown, 4-shade glaze tint switcher, and filterable skin concern review wall.",
+    accentColor: "#C87D65",
+    heroImg: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1600&q=85",
+    stats: "4.98★ (14,800+ Verified Buyers) · 96% Hydration Surge",
+    conversionFeatures: [
+      "Above-The-Fold Verified Social Proof & Editorial Hero",
+      "Interactive 3-Step Dewy Routine Bundle Builder (Save 30%)",
+      "14-Day Before/After Lipid Barrier Transformation Slider",
+      "4-Shade Glaze Tint Swatch Selector & Preview",
+      "Bio-Cellular Active Molecules Macro Breakdown",
+      "Filterable UGC Skin Concern Review Wall (Dry, Sensitive, Acne)",
+      "Clinical Protocol FAQ Accordion",
+      "Bottom-Docked Sticky ATC Conversion Bar"
+    ],
+    palette: {
+      background: "#FAF8F5",
+      text: "#1C1917",
+      primary: "#C87D65",
+      accent: "#F4EDE4"
+    },
+    announcement: "",
+    header: "",
+    footer: "",
+    sections: [
+      { componentId: "new-age-beauty-landing", role: "main", title: "Complete Cellular Glass Skin Landing Page" }
+    ],
+    contentOverrides: {
+      hero: {
+        eyebrow: "100% BIO-PEPTIDE FERMENT • CLINICAL GRADE",
+        heading: "The 3-Step Dewy Glaze That Changed Everything.",
+        subtext: "A synergistic cellular triad engineered to flood skin with 72-hour moisture, restore compromised lipid barriers, and leave a weightless glazed reflection.",
+        image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1600&q=85",
+        pressOutlet: "ALLURE",
+        pressQuote: "The glass-skin holy grail. Plumps cells immediately and leaves that glazed donut reflection without any sticky residue.",
+        socialProof: "4.98★ by 14,800+ Verified Buyers"
+      }
+    }
   }
 ];
 
