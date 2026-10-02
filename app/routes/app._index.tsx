@@ -35,22 +35,57 @@ import { installLandingPage } from "../services/landing-page-install.server";
  */
 
 const CATEGORIES = [
-  { id: "all", label: "All Sections (38)" },
-  { id: "landing-page", label: "Landing Pages (12) 🔥" },
-  { id: "announcement", label: "Announcement Bars (2)" },
-  { id: "hero", label: "Hero Banners (5)" },
-  { id: "product-page", label: "PDP & Sticky ATC (5)" },
-  { id: "offer", label: "Offer & Poster Banners (5)" },
-  { id: "categories", label: "Category & Collections (5)" },
-  { id: "product-card", label: "Product Cards (5)" },
-  { id: "header", label: "Headers (5)" },
-  { id: "footer", label: "Footers (5)" },
+  { id: "all", label: "🌟 All Templates & Sections (120+)" },
+  { id: "landing-page", label: "🚀 Landing Pages (D2C Home) (12)" },
+  { id: "product-page", label: "💎 Product Pages (PDP) (88)" },
+  { id: "cart-drawer", label: "🛒 Cart & Slide Drawers (20)" },
+  { id: "urgency", label: "⚡ Emergency & Urgency Boosters (5)" },
+  { id: "hero", label: "🎯 Hero Banners (15)" },
+  { id: "announcement", label: "📢 Announcement Bars (10)" },
+  { id: "product-card", label: "🏷️ Product Cards & Grids (12)" },
+  { id: "header", label: "🔝 Headers (10)" },
+  { id: "footer", label: "🔻 Footers (10)" },
+];
+
+const CATEGORY_GROUPS = [
+  {
+    title: "PAGE TEMPLATES (FULL FUNNELS)",
+    items: [
+      { id: "landing-page", label: "Home Landing Pages", icon: "🚀", count: "12", desc: "Complete D2C Home Stores" },
+      { id: "product-page", label: "Product Pages (PDP)", icon: "💎", count: "88", desc: "High-CRO Product Funnels" },
+      { id: "cart-drawer", label: "Cart & Slide Drawers", icon: "🛒", count: "20", desc: "Drawers with Upsells" },
+      { id: "urgency", label: "Urgency & Scarcity", icon: "⚡", count: "5", desc: "Emergency Sales Boosters" },
+    ],
+  },
+  {
+    title: "SECTION LIBRARIES",
+    items: [
+      { id: "all", label: "All Templates & Sections", icon: "🌟", count: "120+", desc: "Entire Library" },
+      { id: "hero", label: "Hero Banners", icon: "🎯", count: "15", desc: "High-Impact Visuals" },
+      { id: "announcement", label: "Announcement Bars", icon: "📢", count: "10", desc: "Tickers & Marquees" },
+      { id: "product-card", label: "Product Cards & Grids", icon: "🏷️", count: "12", desc: "Collections & Swatches" },
+      { id: "header", label: "Headers & Navbars", icon: "🔝", count: "10", desc: "Sticky Navigation" },
+      { id: "footer", label: "Footers", icon: "🔻", count: "10", desc: "Trust & Legal Links" },
+    ],
+  },
+];
+
+const NICHE_FILTERS = [
+  { id: "all", label: "✨ All Niches" },
+  { id: "streetwear", label: "👗 Streetwear & Urban" },
+  { id: "beauty", label: "💄 Beauty & Skincare" },
+  { id: "luxury", label: "✨ Luxury & Jewelry" },
+  { id: "tech", label: "🎧 Tech & Audio" },
+  { id: "wellness", label: "🌿 Health & Wellness" },
+  { id: "coffee", label: "☕ Food & Artisanal" },
+  { id: "dropship", label: "⚡ High-CRO Dropship" },
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { session } = await authenticate.admin(request);
   const url = new URL(request.url);
   const category = url.searchParams.get("category") || "all";
+  const niche = (url.searchParams.get("niche") || "all").toLowerCase();
   const q = (url.searchParams.get("q") || "").trim();
 
   const shop = await getOrSyncShop(session.shop, session.accessToken);
@@ -59,20 +94,37 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   let filteredLandingPages: LandingPageDefinition[] = [];
   if (isLandingPageCategory) {
-    filteredLandingPages = q
-      ? D2C_LANDING_PAGES.filter(
-          (lp) =>
-            lp.name.toLowerCase().includes(q.toLowerCase()) ||
-            lp.nicheLabel.toLowerCase().includes(q.toLowerCase()) ||
-            lp.tagline.toLowerCase().includes(q.toLowerCase()) ||
-            lp.description.toLowerCase().includes(q.toLowerCase()) ||
-            lp.conversionFeatures.some((f) => f.toLowerCase().includes(q.toLowerCase()))
-        )
-      : D2C_LANDING_PAGES;
+    filteredLandingPages = D2C_LANDING_PAGES;
+
+    if (q) {
+      filteredLandingPages = filteredLandingPages.filter(
+        (lp) =>
+          lp.name.toLowerCase().includes(q.toLowerCase()) ||
+          lp.nicheLabel.toLowerCase().includes(q.toLowerCase()) ||
+          lp.tagline.toLowerCase().includes(q.toLowerCase()) ||
+          lp.description.toLowerCase().includes(q.toLowerCase()) ||
+          lp.conversionFeatures.some((f) => f.toLowerCase().includes(q.toLowerCase()))
+      );
+    }
+
+    if (niche !== "all") {
+      filteredLandingPages = filteredLandingPages.filter(lp => {
+        const text = `${lp.name} ${lp.nicheLabel} ${lp.tagline} ${lp.description}`.toLowerCase();
+        if (niche === "streetwear") return text.includes("streetwear") || text.includes("urban") || text.includes("heavyweight");
+        if (niche === "beauty") return text.includes("beauty") || text.includes("skin") || text.includes("cosmetic") || text.includes("ayurveda");
+        if (niche === "luxury") return text.includes("luxury") || text.includes("jewelry") || text.includes("couture") || text.includes("solitaire");
+        if (niche === "tech") return text.includes("audio") || text.includes("tech") || text.includes("headphone") || text.includes("flagship");
+        if (niche === "wellness") return text.includes("wellness") || text.includes("clinical") || text.includes("supplement");
+        if (niche === "coffee") return text.includes("coffee") || text.includes("roastery") || text.includes("artisanal");
+        if (niche === "dropship") return text.includes("conversion") || text.includes("dropship") || text.includes("funnel");
+        return text.includes(niche);
+      });
+    }
 
     return json({
       shopDomain: session.shop,
       category,
+      niche,
       q,
       totalCount: filteredLandingPages.length,
       components: [],
@@ -81,31 +133,55 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   }
 
-  // Build where clause according to category and search
+  // Build where clause according to category, niche, and search
   const where: any = { status: "PUBLISHED" };
 
   if (category && category !== "all") {
     where.category = category;
   }
 
+  const conditions: any[] = [];
+
+  if (niche && niche !== "all") {
+    const keywordMap: Record<string, string[]> = {
+      streetwear: ["streetwear", "urban", "hype", "drop", "apparel", "Streetwear", "Urban", "Hype", "Bold"],
+      beauty: ["beauty", "skin", "cosmetics", "glow", "lumiere", "serum", "Beauty", "Glamour", "Editorial"],
+      luxury: ["luxury", "jewelry", "gem", "couture", "atelier", "caratlane", "solitaire", "gold", "polki", "royal", "Luxury", "Heritage"],
+      tech: ["tech", "audio", "cyber", "specs", "flagship", "Tech", "Cyber"],
+      wellness: ["wellness", "clinical", "health", "supplement", "ayurveda", "organic", "natural", "Organic", "Clinical", "Natural"],
+      coffee: ["coffee", "roast", "beverage", "artisanal", "tea", "Coffee", "Food"],
+      dropship: ["urgency", "countdown", "atc", "bundle", "flash", "scarcity", "timer", "proof", "fbt"],
+    };
+    const keywords = keywordMap[niche] || [niche];
+    conditions.push({
+      OR: keywords.flatMap((kw) => [
+        { componentId: { contains: kw } },
+        { family: { contains: kw } },
+        { visualStyle: { contains: kw } },
+      ]),
+    });
+  }
+
   if (q) {
-    where.AND = [
-      {
-        OR: [
-          { componentId: { contains: q } },
-          { family: { contains: q } },
-          { visualStyle: { contains: q } },
-          { category: { contains: q } },
-        ],
-      },
-    ];
+    conditions.push({
+      OR: [
+        { componentId: { contains: q } },
+        { family: { contains: q } },
+        { visualStyle: { contains: q } },
+        { category: { contains: q } },
+      ],
+    });
+  }
+
+  if (conditions.length > 0) {
+    where.AND = conditions;
   }
 
   const [components, totalCount] = await Promise.all([
     prisma.componentRegistry.findMany({
       where,
       orderBy: { componentId: "asc" },
-      take: 80,
+      take: 120,
     }),
     prisma.componentRegistry.count({ where }),
   ]);
@@ -120,6 +196,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({
     shopDomain: session.shop,
     category,
+    niche,
     q,
     totalCount,
     components: described,
@@ -145,14 +222,24 @@ export async function action({ request }: ActionFunctionArgs) {
     if (intent === "preview") {
       const theme = await ensurePreviewTheme(shop);
 
+      const isPdp = sectionType === "product-page" || sectionType.startsWith("pdp") || componentId.startsWith("pdp") || sectionType.startsWith("product-card");
+      const isCart = sectionType === "cart-drawer" || componentId.startsWith("cdr");
+      const isUrgency = sectionType === "urgency" || componentId.startsWith("urgency");
+
       const target =
         sectionType === "header" || sectionType.startsWith("header")
           ? ({ kind: "group", group: "header", replace: "header" } as const)
           : sectionType === "footer" || sectionType.startsWith("footer")
             ? ({ kind: "group", group: "footer", replace: "footer" } as const)
-            : targetChoice === "product" || (!targetChoice && (sectionType === "product-page" || sectionType.startsWith("pdp") || sectionType.startsWith("product-card")))
+            : targetChoice === "product" || (!targetChoice && isPdp)
               ? ({ kind: "template", template: "product", position: "bottom" } as const)
-              : ({ kind: "template", template: "index", position: "top" } as const);
+              : isCart
+                ? ({ kind: "template", template: "index", position: "bottom" } as const)
+                : isUrgency
+                  ? (componentId.includes("sticky") || componentId.includes("stock")
+                      ? ({ kind: "template", template: "product", position: "bottom" } as const)
+                      : ({ kind: "template", template: "index", position: "top" } as const))
+                  : ({ kind: "template", template: "index", position: "top" } as const);
 
       const result = await installSection(
         shop,
@@ -195,13 +282,25 @@ export async function action({ request }: ActionFunctionArgs) {
         themeName = theme.name;
       }
 
+      const isPdp = sectionType === "product-page" || sectionType.startsWith("pdp") || componentId.startsWith("pdp") || sectionType.startsWith("product-card");
+      const isCart = sectionType === "cart-drawer" || componentId.startsWith("cdr");
+      const isUrgency = sectionType === "urgency" || componentId.startsWith("urgency");
+
       let target: any;
       if (sectionType === "header" || sectionType.startsWith("header")) {
         target = { kind: "group", group: "header", replace: "header" };
       } else if (sectionType === "footer" || sectionType.startsWith("footer")) {
         target = { kind: "group", group: "footer", replace: "footer" };
-      } else if (targetChoice === "product" || (!targetChoice && (sectionType === "product-page" || sectionType.startsWith("pdp") || sectionType.startsWith("product-card")))) {
+      } else if (targetChoice === "product" || (!targetChoice && isPdp)) {
         target = { kind: "template", template: "product", position: "bottom" };
+      } else if (isCart) {
+        target = { kind: "template", template: "index", position: "bottom" };
+      } else if (isUrgency) {
+        if (componentId.includes("sticky") || componentId.includes("stock")) {
+          target = { kind: "template", template: "product", position: "bottom" };
+        } else {
+          target = { kind: "template", template: "index", position: "top" };
+        }
       } else {
         const topTypes = ["hero", "announcement", "marquee", "ticker"];
         const position = topTypes.includes(sectionType) ? "top" : "bottom";
@@ -372,18 +471,27 @@ function BentoSectionCard({
           <span style={{ width: 7, height: 7, borderRadius: 99, background: "#ef4444" }} />
           <span style={{ width: 7, height: 7, borderRadius: 99, background: "#f59e0b" }} />
           <span style={{ width: 7, height: 7, borderRadius: 99, background: "#10b981" }} />
-          <span
-            style={{
-              marginLeft: 8,
-              fontSize: 10,
-              fontWeight: 800,
-              color: "#38bdf8",
-              letterSpacing: "0.5px",
-              textTransform: "uppercase",
-            }}
-          >
-            {component.sectionType}
-          </span>
+          {(() => {
+            const isUrgency = component.category === "urgency" || component.componentId.startsWith("urgency");
+            const isPdp = component.category === "product-page" || component.sectionType === "product-page" || component.componentId.startsWith("pdp");
+            const isCart = component.category === "cart-drawer" || component.sectionType === "cart-drawer" || component.componentId.startsWith("cdr");
+            const label = isUrgency ? "⚡ Urgency Booster" : isPdp ? "💎 PDP Design" : isCart ? "🛒 Cart Drawer" : component.sectionType;
+            const color = isUrgency ? "#fbbf24" : isPdp ? "#34d399" : isCart ? "#38bdf8" : "#94a3b8";
+            return (
+              <span
+                style={{
+                  marginLeft: 8,
+                  fontSize: 10,
+                  fontWeight: 800,
+                  color,
+                  letterSpacing: "0.5px",
+                  textTransform: "uppercase",
+                }}
+              >
+                {label}
+              </span>
+            );
+          })()}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span
@@ -523,47 +631,72 @@ function BentoSectionCard({
           </div>
 
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
-            {component.visualStyle && (
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  color: "#059669",
-                  background: "#ecfdf5",
-                  padding: "2px 6px",
-                  borderRadius: 4,
-                  textTransform: "uppercase",
-                }}
-              >
-                {component.visualStyle}
-              </span>
-            )}
-            {component.family && (
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: "#475569",
-                  background: "#f1f5f9",
-                  padding: "2px 6px",
-                  borderRadius: 4,
-                }}
-              >
-                {component.family}
-              </span>
-            )}
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 600,
-                color: "#6b7280",
-                background: "#f3f4f6",
-                padding: "2px 6px",
-                borderRadius: 4,
-              }}
-            >
-              Shopify 2.0 Native
-            </span>
+            {(() => {
+              const isUrgency = component.category === "urgency" || component.componentId.startsWith("urgency");
+              const isPdp = component.category === "product-page" || component.sectionType === "product-page" || component.componentId.startsWith("pdp");
+              const isCart = component.category === "cart-drawer" || component.sectionType === "cart-drawer" || component.componentId.startsWith("cdr");
+
+              return (
+                <>
+                  {isUrgency && (
+                    <span style={{ fontSize: 10, fontWeight: 800, color: "#b45309", background: "#fef3c7", padding: "2px 7px", borderRadius: 4 }}>
+                      ⚡ Urgency Trigger
+                    </span>
+                  )}
+                  {isPdp && (
+                    <span style={{ fontSize: 10, fontWeight: 800, color: "#047857", background: "#d1fae5", padding: "2px 7px", borderRadius: 4 }}>
+                      💎 Complete PDP
+                    </span>
+                  )}
+                  {isCart && (
+                    <span style={{ fontSize: 10, fontWeight: 800, color: "#0369a1", background: "#e0f2fe", padding: "2px 7px", borderRadius: 4 }}>
+                      🛒 High-CRO Cart
+                    </span>
+                  )}
+                  {component.visualStyle && (
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "#059669",
+                        background: "#ecfdf5",
+                        padding: "2px 6px",
+                        borderRadius: 4,
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {component.visualStyle}
+                    </span>
+                  )}
+                  {component.family && (
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        color: "#475569",
+                        background: "#f1f5f9",
+                        padding: "2px 6px",
+                        borderRadius: 4,
+                      }}
+                    >
+                      {component.family}
+                    </span>
+                  )}
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 600,
+                      color: "#6b7280",
+                      background: "#f3f4f6",
+                      padding: "2px 6px",
+                      borderRadius: 4,
+                    }}
+                  >
+                    Shopify 2.0 Native
+                  </span>
+                </>
+              );
+            })()}
           </div>
         </div>
 
@@ -1013,7 +1146,7 @@ function LandingPageCard({
 }
 
 export default function PreMadeSectionsStore() {
-  const { shopDomain, category, q, totalCount, components, landingPages, isLandingPageCategory } = useLoaderData<typeof loader>();
+  const { shopDomain, category, niche, q, totalCount, components, landingPages, isLandingPageCategory } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
   const fetcher = useFetcher<any>();
 
@@ -1021,7 +1154,7 @@ export default function PreMadeSectionsStore() {
   const [activePreview, setActivePreview] = useState<any>(null);
   const [activeTarget, setActiveTarget] = useState<string>("auto");
   const [searchQuery, setSearchQuery] = useState(q);
-  const [sectionDevice, setSectionDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [sectionDevice, setSectionDevice] = useState<"desktop" | "laptop" | "tablet" | "mobile">("desktop");
 
   const busy = fetcher.state !== "idle";
   const data = fetcher.data;
@@ -1046,6 +1179,15 @@ export default function PreMadeSectionsStore() {
   const handleCategoryChange = (newCategory: string) => {
     const params = new URLSearchParams(searchParams);
     params.set("category", newCategory);
+    if (searchQuery) params.set("q", searchQuery);
+    else params.delete("q");
+    setSearchParams(params);
+  };
+
+  const handleNicheChange = (newNiche: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (newNiche === "all") params.delete("niche");
+    else params.set("niche", newNiche);
     if (searchQuery) params.set("q", searchQuery);
     else params.delete("q");
     setSearchParams(params);
@@ -1108,8 +1250,8 @@ export default function PreMadeSectionsStore() {
 
   return (
     <Page
-      title="Section Store"
-      subtitle="Browse verified, production-grade Shopify 2.0 sections & 10 complete D2C landing pages. Preview live and add directly to your theme with 1 click."
+      title="Converflow Studio (PageFly-Grade Builder)"
+      subtitle="Modular Page & Section Builder — Complete Landing Pages, 88+ PDP Variations, Slide Cart Drawers & Emergency Urgency Boosters with 1-click theme install."
       primaryAction={{
         content: "Open Theme Editor",
         url: themeEditorUrl,
@@ -1206,6 +1348,297 @@ export default function PreMadeSectionsStore() {
           )
         )}
 
+        {/* ── PageFly Studio Master Layout (Sidebar + Workspace) ── */}
+        <div className="cf-pagefly-layout">
+          {/* ── Left Category Navigation Rail (PageFly Style) ── */}
+          <aside className="cf-pagefly-sidebar">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #e2e8f0" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: "800" }}>
+                  PF
+                </div>
+                <div>
+                  <div style={{ fontSize: "13px", fontWeight: "800", color: "#0f172a" }}>PageFly Studio</div>
+                  <div style={{ fontSize: "11px", color: "#64748b" }}>Shopify 2.0 Engine</div>
+                </div>
+              </div>
+              <span style={{ fontSize: "10px", fontWeight: "700", color: "#059669", background: "#ecfdf5", border: "1px solid #a7f3d0", padding: "2px 6px", borderRadius: "999px" }}>
+                Online
+              </span>
+            </div>
+
+            {/* Category Groups Tree */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              {CATEGORY_GROUPS.map((group, gIdx) => (
+                <div key={gIdx}>
+                  <div style={{ fontSize: "10px", fontWeight: "800", color: "#94a3b8", letterSpacing: "0.5px", marginBottom: "6px", paddingLeft: "8px" }}>
+                    {group.title}
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+                    {group.items.map((cat) => {
+                      const isActive = category === cat.id;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => handleCategoryChange(cat.id)}
+                          style={{
+                            width: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            padding: "8px 10px",
+                            borderRadius: "8px",
+                            border: isActive ? "1px solid #0284c7" : "1px solid transparent",
+                            background: isActive ? "#f0f9ff" : "transparent",
+                            color: isActive ? "#0284c7" : "#334155",
+                            cursor: "pointer",
+                            textAlign: "left",
+                            transition: "all 0.15s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isActive) e.currentTarget.style.background = "#f8fafc";
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isActive) e.currentTarget.style.background = "transparent";
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span style={{ fontSize: "14px" }}>{cat.icon}</span>
+                            <div>
+                              <div style={{ fontSize: "12px", fontWeight: isActive ? 700 : 500 }}>{cat.label}</div>
+                            </div>
+                          </div>
+                          <span
+                            style={{
+                              fontSize: "10px",
+                              fontWeight: 700,
+                              padding: "1px 6px",
+                              borderRadius: "999px",
+                              background: isActive ? "#0284c7" : "#f1f5f9",
+                              color: isActive ? "#ffffff" : "#64748b",
+                            }}
+                          >
+                            {cat.count}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+
+              {/* Studio Quick Launch Apps */}
+              <div style={{ paddingTop: "10px", borderTop: "1px solid #f1f5f9" }}>
+                <div style={{ fontSize: "10px", fontWeight: "800", color: "#94a3b8", letterSpacing: "0.5px", marginBottom: "8px", paddingLeft: "8px" }}>
+                  PAGEFLY APPS
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <a
+                    href="/app/builder"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "8px 10px",
+                      borderRadius: "8px",
+                      textDecoration: "none",
+                      color: "#1e293b",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                    }}
+                  >
+                    <span>🎨</span> Visual Page Builder ↗
+                  </a>
+                  <a
+                    href="/app/theme"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "8px 10px",
+                      borderRadius: "8px",
+                      textDecoration: "none",
+                      color: "#1e293b",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                    }}
+                  >
+                    <span>🛡️</span> Theme Manager &amp; Assets ↗
+                  </a>
+                  <a
+                    href="/app/pagekit"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "8px 10px",
+                      borderRadius: "8px",
+                      textDecoration: "none",
+                      color: "#1e293b",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                    }}
+                  >
+                    <span>📦</span> PageKit Catalogue (151+) ↗
+                  </a>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* ── Right Content Area ── */}
+          <div className="cf-pagefly-content">
+            {/* Converflow PageFly Studio Overview Hero Card */}
+            <div style={{
+              background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f2b38 100%)",
+              borderRadius: "16px",
+          padding: "24px 28px",
+          color: "#ffffff",
+          boxShadow: "0 10px 25px -5px rgba(15, 23, 42, 0.25)",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          position: "relative",
+          overflow: "hidden"
+        }}>
+          {/* Subtle glow / grid accent */}
+          <div style={{
+            position: "absolute",
+            top: "-40px",
+            right: "-40px",
+            width: "200px",
+            height: "200px",
+            background: "radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%)",
+            pointerEvents: "none"
+          }} />
+
+          <BlockStack gap="300">
+            <InlineStack align="space-between" blockAlign="center" wrap>
+              <InlineStack gap="200" blockAlign="center">
+                <span style={{ fontSize: "20px" }}>⚡</span>
+                <span style={{ fontSize: "18px", fontWeight: 700, letterSpacing: "-0.02em", color: "#f8fafc" }}>
+                  Converflow Studio
+                </span>
+                <span style={{
+                  background: "rgba(16, 185, 129, 0.2)",
+                  color: "#34d399",
+                  padding: "2px 10px",
+                  borderRadius: "9999px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  border: "1px solid rgba(52, 211, 153, 0.3)"
+                }}>
+                  PageFly Mode
+                </span>
+                <span style={{
+                  background: "rgba(2, 132, 199, 0.2)",
+                  color: "#38bdf8",
+                  padding: "2px 10px",
+                  borderRadius: "9999px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  border: "1px solid rgba(56, 189, 248, 0.3)"
+                }}>
+                  Shopify 2.0 Native
+                </span>
+              </InlineStack>
+
+              <span style={{ color: "#94a3b8", fontSize: "13px" }}>
+                Connected Store: <strong style={{ color: "#e2e8f0" }}>{shopDomain}</strong>
+              </span>
+            </InlineStack>
+
+            <p style={{ margin: 0, color: "#cbd5e1", fontSize: "14px", lineHeight: "1.5", maxWidth: "860px" }}>
+              Build high-converting Shopify storefronts without theme locks or monthly bloat. Preview live across Desktop, Tablet &amp; Mobile devices, then install directly into your live theme or safe draft theme with 1 click.
+            </p>
+
+            {/* Interactive Section Type Quick Jump Cards */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+              gap: "12px",
+              marginTop: "4px"
+            }}>
+              <div
+                onClick={() => handleCategoryChange("landing-page")}
+                style={{
+                  background: category === "landing-page" ? "rgba(2, 132, 199, 0.25)" : "rgba(255, 255, 255, 0.05)",
+                  border: category === "landing-page" ? "1px solid #38bdf8" : "1px solid rgba(255, 255, 255, 0.12)",
+                  borderRadius: "12px",
+                  padding: "12px 16px",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#f8fafc" }}>🚀 Landing Pages</span>
+                  <span style={{ background: "#0284c7", color: "#fff", borderRadius: "8px", padding: "1px 6px", fontSize: "11px", fontWeight: 700 }}>12</span>
+                </div>
+                <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8" }}>Full D2C home stores (11-13 cohesive sections)</p>
+              </div>
+
+              <div
+                onClick={() => handleCategoryChange("product-page")}
+                style={{
+                  background: category === "product-page" ? "rgba(16, 185, 129, 0.25)" : "rgba(255, 255, 255, 0.05)",
+                  border: category === "product-page" ? "1px solid #34d399" : "1px solid rgba(255, 255, 255, 0.12)",
+                  borderRadius: "12px",
+                  padding: "12px 16px",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#f8fafc" }}>💎 Product Pages</span>
+                  <span style={{ background: "#059669", color: "#fff", borderRadius: "8px", padding: "1px 6px", fontSize: "11px", fontWeight: 700 }}>88</span>
+                </div>
+                <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8" }}>Tech, Luxury, Fashion &amp; Dropshipping PDPs</p>
+              </div>
+
+              <div
+                onClick={() => handleCategoryChange("cart-drawer")}
+                style={{
+                  background: category === "cart-drawer" ? "rgba(245, 158, 11, 0.25)" : "rgba(255, 255, 255, 0.05)",
+                  border: category === "cart-drawer" ? "1px solid #fbbf24" : "1px solid rgba(255, 255, 255, 0.12)",
+                  borderRadius: "12px",
+                  padding: "12px 16px",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#f8fafc" }}>🛒 Cart Drawers</span>
+                  <span style={{ background: "#d97706", color: "#fff", borderRadius: "8px", padding: "1px 6px", fontSize: "11px", fontWeight: 700 }}>20</span>
+                </div>
+                <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8" }}>Slide drawers with progress bars &amp; upsells</p>
+              </div>
+
+              <div
+                onClick={() => handleCategoryChange("urgency")}
+                style={{
+                  background: category === "urgency" ? "rgba(225, 29, 72, 0.25)" : "rgba(255, 255, 255, 0.05)",
+                  border: category === "urgency" ? "1px solid #fb7185" : "1px solid rgba(255, 255, 255, 0.12)",
+                  borderRadius: "12px",
+                  padding: "12px 16px",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#f8fafc" }}>⚡ Urgency Creators</span>
+                  <span style={{ background: "#e11d48", color: "#fff", borderRadius: "8px", padding: "1px 6px", fontSize: "11px", fontWeight: 700 }}>5</span>
+                </div>
+                <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8" }}>Emergency countdowns, stock scarcity, proof</p>
+              </div>
+            </div>
+          </BlockStack>
+        </div>
+
         {/* Search & Placement Controls */}
         <Card>
           <BlockStack gap="300">
@@ -1263,6 +1696,37 @@ export default function PreMadeSectionsStore() {
                 );
               })}
             </InlineStack>
+
+            <Divider />
+
+            {/* Niche Filter Chips */}
+            <BlockStack gap="150">
+              <InlineStack align="space-between" blockAlign="center">
+                <Text as="span" variant="bodySm" fontWeight="semibold" tone="subdued">
+                  Filter by Niche / Industry:
+                </Text>
+                {niche !== "all" && (
+                  <Button variant="plain" size="slim" onClick={() => handleNicheChange("all")}>
+                    Clear niche filter
+                  </Button>
+                )}
+              </InlineStack>
+              <InlineStack gap="150" wrap>
+                {NICHE_FILTERS.map((nf) => {
+                  const isActive = niche === nf.id || (niche === "" && nf.id === "all");
+                  return (
+                    <Button
+                      key={nf.id}
+                      size="slim"
+                      variant={isActive ? "primary" : "tertiary"}
+                      onClick={() => handleNicheChange(nf.id)}
+                    >
+                      {nf.label}
+                    </Button>
+                  );
+                })}
+              </InlineStack>
+            </BlockStack>
           </BlockStack>
         </Card>
 
@@ -1287,8 +1751,42 @@ export default function PreMadeSectionsStore() {
           </Text>
         </InlineStack>
 
-        {/* CSS for Bento & Landing Page Grids */}
+        {/* CSS for Bento & Landing Page Grids & PageFly Studio Layout */}
         <style>{`
+          .cf-pagefly-layout {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            width: 100%;
+          }
+          .cf-pagefly-sidebar {
+            width: 270px;
+            flex-shrink: 0;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            position: sticky;
+            top: 16px;
+            box-sizing: border-box;
+          }
+          .cf-pagefly-content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+          }
+          @media (max-width: 1024px) {
+            .cf-pagefly-layout {
+              flex-direction: column;
+            }
+            .cf-pagefly-sidebar {
+              width: 100%;
+              position: static;
+            }
+          }
           .cf-bento-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1449,6 +1947,8 @@ export default function PreMadeSectionsStore() {
             })}
           </div>
         )}
+          </div>
+        </div>
 
         {/* ── PageFly-Style Section Preview & Submit Modal ── */}
         {activePreview && (
@@ -1478,6 +1978,13 @@ export default function PreMadeSectionsStore() {
                         onClick={() => setSectionDevice("desktop")}
                       >
                         🖥️ Desktop
+                      </Button>
+                      <Button
+                        size="slim"
+                        pressed={sectionDevice === "laptop"}
+                        onClick={() => setSectionDevice("laptop")}
+                      >
+                        💻 Laptop
                       </Button>
                       <Button
                         size="slim"
@@ -1620,7 +2127,7 @@ export default function PreMadeSectionsStore() {
                 {/* Responsive Viewport Frame */}
                 <div style={{
                   background: "#0F172A",
-                  padding: sectionDevice === "mobile" ? "24px 0" : sectionDevice === "tablet" ? "16px 0" : "0",
+                  padding: sectionDevice === "mobile" ? "24px 0" : sectionDevice === "tablet" ? "16px 0" : sectionDevice === "laptop" ? "12px 0" : "0",
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
@@ -1631,10 +2138,10 @@ export default function PreMadeSectionsStore() {
                     title="Section Live Preview"
                     src={activePreview.url}
                     style={{
-                      width: sectionDevice === "mobile" ? "390px" : sectionDevice === "tablet" ? "768px" : "100%",
+                      width: sectionDevice === "mobile" ? "390px" : sectionDevice === "tablet" ? "768px" : sectionDevice === "laptop" ? "1024px" : "100%",
                       height: "70vh",
-                      border: sectionDevice === "mobile" ? "8px solid #1E293B" : sectionDevice === "tablet" ? "4px solid #334155" : "0",
-                      borderRadius: sectionDevice === "mobile" ? "28px" : sectionDevice === "tablet" ? "12px" : "0",
+                      border: sectionDevice === "mobile" ? "8px solid #1E293B" : sectionDevice === "tablet" ? "4px solid #334155" : sectionDevice === "laptop" ? "3px solid #475569" : "0",
+                      borderRadius: sectionDevice === "mobile" ? "28px" : sectionDevice === "tablet" ? "12px" : sectionDevice === "laptop" ? "8px" : "0",
                       boxShadow: sectionDevice !== "desktop" ? "0 25px 50px -12px rgba(0, 0, 0, 0.6)" : "none",
                       display: "block",
                       background: "#fff",

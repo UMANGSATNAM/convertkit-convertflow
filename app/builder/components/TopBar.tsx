@@ -116,6 +116,19 @@ export const TopBar: React.FC<TopBarProps> = ({
         >
           {status}
         </span>
+        <span
+          style={{
+            fontSize: "11px",
+            fontWeight: "700",
+            padding: "2px 8px",
+            borderRadius: "999px",
+            backgroundColor: "rgba(2, 132, 199, 0.2)",
+            color: "#38bdf8",
+            border: "1px solid rgba(56, 189, 248, 0.3)",
+          }}
+        >
+          ⚡ PageFly Mode
+        </span>
       </div>
 
       {/* Center: Responsive Viewport Switcher + Undo/Redo */}
@@ -186,7 +199,27 @@ export const TopBar: React.FC<TopBarProps> = ({
               transition: "all 0.15s ease",
             }}
           >
-            <span>🖥️</span> Desktop
+            <span>🖥️</span> Desktop (1440px)
+          </button>
+          <button
+            type="button"
+            onClick={() => onViewportChange("laptop")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "5px 12px",
+              fontSize: "12px",
+              fontWeight: "600",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              backgroundColor: viewport === "laptop" ? "#0284c7" : "transparent",
+              color: viewport === "laptop" ? "#ffffff" : "#94a3b8",
+              transition: "all 0.15s ease",
+            }}
+          >
+            <span>💻</span> Laptop (1024px)
           </button>
           <button
             type="button"
@@ -206,7 +239,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               transition: "all 0.15s ease",
             }}
           >
-            <span>💻</span> Tablet
+            <span>💻</span> Tablet (768px)
           </button>
           <button
             type="button"
@@ -226,7 +259,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               transition: "all 0.15s ease",
             }}
           >
-            <span>📱</span> Mobile
+            <span>📱</span> Mobile (390px)
           </button>
         </div>
 

@@ -60,6 +60,14 @@ function cleanLiquid(liquidContent: string, sectionIdx: number, overrides?: any)
     "forloop.first": "true",
     "request.locale.iso_code": "en",
     "cart.currency.symbol": "$",
+    "product.title": "Aura Titanium Minimalist Edition",
+    "product.price": "$129.00",
+    "product.compare_at_price": "$189.00",
+    "product.description": "Engineered with ultra-pure materials and crafted for elevated everyday carry.",
+    "product.featured_image": DEMO_IMAGES[0],
+    "cart.item_count": "2",
+    "cart.total_price": "$198.00",
+    "settings.free_shipping_threshold": "100",
   };
 
   // Populate from schema settings
@@ -398,7 +406,54 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         .map(([, v]) => v)
         .join("\n");
 
-      const body = `<div style="max-width:1440px; margin:0 auto; padding:${isEmbed ? '0' : '40px 20px'};">${cleaned}</div>`;
+      const isDrawer = sectionId.startsWith("cdr-") || sec.source.includes("cf-drawer");
+      const isSticky = sectionId.includes("sticky") || sec.source.includes("cf-sticky");
+      const isFloating = sectionId.includes("live-proof") || sec.source.includes("cf-floating-toast");
+
+      const previewHelpers = `
+        <style>
+          ${isDrawer ? `
+            .cf-drawer, .cdr-v1, [id="cf-cart-drawer"] {
+              visibility: visible !important;
+              position: relative !important;
+              inset: auto !important;
+              margin: 24px auto !important;
+              display: block !important;
+            }
+            .cf-drawer__panel {
+              transform: translateX(0) !important;
+              position: relative !important;
+              margin: 0 auto !important;
+              max-width: 440px !important;
+              box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2) !important;
+              border-radius: 16px !important;
+              overflow: hidden !important;
+              border: 1px solid #e2e8f0 !important;
+            }
+            .cf-drawer__overlay { display: none !important; }
+          ` : ""}
+          ${isSticky ? `
+            .cf-sticky-urgency, .cf-sticky-atc {
+              position: relative !important;
+              margin: 30px auto !important;
+              border-radius: 12px !important;
+              max-width: 1040px !important;
+            }
+          ` : ""}
+          ${isFloating ? `
+            .cf-floating-toast {
+              position: relative !important;
+              bottom: auto !important;
+              left: auto !important;
+              margin: 30px auto !important;
+              display: flex !important;
+              justify-content: center !important;
+            }
+          ` : ""}
+        </style>
+      `;
+
+      const body = `<div style="max-width:1440px; margin:0 auto; padding:${isEmbed ? '0' : '40px 20px'};">${previewHelpers}${cleaned}</div>`;
       const html = wrapHtmlDocument(`Section: ${sectionId}`, body, extraCss, extraJs, isEmbed);
       return new Response(html, {
         status: 200,

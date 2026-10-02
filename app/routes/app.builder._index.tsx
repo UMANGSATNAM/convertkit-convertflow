@@ -187,14 +187,20 @@ export default function BuilderDashboardPage() {
           <BlockStack gap="300">
             <InlineStack align="space-between" blockAlign="center">
               <div style={{ display: "flex", gap: "8px" }}>
-                {["ALL", "LANDING", "PRODUCT", "COLLECTION", "HOME"].map((t) => (
+                {[
+                  { id: "ALL", label: "🌟 All Pages" },
+                  { id: "LANDING", label: "🚀 Landing Pages" },
+                  { id: "PRODUCT", label: "💎 Product Pages" },
+                  { id: "COLLECTION", label: "🏷️ Collections" },
+                  { id: "HOME", label: "🏠 Homepages" },
+                ].map((t) => (
                   <Button
-                    key={t}
+                    key={t.id}
                     size="slim"
-                    variant={filterType === t ? "primary" : "secondary"}
-                    onClick={() => setFilterType(t)}
+                    variant={filterType === t.id ? "primary" : "secondary"}
+                    onClick={() => setFilterType(t.id)}
                   >
-                    {t === "ALL" ? "All Pages" : `${t[0]}${t.slice(1).toLowerCase()}s`}
+                    {t.label}
                   </Button>
                 ))}
               </div>

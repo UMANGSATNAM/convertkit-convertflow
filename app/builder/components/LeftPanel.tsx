@@ -1,6 +1,5 @@
-// app/builder/components/LeftPanel.tsx
 import React, { useState } from "react";
-import { ELEMENT_PALETTE, PREBUILT_SECTIONS } from "../default-templates";
+import { ELEMENT_PALETTE, PREBUILT_SECTIONS, PREBUILT_URGENCY_SECTIONS } from "../default-templates";
 import type { Block, Section, PageSchema } from "../types";
 
 interface LeftPanelProps {
@@ -26,7 +25,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
   isOpen,
   onToggle,
 }) => {
-  const [activeTab, setActiveTab] = useState<"elements" | "sections" | "layers">("elements");
+  const [activeTab, setActiveTab] = useState<"elements" | "sections" | "urgency" | "layers">("elements");
   const [activeCategory, setActiveCategory] = useState<"all" | "basic" | "product" | "cro" | "layout">("all");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -92,7 +91,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
       <div style={{ borderBottom: "1px solid #e2e8f0", padding: "12px 14px 0 14px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
           <span style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            Add Content
+            PageFly Studio Library
           </span>
           <button
             type="button"
@@ -105,7 +104,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
         </div>
 
         {/* Tab navigation */}
-        <div style={{ display: "flex", gap: "4px" }}>
+        <div style={{ display: "flex", gap: "2px" }}>
           <button
             type="button"
             onClick={() => setActiveTab("elements")}
@@ -115,7 +114,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
               border: "none",
               borderBottom: activeTab === "elements" ? "2px solid #0284c7" : "2px solid transparent",
               background: "none",
-              fontSize: "13px",
+              fontSize: "12px",
               fontWeight: activeTab === "elements" ? "700" : "500",
               color: activeTab === "elements" ? "#0284c7" : "#64748b",
               cursor: "pointer",
@@ -132,13 +131,30 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
               border: "none",
               borderBottom: activeTab === "sections" ? "2px solid #0284c7" : "2px solid transparent",
               background: "none",
-              fontSize: "13px",
+              fontSize: "12px",
               fontWeight: activeTab === "sections" ? "700" : "500",
               color: activeTab === "sections" ? "#0284c7" : "#64748b",
               cursor: "pointer",
             }}
           >
             📦 Sections
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("urgency")}
+            style={{
+              flex: 1,
+              padding: "7px 0",
+              border: "none",
+              borderBottom: activeTab === "urgency" ? "2px solid #e11d48" : "2px solid transparent",
+              background: "none",
+              fontSize: "12px",
+              fontWeight: activeTab === "urgency" ? "700" : "500",
+              color: activeTab === "urgency" ? "#e11d48" : "#64748b",
+              cursor: "pointer",
+            }}
+          >
+            ⚡ Urgency
           </button>
           <button
             type="button"
@@ -149,7 +165,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
               border: "none",
               borderBottom: activeTab === "layers" ? "2px solid #0284c7" : "2px solid transparent",
               background: "none",
-              fontSize: "13px",
+              fontSize: "12px",
               fontWeight: activeTab === "layers" ? "700" : "500",
               color: activeTab === "layers" ? "#0284c7" : "#64748b",
               cursor: "pointer",
@@ -292,7 +308,126 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
         </div>
       )}
 
-      {/* Tab 3: Layers / Tree */}
+      {/* Tab 3: Urgency & Scarcity Boosters */}
+      {activeTab === "urgency" && (
+        <div style={{ flex: 1, overflowY: "auto", padding: "14px" }}>
+          <div style={{
+            background: "linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%)",
+            border: "1px solid #fecdd3",
+            borderRadius: "8px",
+            padding: "10px 12px",
+            marginBottom: "14px",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+              <span style={{ fontSize: "14px" }}>⚡</span>
+              <span style={{ fontSize: "12px", fontWeight: "800", color: "#9f1239", textTransform: "uppercase" }}>
+                Emergency Urgency Suite
+              </span>
+            </div>
+            <p style={{ margin: 0, fontSize: "11px", color: "#881337", lineHeight: "1.4" }}>
+              Insert high-converting urgency creators proven to reduce cart abandonment and increase conversion velocity.
+            </p>
+          </div>
+
+          <div style={{ fontSize: "11px", fontWeight: "700", color: "#475569", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>
+            Prebuilt Urgency Sections (1-Click Add):
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {PREBUILT_URGENCY_SECTIONS.map((sec) => (
+              <div
+                key={sec.id}
+                onClick={() => onAddSection(sec.create())}
+                style={{
+                  border: "1px solid #fecdd3",
+                  borderRadius: "8px",
+                  padding: "12px",
+                  backgroundColor: "#ffffff",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#e11d48";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                  e.currentTarget.style.boxShadow = "0 4px 6px -1px rgba(225, 29, 72, 0.15)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#fecdd3";
+                  e.currentTarget.style.transform = "none";
+                  e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
+                  <span style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a" }}>
+                    {sec.title}
+                  </span>
+                  <span style={{
+                    fontSize: "9px",
+                    fontWeight: "800",
+                    background: "#ffe4e6",
+                    color: "#e11d48",
+                    padding: "2px 6px",
+                    borderRadius: "999px",
+                  }}>
+                    HIGH CRO
+                  </span>
+                </div>
+                <div style={{ fontSize: "11px", color: "#64748b", marginBottom: "8px" }}>
+                  {sec.id === "sec_urgency_flash_bar"
+                    ? "Sticky countdown bar with storewide discount and coupon code"
+                    : sec.id === "sec_urgency_stock_scarcity"
+                    ? "Live low-stock alert with real-time remaining inventory progress meter"
+                    : sec.id === "sec_urgency_live_proof"
+                    ? "Verified real-time customer purchase notification badge"
+                    : sec.id === "sec_urgency_cart_timer"
+                    ? "Locked cart reservation countdown timer banner"
+                    : "Floating bottom sticky add-to-cart bar with 1-click checkout"}
+                </div>
+                <div style={{ display: "inline-block", fontSize: "11px", fontWeight: "700", color: "#e11d48" }}>
+                  + Insert Section Into Canvas →
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ fontSize: "11px", fontWeight: "700", color: "#475569", textTransform: "uppercase", letterSpacing: "0.5px", marginTop: "16px", marginBottom: "8px" }}>
+            Urgency Elements (Add to Selected Column):
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+            {ELEMENT_PALETTE.filter((el) => el.category === "cro").map((el) => (
+              <div
+                key={el.type}
+                onClick={() => onAddBlock(el.defaultBlock())}
+                style={{
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "6px",
+                  padding: "10px 8px",
+                  textAlign: "center",
+                  cursor: "pointer",
+                  backgroundColor: "#ffffff",
+                  transition: "all 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#e11d48";
+                  e.currentTarget.style.backgroundColor = "#fff1f2";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                  e.currentTarget.style.backgroundColor = "#ffffff";
+                }}
+              >
+                <div style={{ fontSize: "20px", marginBottom: "4px" }}>{el.icon}</div>
+                <div style={{ fontSize: "11px", fontWeight: "700", color: "#0f172a" }}>{el.title}</div>
+                <div style={{ fontSize: "10px", color: "#e11d48", fontWeight: "600", marginTop: "2px" }}>+ Add Element</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Tab 4: Layers / Tree */}
       {activeTab === "layers" && (
         <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
           <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "10px" }}>

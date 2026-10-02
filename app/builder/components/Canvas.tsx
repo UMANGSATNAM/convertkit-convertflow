@@ -33,6 +33,8 @@ export const Canvas: React.FC<CanvasProps> = ({
         return "390px";
       case "tablet":
         return "768px";
+      case "laptop":
+        return "1024px";
       case "desktop":
       default:
         return "100%";

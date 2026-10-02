@@ -853,7 +853,196 @@ export const PREBUILT_SECTIONS = [
       ],
     }),
   },
+  {
+    id: "sec_urgency_flash_bar",
+    title: "⚡ Flash Sale Urgency Countdown Bar",
+    category: "urgency",
+    create: (): Section => ({
+      id: generateId("sec"),
+      title: "Flash Sale Urgency Bar",
+      styles: {
+        paddingTop: 16,
+        paddingBottom: 16,
+        backgroundColor: "#0f172a",
+      },
+      columns: [
+        {
+          id: generateId("col"),
+          width: 12,
+          blocks: [
+            {
+              id: generateId("b"),
+              type: "countdown_timer",
+              settings: {
+                title: "🔥 FLASH SALE ENDING: 40% OFF STOREWIDE — CODE: FLASH40",
+                hours: 2,
+                minutes: 48,
+                seconds: 15,
+              },
+              styles: {
+                textColor: "#f8fafc",
+                backgroundColor: "transparent",
+                marginBottom: 0,
+              },
+            },
+          ],
+        },
+      ],
+    }),
+  },
+  {
+    id: "sec_urgency_stock_scarcity",
+    title: "🔥 Stock Scarcity & Inventory Urgency Meter",
+    category: "urgency",
+    create: (): Section => ({
+      id: generateId("sec"),
+      title: "Stock Scarcity Meter",
+      styles: {
+        paddingTop: 20,
+        paddingBottom: 20,
+        backgroundColor: "#fff1f2",
+      },
+      columns: [
+        {
+          id: generateId("col"),
+          width: 12,
+          blocks: [
+            {
+              id: generateId("b"),
+              type: "product_stock_urgency",
+              settings: {
+                text: "⚡ CRITICAL DEMAND: Only 4 items left in stock! 87 shoppers viewing right now.",
+                percentage: 92,
+              },
+              styles: {
+                textColor: "#9f1239",
+                marginBottom: 0,
+              },
+            },
+          ],
+        },
+      ],
+    }),
+  },
+  {
+    id: "sec_urgency_live_proof",
+    title: "👥 Real-Time Live Buyer Social Proof",
+    category: "urgency",
+    create: (): Section => ({
+      id: generateId("sec"),
+      title: "Live Buyer Proof",
+      styles: {
+        paddingTop: 24,
+        paddingBottom: 24,
+        backgroundColor: "#f0fdf4",
+      },
+      columns: [
+        {
+          id: generateId("col"),
+          width: 12,
+          blocks: [
+            {
+              id: generateId("b"),
+              type: "testimonial",
+              settings: {
+                quote: "“Just ordered 2 pairs! Fast COD checkout and unbelievable quality.”",
+                name: "Aman Sharma from Mumbai (Purchased 4 minutes ago)",
+              },
+              styles: {
+                backgroundColor: "#ffffff",
+                paddingTop: 16,
+                paddingBottom: 16,
+                paddingLeft: 20,
+                paddingRight: 20,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: "#bbf7d0",
+                marginBottom: 0,
+              },
+            },
+          ],
+        },
+      ],
+    }),
+  },
+  {
+    id: "sec_urgency_cart_timer",
+    title: "⏳ Cart Reservation Timer & Locked Price",
+    category: "urgency",
+    create: (): Section => ({
+      id: generateId("sec"),
+      title: "Cart Reservation Timer",
+      styles: {
+        paddingTop: 16,
+        paddingBottom: 16,
+        backgroundColor: "#fef3c7",
+      },
+      columns: [
+        {
+          id: generateId("col"),
+          width: 12,
+          blocks: [
+            {
+              id: generateId("b"),
+              type: "countdown_timer",
+              settings: {
+                title: "🔒 YOUR CART IS RESERVED FOR THE NEXT:",
+                hours: 0,
+                minutes: 9,
+                seconds: 52,
+              },
+              styles: {
+                textColor: "#92400e",
+                marginBottom: 0,
+              },
+            },
+          ],
+        },
+      ],
+    }),
+  },
+  {
+    id: "sec_urgency_sticky_atc",
+    title: "🛒 Sticky Floating Add-to-Cart Conversion Bar",
+    category: "urgency",
+    create: (): Section => ({
+      id: generateId("sec"),
+      title: "Sticky Add to Cart Bar",
+      styles: {
+        paddingTop: 16,
+        paddingBottom: 16,
+        backgroundColor: "#0f172a",
+      },
+      columns: [
+        {
+          id: generateId("col"),
+          width: 12,
+          blocks: [
+            {
+              id: generateId("b"),
+              type: "product_atc",
+              settings: {
+                text: "⚡ INSTANT CHECKOUT — 40% OFF APPLIED",
+                showQuantity: true,
+              },
+              styles: {
+                backgroundColor: "#0284c7",
+                textColor: "#ffffff",
+                borderRadius: 8,
+                paddingTop: 14,
+                paddingBottom: 14,
+                width: "100%",
+                marginBottom: 0,
+              },
+            },
+          ],
+        },
+      ],
+    }),
+  },
 ];
+
+export const PREBUILT_URGENCY_SECTIONS = PREBUILT_SECTIONS.filter((s) => s.category === "urgency");
 
 export const PREBUILT_TEMPLATES: Array<{
   id: string;

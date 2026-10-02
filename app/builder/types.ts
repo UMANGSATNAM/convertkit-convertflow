@@ -1,7 +1,7 @@
 // app/builder/types.ts
 // Core data models for ConvertFlow PageFly-style Visual Page Builder
 
-export type DeviceViewport = "desktop" | "tablet" | "mobile";
+export type DeviceViewport = "desktop" | "laptop" | "tablet" | "mobile";
 
 export type LayoutMode = "FULL_PAGE_NO_CHROME" | "THEME_CHROME";
 

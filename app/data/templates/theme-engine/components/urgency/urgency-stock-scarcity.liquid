@@ -1,0 +1,160 @@
+{% comment %}
+  Urgency Stock Scarcity - Real-Time Low Stock & Cart Demand Meter
+  PageFly-Style Booster Section
+{% endcomment %}
+
+<div id="cf-scarcity-{{ section.id }}" class="cf-scarcity-box" style="background: {{ section.settings.bg_color | default: '#fff7ed' }}; border-color: {{ section.settings.border_color | default: '#fed7aa' }};">
+  <div class="cf-scarcity-content">
+    <div class="cf-scarcity-header">
+      <div class="cf-scarcity-icon-pulse">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"></path>
+        </svg>
+      </div>
+      <div class="cf-scarcity-text">
+        <span class="cf-scarcity-title" style="color: {{ section.settings.text_color | default: '#9a3412' }};">
+          {{ section.settings.alert_text | default: 'Hurry! Only' }}
+          <strong class="cf-scarcity-stock-num">3</strong>
+          {{ section.settings.stock_suffix | default: 'items left in stock!' }}
+        </span>
+        <span class="cf-scarcity-sub" style="color: {{ section.settings.sub_text_color | default: '#c2410c' }};">
+          ⚡ <strong class="cf-scarcity-viewers-num">18</strong> shoppers have this in their cart right now.
+        </span>
+      </div>
+    </div>
+
+    <!-- Animated Progress Bar -->
+    <div class="cf-scarcity-meter">
+      <div class="cf-scarcity-fill" style="background: linear-gradient(90deg, #ea580c, #f97316); width: 22%;"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cf-scarcity-box {
+    margin: 16px 0;
+    padding: 14px 18px;
+    border-radius: 10px;
+    border: 1px solid #fed7aa;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .cf-scarcity-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cf-scarcity-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .cf-scarcity-icon-pulse {
+    width: 34px;
+    height: 34px;
+    border-radius: 99px;
+    background: #ffedd5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    animation: cfFlamePulse 1.5s infinite ease-in-out;
+  }
+  @keyframes cfFlamePulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.4); }
+    50% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(234, 88, 12, 0); }
+  }
+  .cf-scarcity-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .cf-scarcity-title {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .cf-scarcity-stock-num {
+    background: #ea580c;
+    color: #ffffff;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin: 0 2px;
+    font-weight: 800;
+  }
+  .cf-scarcity-sub {
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.9;
+  }
+  .cf-scarcity-meter {
+    width: 100%;
+    height: 7px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 99px;
+    overflow: hidden;
+    position: relative;
+  }
+  .cf-scarcity-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 1s ease-in-out;
+    position: relative;
+  }
+  .cf-scarcity-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+    animation: cfShimmer 2s infinite;
+  }
+  @keyframes cfShimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+</style>
+
+<script>
+  (function() {
+    var box = document.getElementById("cf-scarcity-{{ section.id }}");
+    if (!box) return;
+    var stockEl = box.querySelector(".cf-scarcity-stock-num");
+    var viewersEl = box.querySelector(".cf-scarcity-viewers-num");
+    var fillEl = box.querySelector(".cf-scarcity-fill");
+
+    var minStock = {{ section.settings.min_stock | default: 2 }};
+    var maxStock = {{ section.settings.max_stock | default: 5 }};
+    var currentStock = Math.floor(Math.random() * (maxStock - minStock + 1)) + minStock;
+    if (stockEl) stockEl.textContent = currentStock;
+    if (fillEl) fillEl.style.width = Math.max(15, currentStock * 8) + "%";
+
+    setInterval(function() {
+      if (viewersEl) {
+        var base = parseInt(viewersEl.textContent, 10) || 16;
+        var delta = (Math.random() > 0.5 ? 1 : -1) * Math.floor(Math.random() * 3);
+        viewersEl.textContent = Math.max(11, Math.min(32, base + delta));
+      }
+    }, 4000);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Urgency Stock Scarcity",
+  "settings": [
+    { "type": "text", "id": "alert_text", "label": "Alert Prefix", "default": "Hurry! Only" },
+    { "type": "text", "id": "stock_suffix", "label": "Stock Suffix", "default": "items left in stock!" },
+    { "type": "number", "id": "min_stock", "label": "Simulated Min Stock", "default": 2 },
+    { "type": "number", "id": "max_stock", "label": "Simulated Max Stock", "default": 5 },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#fff7ed" },
+    { "type": "color", "id": "border_color", "label": "Border Color", "default": "#fed7aa" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#9a3412" },
+    { "type": "color", "id": "sub_text_color", "label": "Subtitle Color", "default": "#c2410c" }
+  ],
+  "presets": [
+    {
+      "name": "Urgency Stock Scarcity"
+    }
+  ]
+}
+{% endschema %}
