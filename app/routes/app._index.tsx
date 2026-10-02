@@ -708,18 +708,19 @@ function BentoSectionCard({
             disabled={isPreviewing}
             style={{
               flex: 1,
-              background: "#0284c7",
-              color: "#ffffff",
-              border: "none",
+              background: "#ffffff",
+              color: "#0f172a",
+              border: "1px solid #cbd5e1",
               padding: "7px 10px",
-              borderRadius: 8,
+              borderRadius: 6,
               fontSize: 12,
-              fontWeight: 700,
+              fontWeight: 600,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               gap: 4,
+              transition: "all 0.15s ease",
             }}
           >
             👁️ Preview
@@ -730,13 +731,13 @@ function BentoSectionCard({
             disabled={isInstalling}
             title="Safe install to private preview theme"
             style={{
-              background: "#f1f5f9",
-              color: "#0f172a",
-              border: "1px solid #cbd5e1",
-              padding: "7px 10px",
-              borderRadius: 8,
+              background: "#f8fafc",
+              color: "#475569",
+              border: "1px solid #e2e8f0",
+              padding: "7px 8px",
+              borderRadius: 6,
               fontSize: 11,
-              fontWeight: 700,
+              fontWeight: 600,
               cursor: "pointer",
               whiteSpace: "nowrap",
             }}
@@ -753,11 +754,12 @@ function BentoSectionCard({
               color: "#ffffff",
               border: "none",
               padding: "7px 10px",
-              borderRadius: 8,
+              borderRadius: 6,
               fontSize: 11,
               fontWeight: 700,
               cursor: "pointer",
               whiteSpace: "nowrap",
+              transition: "background 0.15s ease",
             }}
           >
             ⚡ Live
@@ -1083,18 +1085,19 @@ function LandingPageCard({
             onClick={onPreview}
             style={{
               flex: 1.2,
-              background: "#0284c7",
-              color: "#ffffff",
-              border: "none",
-              padding: "9px 12px",
-              borderRadius: 8,
+              background: "#ffffff",
+              color: "#0f172a",
+              border: "1px solid #cbd5e1",
+              padding: "8px 12px",
+              borderRadius: 6,
               fontSize: 12,
-              fontWeight: 700,
+              fontWeight: 600,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               gap: 4,
+              transition: "all 0.15s ease",
             }}
           >
             👁️ Studio Preview
@@ -1107,12 +1110,12 @@ function LandingPageCard({
             style={{
               flex: 1,
               background: "#f8fafc",
-              color: "#0f172a",
-              border: "1px solid #cbd5e1",
-              padding: "9px 10px",
-              borderRadius: 8,
+              color: "#475569",
+              border: "1px solid #e2e8f0",
+              padding: "8px 10px",
+              borderRadius: 6,
               fontSize: 11,
-              fontWeight: 700,
+              fontWeight: 600,
               cursor: "pointer",
               whiteSpace: "nowrap",
             }}
@@ -1129,12 +1132,13 @@ function LandingPageCard({
               background: "#0f172a",
               color: "#ffffff",
               border: "none",
-              padding: "9px 10px",
-              borderRadius: 8,
+              padding: "8px 10px",
+              borderRadius: 6,
               fontSize: 11,
               fontWeight: 700,
               cursor: "pointer",
               whiteSpace: "nowrap",
+              transition: "background 0.15s ease",
             }}
           >
             ⚡ Add Live
@@ -1250,6 +1254,7 @@ export default function PreMadeSectionsStore() {
 
   return (
     <Page
+      fullWidth
       title="Converflow Studio (PageFly-Grade Builder)"
       subtitle="Modular Page & Section Builder — Complete Landing Pages, 88+ PDP Variations, Slide Cart Drawers & Emergency Urgency Boosters with 1-click theme install."
       primaryAction={{
@@ -1387,14 +1392,15 @@ export default function PreMadeSectionsStore() {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "space-between",
-                            padding: "8px 10px",
-                            borderRadius: "8px",
-                            border: isActive ? "1px solid #0284c7" : "1px solid transparent",
-                            background: isActive ? "#f0f9ff" : "transparent",
-                            color: isActive ? "#0284c7" : "#334155",
+                            padding: "7px 10px",
+                            borderRadius: "6px",
+                            border: "none",
+                            borderLeft: isActive ? "3px solid #0284c7" : "3px solid transparent",
+                            background: isActive ? "#f1f5f9" : "transparent",
+                            color: isActive ? "#0f172a" : "#475569",
                             cursor: "pointer",
                             textAlign: "left",
-                            transition: "all 0.15s ease",
+                            transition: "all 0.12s ease",
                           }}
                           onMouseEnter={(e) => {
                             if (!isActive) e.currentTarget.style.background = "#f8fafc";
@@ -1415,7 +1421,7 @@ export default function PreMadeSectionsStore() {
                               fontWeight: 700,
                               padding: "1px 6px",
                               borderRadius: "999px",
-                              background: isActive ? "#0284c7" : "#f1f5f9",
+                              background: isActive ? "#0f172a" : "#f1f5f9",
                               color: isActive ? "#ffffff" : "#64748b",
                             }}
                           >
@@ -1495,280 +1501,234 @@ export default function PreMadeSectionsStore() {
 
           {/* ── Right Content Area ── */}
           <div className="cf-pagefly-content">
-            {/* Converflow PageFly Studio Overview Hero Card */}
-            <div style={{
-              background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f2b38 100%)",
-              borderRadius: "16px",
-          padding: "24px 28px",
-          color: "#ffffff",
-          boxShadow: "0 10px 25px -5px rgba(15, 23, 42, 0.25)",
-          border: "1px solid rgba(255, 255, 255, 0.1)",
-          position: "relative",
-          overflow: "hidden"
-        }}>
-          {/* Subtle glow / grid accent */}
-          <div style={{
-            position: "absolute",
-            top: "-40px",
-            right: "-40px",
-            width: "200px",
-            height: "200px",
-            background: "radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%)",
-            pointerEvents: "none"
-          }} />
-
-          <BlockStack gap="300">
-            <InlineStack align="space-between" blockAlign="center" wrap>
-              <InlineStack gap="200" blockAlign="center">
-                <span style={{ fontSize: "20px" }}>⚡</span>
-                <span style={{ fontSize: "18px", fontWeight: 700, letterSpacing: "-0.02em", color: "#f8fafc" }}>
+            {/* Minimal Classic Studio Header Strip */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                background: "#ffffff",
+                border: "1px solid #e2e8f0",
+                borderRadius: "10px",
+                padding: "10px 16px",
+                boxShadow: "0 1px 2px rgba(0, 0, 0, 0.03)",
+                flexWrap: "wrap",
+                gap: "10px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "6px",
+                    background: "#0f172a",
+                    color: "#ffffff",
+                    fontSize: "12px",
+                    fontWeight: "800",
+                  }}
+                >
+                  PF
+                </span>
+                <span style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a" }}>
                   Converflow Studio
                 </span>
-                <span style={{
-                  background: "rgba(16, 185, 129, 0.2)",
-                  color: "#34d399",
-                  padding: "2px 10px",
-                  borderRadius: "9999px",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  border: "1px solid rgba(52, 211, 153, 0.3)"
-                }}>
-                  PageFly Mode
-                </span>
-                <span style={{
-                  background: "rgba(2, 132, 199, 0.2)",
-                  color: "#38bdf8",
-                  padding: "2px 10px",
-                  borderRadius: "9999px",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  border: "1px solid rgba(56, 189, 248, 0.3)"
-                }}>
+                <span
+                  style={{
+                    background: "#ecfdf5",
+                    color: "#047857",
+                    border: "1px solid #a7f3d0",
+                    padding: "1px 8px",
+                    borderRadius: "999px",
+                    fontSize: "11px",
+                    fontWeight: "700",
+                  }}
+                >
                   Shopify 2.0 Native
                 </span>
-              </InlineStack>
-
-              <span style={{ color: "#94a3b8", fontSize: "13px" }}>
-                Connected Store: <strong style={{ color: "#e2e8f0" }}>{shopDomain}</strong>
-              </span>
-            </InlineStack>
-
-            <p style={{ margin: 0, color: "#cbd5e1", fontSize: "14px", lineHeight: "1.5", maxWidth: "860px" }}>
-              Build high-converting Shopify storefronts without theme locks or monthly bloat. Preview live across Desktop, Tablet &amp; Mobile devices, then install directly into your live theme or safe draft theme with 1 click.
-            </p>
-
-            {/* Interactive Section Type Quick Jump Cards */}
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
-              gap: "12px",
-              marginTop: "4px"
-            }}>
-              <div
-                onClick={() => handleCategoryChange("landing-page")}
-                style={{
-                  background: category === "landing-page" ? "rgba(2, 132, 199, 0.25)" : "rgba(255, 255, 255, 0.05)",
-                  border: category === "landing-page" ? "1px solid #38bdf8" : "1px solid rgba(255, 255, 255, 0.12)",
-                  borderRadius: "12px",
-                  padding: "12px 16px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease"
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#f8fafc" }}>🚀 Landing Pages</span>
-                  <span style={{ background: "#0284c7", color: "#fff", borderRadius: "8px", padding: "1px 6px", fontSize: "11px", fontWeight: 700 }}>12</span>
-                </div>
-                <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8" }}>Full D2C home stores (11-13 cohesive sections)</p>
+                <span style={{ color: "#64748b", fontSize: "12px" }}>
+                  • 151 Modular Sections &amp; Funnels
+                </span>
               </div>
 
-              <div
-                onClick={() => handleCategoryChange("product-page")}
-                style={{
-                  background: category === "product-page" ? "rgba(16, 185, 129, 0.25)" : "rgba(255, 255, 255, 0.05)",
-                  border: category === "product-page" ? "1px solid #34d399" : "1px solid rgba(255, 255, 255, 0.12)",
-                  borderRadius: "12px",
-                  padding: "12px 16px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease"
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#f8fafc" }}>💎 Product Pages</span>
-                  <span style={{ background: "#059669", color: "#fff", borderRadius: "8px", padding: "1px 6px", fontSize: "11px", fontWeight: 700 }}>88</span>
-                </div>
-                <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8" }}>Tech, Luxury, Fashion &amp; Dropshipping PDPs</p>
-              </div>
-
-              <div
-                onClick={() => handleCategoryChange("cart-drawer")}
-                style={{
-                  background: category === "cart-drawer" ? "rgba(245, 158, 11, 0.25)" : "rgba(255, 255, 255, 0.05)",
-                  border: category === "cart-drawer" ? "1px solid #fbbf24" : "1px solid rgba(255, 255, 255, 0.12)",
-                  borderRadius: "12px",
-                  padding: "12px 16px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease"
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#f8fafc" }}>🛒 Cart Drawers</span>
-                  <span style={{ background: "#d97706", color: "#fff", borderRadius: "8px", padding: "1px 6px", fontSize: "11px", fontWeight: 700 }}>20</span>
-                </div>
-                <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8" }}>Slide drawers with progress bars &amp; upsells</p>
-              </div>
-
-              <div
-                onClick={() => handleCategoryChange("urgency")}
-                style={{
-                  background: category === "urgency" ? "rgba(225, 29, 72, 0.25)" : "rgba(255, 255, 255, 0.05)",
-                  border: category === "urgency" ? "1px solid #fb7185" : "1px solid rgba(255, 255, 255, 0.12)",
-                  borderRadius: "12px",
-                  padding: "12px 16px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease"
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#f8fafc" }}>⚡ Urgency Creators</span>
-                  <span style={{ background: "#e11d48", color: "#fff", borderRadius: "8px", padding: "1px 6px", fontSize: "11px", fontWeight: 700 }}>5</span>
-                </div>
-                <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8" }}>Emergency countdowns, stock scarcity, proof</p>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px", color: "#64748b" }}>
+                <span>
+                  Store: <strong style={{ color: "#0f172a" }}>{shopDomain}</strong>
+                </span>
+                <a
+                  href={themeEditorUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    background: "#0f172a",
+                    color: "#ffffff",
+                    padding: "5px 12px",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    fontWeight: "600",
+                    fontSize: "12px",
+                    transition: "background 0.15s ease",
+                  }}
+                >
+                  Open Theme Editor ↗
+                </a>
               </div>
             </div>
-          </BlockStack>
-        </div>
 
-        {/* Search & Placement Controls */}
-        <Card>
-          <BlockStack gap="300">
-            <InlineStack align="space-between" blockAlign="center" gap="400">
-              <Box minWidth="320px">
-                <TextField
-                  label="Search sections and landing pages"
-                  labelHidden
-                  placeholder={
-                    isLandingPageCategory
-                      ? "Search by brand, niche (e.g. skincare, streetwear, jewelry, audio)..."
-                      : "Search by name, feature (e.g. hero, sticky, faq, reviews)..."
-                  }
-                  value={searchQuery}
-                  onChange={handleSearchSubmit}
-                  clearButton
-                  onClearButtonClick={() => handleSearchSubmit("")}
-                  autoComplete="off"
-                />
-              </Box>
-              <InlineStack gap="300" blockAlign="center">
-                <Text as="span" tone="subdued">Target Page:</Text>
-                <Box minWidth="180px">
-                  <Select
-                    label="Target page"
+            {/* Unified Minimal Search & Filter Toolbar */}
+            <div
+              style={{
+                background: "#ffffff",
+                border: "1px solid #e2e8f0",
+                borderRadius: "10px",
+                padding: "14px 16px",
+                boxShadow: "0 1px 2px rgba(0, 0, 0, 0.03)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: "260px" }}>
+                  <TextField
+                    label="Search"
                     labelHidden
-                    options={[
-                      { label: "Smart Placement (Recommended)", value: "auto" },
-                      { label: "Homepage (index.json)", value: "index" },
-                      { label: "Product Page (product.json)", value: "product" },
-                    ]}
-                    value={activeTarget}
-                    onChange={setActiveTarget}
-                    disabled={isLandingPageCategory}
+                    placeholder={
+                      isLandingPageCategory
+                        ? "Search by brand, niche (e.g. skincare, streetwear, jewelry, audio)..."
+                        : "Search sections by name, feature (e.g. hero, sticky cart, faq, timer)..."
+                    }
+                    value={searchQuery}
+                    onChange={handleSearchSubmit}
+                    clearButton
+                    onClearButtonClick={() => handleSearchSubmit("")}
+                    autoComplete="off"
                   />
-                </Box>
-              </InlineStack>
-            </InlineStack>
+                </div>
 
-            <Divider />
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "600", whiteSpace: "nowrap" }}>
+                    Target:
+                  </span>
+                  <div style={{ width: "175px" }}>
+                    <Select
+                      label="Target page"
+                      labelHidden
+                      options={[
+                        { label: "Smart Placement", value: "auto" },
+                        { label: "Homepage (index.json)", value: "index" },
+                        { label: "Product Page (product.json)", value: "product" },
+                      ]}
+                      value={activeTarget}
+                      onChange={setActiveTarget}
+                      disabled={isLandingPageCategory}
+                    />
+                  </div>
+                </div>
 
-            {/* Category Pills */}
-            <InlineStack gap="200" wrap>
-              {CATEGORIES.map((cat) => {
-                const isActive = category === cat.id;
-                return (
-                  <Button
-                    key={cat.id}
-                    size="medium"
-                    variant={isActive ? "primary" : "secondary"}
-                    onClick={() => handleCategoryChange(cat.id)}
-                  >
-                    {cat.label}
-                  </Button>
-                );
-              })}
-            </InlineStack>
+                <div style={{ fontSize: "12px", color: "#475569", fontWeight: "600", whiteSpace: "nowrap" }}>
+                  {isLandingPageCategory ? (
+                    <span>Showing <strong>{landingPages.length}</strong> Landing Pages</span>
+                  ) : (
+                    <span>
+                      Showing <strong>{components.length}</strong> sections
+                      {category !== "all" && ` in ${CATEGORIES.find((c) => c.id === category)?.label}`}
+                    </span>
+                  )}
+                </div>
+              </div>
 
-            <Divider />
-
-            {/* Niche Filter Chips */}
-            <BlockStack gap="150">
-              <InlineStack align="space-between" blockAlign="center">
-                <Text as="span" variant="bodySm" fontWeight="semibold" tone="subdued">
-                  Filter by Niche / Industry:
-                </Text>
-                {niche !== "all" && (
-                  <Button variant="plain" size="slim" onClick={() => handleNicheChange("all")}>
-                    Clear niche filter
-                  </Button>
-                )}
-              </InlineStack>
-              <InlineStack gap="150" wrap>
+              {/* Minimal Niche Filter Chips */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  flexWrap: "wrap",
+                  paddingTop: "10px",
+                  borderTop: "1px solid #f1f5f9",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: "700",
+                    color: "#94a3b8",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    marginRight: "4px",
+                  }}
+                >
+                  Niche:
+                </span>
                 {NICHE_FILTERS.map((nf) => {
                   const isActive = niche === nf.id || (niche === "" && nf.id === "all");
                   return (
-                    <Button
+                    <button
                       key={nf.id}
-                      size="slim"
-                      variant={isActive ? "primary" : "tertiary"}
+                      type="button"
                       onClick={() => handleNicheChange(nf.id)}
+                      style={{
+                        border: isActive ? "1px solid #0284c7" : "1px solid #e2e8f0",
+                        background: isActive ? "#f0f9ff" : "#ffffff",
+                        color: isActive ? "#0284c7" : "#475569",
+                        borderRadius: "999px",
+                        padding: "3px 10px",
+                        fontSize: "11px",
+                        fontWeight: isActive ? "700" : "500",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
+                      }}
                     >
                       {nf.label}
-                    </Button>
+                    </button>
                   );
                 })}
-              </InlineStack>
-            </BlockStack>
-          </BlockStack>
-        </Card>
-
-        {/* Count Header */}
-        <InlineStack align="space-between" blockAlign="center">
-          <Text as="p" tone="subdued">
-            {isLandingPageCategory ? (
-              <span>
-                Showing <strong>{landingPages.length}</strong> Complete D2C Landing Page Stores (11-13 Cohesive Sections Each)
-                {q && ` matching "${q}"`}
-              </span>
-            ) : (
-              <span>
-                Showing <strong>{components.length}</strong> sections
-                {category !== "all" ? ` in ${CATEGORIES.find((c) => c.id === category)?.label}` : " in Section Store"}
-                {q && ` matching "${q}"`}
-              </span>
-            )}
-          </Text>
-          <Text as="p" tone="subdued">
-            Active Store: <strong>{shopDomain}</strong>
-          </Text>
-        </InlineStack>
+                {niche !== "all" && (
+                  <button
+                    type="button"
+                    onClick={() => handleNicheChange("all")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#e11d48",
+                      fontSize: "11px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                      marginLeft: "6px",
+                    }}
+                  >
+                    Clear niche
+                  </button>
+                )}
+              </div>
+            </div>
 
         {/* CSS for Bento & Landing Page Grids & PageFly Studio Layout */}
         <style>{`
           .cf-pagefly-layout {
             display: flex;
-            gap: 24px;
+            gap: 20px;
             align-items: flex-start;
             width: 100%;
           }
           .cf-pagefly-sidebar {
-            width: 270px;
+            width: 250px;
             flex-shrink: 0;
             background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            border-radius: 10px;
+            padding: 14px 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
             position: sticky;
-            top: 16px;
+            top: 14px;
             box-sizing: border-box;
           }
           .cf-pagefly-content {
@@ -1776,7 +1736,7 @@ export default function PreMadeSectionsStore() {
             min-width: 0;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
           }
           @media (max-width: 1024px) {
             .cf-pagefly-layout {
@@ -1790,9 +1750,9 @@ export default function PreMadeSectionsStore() {
           .cf-bento-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 20px;
+            gap: 16px;
           }
-          @media (max-width: 1200px) {
+          @media (max-width: 1280px) {
             .cf-bento-grid {
               grid-template-columns: repeat(2, minmax(0, 1fr));
             }
@@ -1804,19 +1764,19 @@ export default function PreMadeSectionsStore() {
           }
           .cf-bento-card {
             border: 1px solid #e2e8f0;
-            border-radius: 16px;
+            border-radius: 10px;
             overflow: hidden;
             background: #ffffff;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-            transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
             display: flex;
             flex-direction: column;
             position: relative;
           }
           .cf-bento-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.12);
-            border-color: #0284c7;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px -4px rgba(0, 0, 0, 0.08);
+            border-color: #cbd5e1;
           }
           .cf-bento-featured {
             grid-column: span 2;
