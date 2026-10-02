@@ -35,9 +35,10 @@ import { installLandingPage } from "../services/landing-page-install.server";
  */
 
 const CATEGORIES = [
-  { id: "all", label: "🌟 All Templates & Sections (120+)" },
+  { id: "1000cr-elite", label: "💎 1000cr Elite Suite (New)" },
+  { id: "legacy-all", label: "📦 Legacy Archive (All)" },
   { id: "landing-page", label: "🚀 Landing Pages (D2C Home) (12)" },
-  { id: "product-page", label: "💎 Product Pages (PDP) (88)" },
+  { id: "product-page", label: "📄 Legacy PDP Variations (88)" },
   { id: "cart-drawer", label: "🛒 Cart & Slide Drawers (20)" },
   { id: "urgency", label: "⚡ Emergency & Urgency Boosters (5)" },
   { id: "hero", label: "🎯 Hero Banners (15)" },
@@ -49,22 +50,23 @@ const CATEGORIES = [
 
 const CATEGORY_GROUPS = [
   {
-    title: "PAGE TEMPLATES (FULL FUNNELS)",
+    title: "💎 1000CR ELITE SUITE (NEW ARCHITECTURE)",
     items: [
-      { id: "landing-page", label: "Home Landing Pages", icon: "🚀", count: "12", desc: "Complete D2C Home Stores" },
-      { id: "product-page", label: "Product Pages (PDP)", icon: "💎", count: "88", desc: "High-CRO Product Funnels" },
-      { id: "cart-drawer", label: "Cart & Slide Drawers", icon: "🛒", count: "20", desc: "Drawers with Upsells" },
-      { id: "urgency", label: "Urgency & Scarcity", icon: "⚡", count: "5", desc: "Emergency Sales Boosters" },
+      { id: "1000cr-elite", label: "💎 1000cr PDP Buy Box", icon: "✨", count: "1", desc: "Flagship Luxury PDP Suite" },
     ],
   },
   {
-    title: "SECTION LIBRARIES",
+    title: "📦 LEGACY ARCHIVE (DEPRECATED)",
     items: [
-      { id: "all", label: "All Templates & Sections", icon: "🌟", count: "120+", desc: "Entire Library" },
-      { id: "hero", label: "Hero Banners", icon: "🎯", count: "15", desc: "High-Impact Visuals" },
+      { id: "legacy-all", label: "All Legacy Sections", icon: "📦", count: "120+", desc: "Old Section Library" },
+      { id: "landing-page", label: "Home Landing Pages", icon: "🚀", count: "12", desc: "Complete D2C Home Stores" },
+      { id: "product-page", label: "Legacy PDP Variations", icon: "📄", count: "88", desc: "Old PDP Variations" },
+      { id: "cart-drawer", label: "Cart & Slide Drawers", icon: "🛒", count: "20", desc: "Drawers with Upsells" },
+      { id: "urgency", label: "Urgency & Scarcity", icon: "⚡", count: "5", desc: "Emergency Sales Boosters" },
+      { id: "hero", label: "Hero Banners", icon: "🎯", count: "15", desc: "Visual Banners" },
       { id: "announcement", label: "Announcement Bars", icon: "📢", count: "10", desc: "Tickers & Marquees" },
       { id: "product-card", label: "Product Cards & Grids", icon: "🏷️", count: "12", desc: "Collections & Swatches" },
-      { id: "header", label: "Headers & Navbars", icon: "🔝", count: "10", desc: "Sticky Navigation" },
+      { id: "header", label: "Headers & Navbars", icon: "🔝", count: "10", desc: "Navigation" },
       { id: "footer", label: "Footers", icon: "🔻", count: "10", desc: "Trust & Legal Links" },
     ],
   },
@@ -84,7 +86,7 @@ const NICHE_FILTERS = [
 export async function loader({ request }: LoaderFunctionArgs) {
   const { session } = await authenticate.admin(request);
   const url = new URL(request.url);
-  const category = url.searchParams.get("category") || "all";
+  const category = url.searchParams.get("category") || "1000cr-elite";
   const niche = (url.searchParams.get("niche") || "all").toLowerCase();
   const q = (url.searchParams.get("q") || "").trim();
 
@@ -136,7 +138,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // Build where clause according to category, niche, and search
   const where: any = { status: "PUBLISHED" };
 
-  if (category && category !== "all") {
+  if (category === "1000cr-elite") {
+    where.category = "1000cr-elite";
+  } else if (category === "legacy-all") {
+    where.category = { not: "1000cr-elite" };
+  } else if (category && category !== "all") {
     where.category = category;
   }
 
@@ -222,7 +228,7 @@ export async function action({ request }: ActionFunctionArgs) {
     if (intent === "preview") {
       const theme = await ensurePreviewTheme(shop);
 
-      const isPdp = sectionType === "product-page" || sectionType.startsWith("pdp") || componentId.startsWith("pdp") || sectionType.startsWith("product-card");
+      const isPdp = sectionType === "product-page" || sectionType.startsWith("pdp") || componentId.startsWith("pdp") || componentId.startsWith("elite-pdp") || sectionType.startsWith("product-card");
       const isCart = sectionType === "cart-drawer" || componentId.startsWith("cdr");
       const isUrgency = sectionType === "urgency" || componentId.startsWith("urgency");
 
@@ -282,7 +288,7 @@ export async function action({ request }: ActionFunctionArgs) {
         themeName = theme.name;
       }
 
-      const isPdp = sectionType === "product-page" || sectionType.startsWith("pdp") || componentId.startsWith("pdp") || sectionType.startsWith("product-card");
+      const isPdp = sectionType === "product-page" || sectionType.startsWith("pdp") || componentId.startsWith("pdp") || componentId.startsWith("elite-pdp") || sectionType.startsWith("product-card");
       const isCart = sectionType === "cart-drawer" || componentId.startsWith("cdr");
       const isUrgency = sectionType === "urgency" || componentId.startsWith("urgency");
 
@@ -472,11 +478,12 @@ function BentoSectionCard({
           <span style={{ width: 7, height: 7, borderRadius: 99, background: "#f59e0b" }} />
           <span style={{ width: 7, height: 7, borderRadius: 99, background: "#10b981" }} />
           {(() => {
+            const isElite = component.category === "1000cr-elite" || component.componentId.startsWith("elite-");
             const isUrgency = component.category === "urgency" || component.componentId.startsWith("urgency");
             const isPdp = component.category === "product-page" || component.sectionType === "product-page" || component.componentId.startsWith("pdp");
             const isCart = component.category === "cart-drawer" || component.sectionType === "cart-drawer" || component.componentId.startsWith("cdr");
-            const label = isUrgency ? "⚡ Urgency Booster" : isPdp ? "💎 PDP Design" : isCart ? "🛒 Cart Drawer" : component.sectionType;
-            const color = isUrgency ? "#fbbf24" : isPdp ? "#34d399" : isCart ? "#38bdf8" : "#94a3b8";
+            const label = isElite ? "💎 1000cr Flagship" : isUrgency ? "⚡ Urgency Booster" : isPdp ? "💎 PDP Design" : isCart ? "🛒 Cart Drawer" : component.sectionType;
+            const color = isElite ? "#34d399" : isUrgency ? "#fbbf24" : isPdp ? "#34d399" : isCart ? "#38bdf8" : "#94a3b8";
             return (
               <span
                 style={{
@@ -632,18 +639,24 @@ function BentoSectionCard({
 
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
             {(() => {
+              const isElite = component.category === "1000cr-elite" || component.componentId.startsWith("elite-");
               const isUrgency = component.category === "urgency" || component.componentId.startsWith("urgency");
               const isPdp = component.category === "product-page" || component.sectionType === "product-page" || component.componentId.startsWith("pdp");
               const isCart = component.category === "cart-drawer" || component.sectionType === "cart-drawer" || component.componentId.startsWith("cdr");
 
               return (
                 <>
+                  {isElite && (
+                    <span style={{ fontSize: 10, fontWeight: 800, color: "#047857", background: "#d1fae5", border: "1px solid #a7f3d0", padding: "2px 7px", borderRadius: 4 }}>
+                      💎 1000cr Flagship Suite
+                    </span>
+                  )}
                   {isUrgency && (
                     <span style={{ fontSize: 10, fontWeight: 800, color: "#b45309", background: "#fef3c7", padding: "2px 7px", borderRadius: 4 }}>
                       ⚡ Urgency Trigger
                     </span>
                   )}
-                  {isPdp && (
+                  {isPdp && !isElite && (
                     <span style={{ fontSize: 10, fontWeight: 800, color: "#047857", background: "#d1fae5", padding: "2px 7px", borderRadius: 4 }}>
                       💎 Complete PDP
                     </span>
@@ -1255,8 +1268,8 @@ export default function PreMadeSectionsStore() {
   return (
     <Page
       fullWidth
-      title="Converflow Studio (PageFly-Grade Builder)"
-      subtitle="Modular Page & Section Builder — Complete Landing Pages, 88+ PDP Variations, Slide Cart Drawers & Emergency Urgency Boosters with 1-click theme install."
+      title="Converflow Studio (1000cr Luxury Suite)"
+      subtitle="Modular Page & Section Builder — Re-engineered for 1000cr Brands with 1-click theme install, live device previews, and zero-defect Liquid code."
       primaryAction={{
         content: "Open Theme Editor",
         url: themeEditorUrl,
