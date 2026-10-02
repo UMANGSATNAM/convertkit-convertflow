@@ -115,8 +115,8 @@ function cleanLiquid(liquidContent: string, sectionIdx: number, overrides?: any)
   }
 
   // 2. Strip {% schema %} and {% comment %}
-  html = html.replace(/{% schema %}[\s\S]*?{% endschema %}/g, "");
-  html = html.replace(/{% comment %}[\s\S]*?{% endcomment %}/g, "");
+  html = html.replace(/\{%-?\s*schema\s*-?%\}[\s\S]*?\{%-?\s*endschema\s*-?%\}/g, "");
+  html = html.replace(/\{%-?\s*comment\s*-?%\}[\s\S]*?\{%-?\s*endcomment\s*-?%\}/g, "");
 
   // Convert Shopify style and javascript blocks to HTML tags so CSS and JS are parsed by browser
   html = html.replace(/{%-?\s*style\s*-?%}/g, "<style>");
