@@ -35,7 +35,7 @@ import { installLandingPage } from "../services/landing-page-install.server";
  */
 
 const CATEGORIES = [
-  { id: "1000cr-elite", label: "💎 1000cr Elite Suite (New)" },
+  { id: "1000cr-elite", label: "✨ 1000cr Flagship Suite (New)" },
   { id: "legacy-all", label: "📦 Legacy Archive (All)" },
   { id: "landing-page", label: "🚀 Landing Pages (D2C Home) (12)" },
   { id: "product-page", label: "📄 Legacy PDP Variations (88)" },
@@ -50,9 +50,9 @@ const CATEGORIES = [
 
 const CATEGORY_GROUPS = [
   {
-    title: "💎 1000CR ELITE SUITE (NEW ARCHITECTURE)",
+    title: "FLAGSHIP ARCHITECTURE",
     items: [
-      { id: "1000cr-elite", label: "💎 1000cr PDP Buy Box", icon: "✨", count: "1", desc: "Flagship Luxury PDP Suite" },
+      { id: "1000cr-elite", label: "1000cr Flagship Suite", icon: "✨", count: "1", desc: "Signature Minimal Luxury PDP Showcase" },
     ],
   },
   {
@@ -452,77 +452,79 @@ function BentoSectionCard({
     return () => ro.disconnect();
   }, []);
 
-  const name = component.detail?.name || component.componentId.replace(/[-_]/g, " ");
-  const settingsCount = component.detail?.settings?.length || 0;
+  const isElite = component.category === "1000cr-elite" || component.componentId.startsWith("elite-");
+  const name = component.detail?.name || (isElite ? "Signature Minimal Luxury PDP Showcase" : component.componentId.replace(/[-_]/g, " "));
+  const settingsCount = component.detail?.settings?.length || 23;
   const previewUrl = `/preview?sectionId=${encodeURIComponent(component.componentId)}&shop=${encodeURIComponent(shopDomain)}&embed=1`;
-  const containerHeight = isFeatured ? 290 : 210;
+  const containerHeight = isElite ? 380 : (isFeatured ? 290 : 210);
 
   return (
-    <div className={`cf-bento-card ${isFeatured ? "cf-bento-featured" : ""}`}>
-      {/* Top Browser Window Chrome */}
+    <div className={`cf-bento-card ${isFeatured ? "cf-bento-featured" : ""} ${isElite ? "cf-elite-card" : ""}`}>
+      {/* Sleek Minimal Header */}
       <div
         style={{
-          height: 34,
-          background: "#0f172a",
+          padding: "14px 18px",
+          background: "#ffffff",
+          borderBottom: "1px solid #f1f5f9",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "0 12px",
-          borderTopLeftRadius: 15,
-          borderTopRightRadius: 15,
-          userSelect: "none",
+          gap: "12px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ width: 7, height: 7, borderRadius: 99, background: "#ef4444" }} />
-          <span style={{ width: 7, height: 7, borderRadius: 99, background: "#f59e0b" }} />
-          <span style={{ width: 7, height: 7, borderRadius: 99, background: "#10b981" }} />
-          {(() => {
-            const isElite = component.category === "1000cr-elite" || component.componentId.startsWith("elite-");
-            const isUrgency = component.category === "urgency" || component.componentId.startsWith("urgency");
-            const isPdp = component.category === "product-page" || component.sectionType === "product-page" || component.componentId.startsWith("pdp");
-            const isCart = component.category === "cart-drawer" || component.sectionType === "cart-drawer" || component.componentId.startsWith("cdr");
-            const label = isElite ? "💎 1000cr Flagship" : isUrgency ? "⚡ Urgency Booster" : isPdp ? "💎 PDP Design" : isCart ? "🛒 Cart Drawer" : component.sectionType;
-            const color = isElite ? "#34d399" : isUrgency ? "#fbbf24" : isPdp ? "#34d399" : isCart ? "#38bdf8" : "#94a3b8";
-            return (
-              <span
-                style={{
-                  marginLeft: 8,
-                  fontSize: 10,
-                  fontWeight: 800,
-                  color,
-                  letterSpacing: "0.5px",
-                  textTransform: "uppercase",
-                }}
-              >
-                {label}
-              </span>
-            );
-          })()}
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
           <span
             style={{
-              fontSize: 9,
-              fontWeight: 700,
-              color: "#94a3b8",
-              fontFamily: "monospace",
-              background: "rgba(255, 255, 255, 0.08)",
-              padding: "2px 6px",
-              borderRadius: 4,
+              width: "28px",
+              height: "28px",
+              borderRadius: "8px",
+              background: isElite ? "#0f172a" : "#f1f5f9",
+              color: isElite ? "#ffffff" : "#0f172a",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "13px",
+              flexShrink: 0,
             }}
           >
-            {settingsCount} settings
+            {isElite ? "✨" : "📦"}
           </span>
+          <div style={{ minWidth: 0 }}>
+            <h3
+              onClick={onPreview}
+              style={{
+                margin: 0,
+                fontSize: "15px",
+                fontWeight: 700,
+                color: "#0f172a",
+                letterSpacing: "-0.2px",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {name}
+            </h3>
+            <div style={{ fontSize: "11px", color: "#64748b", marginTop: "1px" }}>
+              {isElite ? "Flagship Product Page Buy Box" : component.sectionType}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
           <span
             style={{
-              fontSize: 9,
-              fontWeight: 700,
-              color: "#64748b",
-              fontFamily: "monospace",
+              fontSize: "11px",
+              fontWeight: 600,
+              color: "#475569",
+              background: "#f8fafc",
+              border: "1px solid #e2e8f0",
+              padding: "3px 8px",
+              borderRadius: "6px",
             }}
           >
-            {component.componentId}
+            {settingsCount} settings • Liquid 2.0
           </span>
         </div>
       </div>
@@ -572,10 +574,10 @@ function BentoSectionCard({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              background: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
+              background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
             }}
           >
-            <span style={{ fontSize: 11, color: "#64748b", fontWeight: 600 }}>Loading live preview…</span>
+            <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>Loading preview…</span>
           </div>
         )}
 
@@ -584,13 +586,13 @@ function BentoSectionCard({
           style={{
             position: "absolute",
             inset: 0,
-            background: "rgba(15, 23, 42, 0.68)",
-            backdropFilter: "blur(3px)",
+            background: "rgba(15, 23, 42, 0.45)",
+            backdropFilter: "blur(2px)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            gap: 10,
+            gap: 8,
             opacity: isHovered ? 1 : 0,
             transition: "opacity 0.2s ease",
             zIndex: 10,
@@ -598,145 +600,58 @@ function BentoSectionCard({
         >
           <div
             style={{
-              background: "#0284c7",
+              background: "#0f172a",
               color: "#ffffff",
-              padding: "7px 18px",
+              padding: "8px 20px",
               borderRadius: 999,
               fontWeight: 700,
               fontSize: 12,
               display: "flex",
               alignItems: "center",
               gap: 6,
-              boxShadow: "0 8px 20px rgba(2, 132, 199, 0.4)",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.25)",
             }}
           >
             👁️ Open Live Preview Studio
           </div>
-          <span style={{ fontSize: 11, color: "#cbd5e1", fontWeight: 500 }}>
-            Click to test viewports & 1-click submit
+          <span style={{ fontSize: 11, color: "#e2e8f0", fontWeight: 500 }}>
+            Click to test responsive mobile & desktop viewports
           </span>
         </div>
       </div>
 
       {/* Card Info & Quick Actions Footer */}
-      <div style={{ padding: "12px 14px", background: "#ffffff", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-            <h3
-              onClick={onPreview}
-              style={{
-                margin: 0,
-                fontSize: 14,
-                fontWeight: 800,
-                color: "#0f172a",
-                lineHeight: 1.3,
-                cursor: "pointer",
-              }}
-            >
-              {name}
-            </h3>
-          </div>
-
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
-            {(() => {
-              const isElite = component.category === "1000cr-elite" || component.componentId.startsWith("elite-");
-              const isUrgency = component.category === "urgency" || component.componentId.startsWith("urgency");
-              const isPdp = component.category === "product-page" || component.sectionType === "product-page" || component.componentId.startsWith("pdp");
-              const isCart = component.category === "cart-drawer" || component.sectionType === "cart-drawer" || component.componentId.startsWith("cdr");
-
-              return (
-                <>
-                  {isElite && (
-                    <span style={{ fontSize: 10, fontWeight: 800, color: "#047857", background: "#d1fae5", border: "1px solid #a7f3d0", padding: "2px 7px", borderRadius: 4 }}>
-                      💎 1000cr Flagship Suite
-                    </span>
-                  )}
-                  {isUrgency && (
-                    <span style={{ fontSize: 10, fontWeight: 800, color: "#b45309", background: "#fef3c7", padding: "2px 7px", borderRadius: 4 }}>
-                      ⚡ Urgency Trigger
-                    </span>
-                  )}
-                  {isPdp && !isElite && (
-                    <span style={{ fontSize: 10, fontWeight: 800, color: "#047857", background: "#d1fae5", padding: "2px 7px", borderRadius: 4 }}>
-                      💎 Complete PDP
-                    </span>
-                  )}
-                  {isCart && (
-                    <span style={{ fontSize: 10, fontWeight: 800, color: "#0369a1", background: "#e0f2fe", padding: "2px 7px", borderRadius: 4 }}>
-                      🛒 High-CRO Cart
-                    </span>
-                  )}
-                  {component.visualStyle && (
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        color: "#059669",
-                        background: "#ecfdf5",
-                        padding: "2px 6px",
-                        borderRadius: 4,
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {component.visualStyle}
-                    </span>
-                  )}
-                  {component.family && (
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 600,
-                        color: "#475569",
-                        background: "#f1f5f9",
-                        padding: "2px 6px",
-                        borderRadius: 4,
-                      }}
-                    >
-                      {component.family}
-                    </span>
-                  )}
-                  <span
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 600,
-                      color: "#6b7280",
-                      background: "#f3f4f6",
-                      padding: "2px 6px",
-                      borderRadius: 4,
-                    }}
-                  >
-                    Shopify 2.0 Native
-                  </span>
-                </>
-              );
-            })()}
-          </div>
-        </div>
+      <div style={{ padding: "14px 18px", background: "#ffffff", borderTop: "1px solid #f1f5f9", display: "flex", flexDirection: "column", gap: "12px" }}>
+        <p style={{ margin: 0, fontSize: "12px", color: "#64748b", lineHeight: 1.5 }}>
+          {component.detail?.description || component.description || "Signature 1000cr brand PDP buy box with dual-variant swatches, real-time stock scarcity counter, delivery pincode estimator, and high-conversion sticky ATC."}
+        </p>
 
         {/* Action Button Strip */}
-        <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           <button
             type="button"
             onClick={onPreview}
             disabled={isPreviewing}
             style={{
-              flex: 1,
+              flex: "1 1 auto",
               background: "#ffffff",
               color: "#0f172a",
               border: "1px solid #cbd5e1",
-              padding: "7px 10px",
-              borderRadius: 6,
-              fontSize: 12,
-              fontWeight: 600,
+              padding: "8px 14px",
+              borderRadius: "8px",
+              fontSize: "12px",
+              fontWeight: "600",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: 4,
+              gap: "6px",
               transition: "all 0.15s ease",
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#f8fafc")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#ffffff")}
           >
-            👁️ Preview
+            👁️ Studio Preview
           </button>
           <button
             type="button"
@@ -747,15 +662,21 @@ function BentoSectionCard({
               background: "#f8fafc",
               color: "#475569",
               border: "1px solid #e2e8f0",
-              padding: "7px 8px",
-              borderRadius: 6,
-              fontSize: 11,
-              fontWeight: 600,
+              padding: "8px 14px",
+              borderRadius: "8px",
+              fontSize: "12px",
+              fontWeight: "600",
               cursor: "pointer",
               whiteSpace: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              transition: "all 0.15s ease",
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#f1f5f9")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#f8fafc")}
           >
-            🛡️ Draft
+            🛡️ Test in Draft
           </button>
           <button
             type="button"
@@ -766,16 +687,22 @@ function BentoSectionCard({
               background: "#0f172a",
               color: "#ffffff",
               border: "none",
-              padding: "7px 10px",
-              borderRadius: 6,
-              fontSize: 11,
-              fontWeight: 700,
+              padding: "8px 18px",
+              borderRadius: "8px",
+              fontSize: "12px",
+              fontWeight: "700",
               cursor: "pointer",
               whiteSpace: "nowrap",
-              transition: "background 0.15s ease",
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              boxShadow: "0 1px 3px rgba(15, 23, 42, 0.2)",
+              transition: "all 0.15s ease",
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#1e293b")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#0f172a")}
           >
-            ⚡ Live
+            ⚡ Add to Live Store
           </button>
         </div>
       </div>
@@ -1172,6 +1099,7 @@ export default function PreMadeSectionsStore() {
   const [activeTarget, setActiveTarget] = useState<string>("auto");
   const [searchQuery, setSearchQuery] = useState(q);
   const [sectionDevice, setSectionDevice] = useState<"desktop" | "laptop" | "tablet" | "mobile">("desktop");
+  const [legacyOpen, setLegacyOpen] = useState(category !== "1000cr-elite");
 
   const busy = fetcher.state !== "idle";
   const data = fetcher.data;
@@ -1268,21 +1196,21 @@ export default function PreMadeSectionsStore() {
   return (
     <Page
       fullWidth
-      title="Converflow Studio (1000cr Luxury Suite)"
-      subtitle="Modular Page & Section Builder — Re-engineered for 1000cr Brands with 1-click theme install, live device previews, and zero-defect Liquid code."
+      title="Converflow Studio"
+      subtitle="Crafting 1000cr storefront sections with zero-defect Liquid code and live interactive preview."
       primaryAction={{
-        content: "Open Theme Editor",
+        content: "Open Theme Editor ↗",
         url: themeEditorUrl,
         external: true,
       }}
       secondaryActions={[
         {
-          content: "Full Page Kits",
-          url: "/app/pagekit",
+          content: "Theme Assets",
+          url: "/app/theme",
         },
         {
-          content: "My Added Sections",
-          url: "/app/theme",
+          content: "Full Page Kits",
+          url: "/app/pagekit",
         },
       ]}
     >
@@ -1366,34 +1294,107 @@ export default function PreMadeSectionsStore() {
           )
         )}
 
-        {/* ── PageFly Studio Master Layout (Sidebar + Workspace) ── */}
+        {/* ── Minimalist Studio Master Layout (Sidebar + Workspace) ── */}
         <div className="cf-pagefly-layout">
-          {/* ── Left Category Navigation Rail (PageFly Style) ── */}
+          {/* ── Minimalist Left Navigation Rail ── */}
           <aside className="cf-pagefly-sidebar">
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #e2e8f0" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px", paddingBottom: "10px", borderBottom: "1px solid #f1f5f9" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: "800" }}>
-                  PF
+                <div style={{ width: "24px", height: "24px", borderRadius: "6px", background: "#0f172a", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: "800" }}>
+                  💎
                 </div>
                 <div>
-                  <div style={{ fontSize: "13px", fontWeight: "800", color: "#0f172a" }}>PageFly Studio</div>
-                  <div style={{ fontSize: "11px", color: "#64748b" }}>Shopify 2.0 Engine</div>
+                  <div style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a" }}>Converflow</div>
+                  <div style={{ fontSize: "10px", color: "#64748b" }}>1000cr Architecture</div>
                 </div>
               </div>
-              <span style={{ fontSize: "10px", fontWeight: "700", color: "#059669", background: "#ecfdf5", border: "1px solid #a7f3d0", padding: "2px 6px", borderRadius: "999px" }}>
-                Online
+              <span style={{ fontSize: "10px", fontWeight: "700", color: "#059669", background: "#ecfdf5", border: "1px solid #a7f3d0", padding: "1px 6px", borderRadius: "999px" }}>
+                Active
               </span>
             </div>
 
-            {/* Category Groups Tree */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              {CATEGORY_GROUPS.map((group, gIdx) => (
-                <div key={gIdx}>
-                  <div style={{ fontSize: "10px", fontWeight: "800", color: "#94a3b8", letterSpacing: "0.5px", marginBottom: "6px", paddingLeft: "8px" }}>
-                    {group.title}
+            {/* Navigation Sections */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <div>
+                <div style={{ fontSize: "10px", fontWeight: "800", color: "#94a3b8", letterSpacing: "0.5px", marginBottom: "6px", paddingLeft: "6px" }}>
+                  FLAGSHIP SUITE
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleCategoryChange("1000cr-elite")}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "8px 10px",
+                    borderRadius: "7px",
+                    border: "none",
+                    background: category === "1000cr-elite" ? "#0f172a" : "transparent",
+                    color: category === "1000cr-elite" ? "#ffffff" : "#334155",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    transition: "all 0.12s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (category !== "1000cr-elite") e.currentTarget.style.background = "#f8fafc";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (category !== "1000cr-elite") e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ fontSize: "13px" }}>✨</span>
+                    <span style={{ fontSize: "12px", fontWeight: category === "1000cr-elite" ? 700 : 500 }}>
+                      1000cr Flagship Suite
+                    </span>
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-                    {group.items.map((cat) => {
+                  <span
+                    style={{
+                      fontSize: "10px",
+                      fontWeight: 700,
+                      padding: "1px 6px",
+                      borderRadius: "999px",
+                      background: category === "1000cr-elite" ? "rgba(255, 255, 255, 0.2)" : "#f1f5f9",
+                      color: category === "1000cr-elite" ? "#ffffff" : "#64748b",
+                    }}
+                  >
+                    1 Active
+                  </span>
+                </button>
+              </div>
+
+              {/* Collapsible Legacy Sections Archive */}
+              <div style={{ paddingTop: "8px", borderTop: "1px solid #f1f5f9" }}>
+                <button
+                  type="button"
+                  onClick={() => setLegacyOpen(!legacyOpen)}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "7px 10px",
+                    borderRadius: "6px",
+                    border: "1px solid #e2e8f0",
+                    background: legacyOpen ? "#f8fafc" : "#ffffff",
+                    color: "#64748b",
+                    cursor: "pointer",
+                    fontSize: "11px",
+                    fontWeight: "600",
+                    transition: "all 0.12s ease",
+                  }}
+                >
+                  <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span>📦</span>
+                    <span>Legacy Archive (120+)</span>
+                  </span>
+                  <span style={{ fontSize: "9px" }}>{legacyOpen ? "▲" : "▼"}</span>
+                </button>
+
+                {legacyOpen && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginTop: "6px" }}>
+                    {CATEGORY_GROUPS[1]?.items.map((cat) => {
                       const isActive = category === cat.id;
                       return (
                         <button
@@ -1405,107 +1406,82 @@ export default function PreMadeSectionsStore() {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "space-between",
-                            padding: "7px 10px",
-                            borderRadius: "6px",
+                            padding: "6px 8px",
+                            borderRadius: "5px",
                             border: "none",
-                            borderLeft: isActive ? "3px solid #0284c7" : "3px solid transparent",
                             background: isActive ? "#f1f5f9" : "transparent",
-                            color: isActive ? "#0f172a" : "#475569",
+                            color: isActive ? "#0f172a" : "#64748b",
                             cursor: "pointer",
                             textAlign: "left",
-                            transition: "all 0.12s ease",
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!isActive) e.currentTarget.style.background = "#f8fafc";
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!isActive) e.currentTarget.style.background = "transparent";
+                            fontSize: "11px",
+                            fontWeight: isActive ? 700 : 500,
                           }}
                         >
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <span style={{ fontSize: "14px" }}>{cat.icon}</span>
-                            <div>
-                              <div style={{ fontSize: "12px", fontWeight: isActive ? 700 : 500 }}>{cat.label}</div>
-                            </div>
-                          </div>
-                          <span
-                            style={{
-                              fontSize: "10px",
-                              fontWeight: 700,
-                              padding: "1px 6px",
-                              borderRadius: "999px",
-                              background: isActive ? "#0f172a" : "#f1f5f9",
-                              color: isActive ? "#ffffff" : "#64748b",
-                            }}
-                          >
-                            {cat.count}
+                          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span style={{ fontSize: "12px" }}>{cat.icon}</span>
+                            <span>{cat.label}</span>
                           </span>
+                          <span style={{ fontSize: "10px", color: "#94a3b8" }}>{cat.count}</span>
                         </button>
                       );
                     })}
                   </div>
-                </div>
-              ))}
+                )}
+              </div>
 
-              {/* Studio Quick Launch Apps */}
-              <div style={{ paddingTop: "10px", borderTop: "1px solid #f1f5f9" }}>
-                <div style={{ fontSize: "10px", fontWeight: "800", color: "#94a3b8", letterSpacing: "0.5px", marginBottom: "8px", paddingLeft: "8px" }}>
-                  PAGEFLY APPS
+              {/* Quick Utilities */}
+              <div style={{ paddingTop: "8px", borderTop: "1px solid #f1f5f9" }}>
+                <div style={{ fontSize: "10px", fontWeight: "800", color: "#94a3b8", letterSpacing: "0.5px", marginBottom: "6px", paddingLeft: "6px" }}>
+                  UTILITIES
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <a
-                    href="/app/builder"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      padding: "8px 10px",
-                      borderRadius: "8px",
-                      textDecoration: "none",
-                      color: "#1e293b",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      background: "#f8fafc",
-                      border: "1px solid #e2e8f0",
-                    }}
-                  >
-                    <span>🎨</span> Visual Page Builder ↗
-                  </a>
+                <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
                   <a
                     href="/app/theme"
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "8px",
-                      padding: "8px 10px",
-                      borderRadius: "8px",
+                      gap: "7px",
+                      padding: "6px 8px",
+                      borderRadius: "6px",
                       textDecoration: "none",
-                      color: "#1e293b",
-                      fontSize: "12px",
+                      color: "#475569",
+                      fontSize: "11px",
                       fontWeight: "600",
-                      background: "#f8fafc",
-                      border: "1px solid #e2e8f0",
                     }}
                   >
-                    <span>🛡️</span> Theme Manager &amp; Assets ↗
+                    <span>🛡️</span> Theme Assets
+                  </a>
+                  <a
+                    href="/app/builder"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "7px",
+                      padding: "6px 8px",
+                      borderRadius: "6px",
+                      textDecoration: "none",
+                      color: "#475569",
+                      fontSize: "11px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    <span>🎨</span> Custom Builder
                   </a>
                   <a
                     href="/app/pagekit"
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "8px",
-                      padding: "8px 10px",
-                      borderRadius: "8px",
+                      gap: "7px",
+                      padding: "6px 8px",
+                      borderRadius: "6px",
                       textDecoration: "none",
-                      color: "#1e293b",
-                      fontSize: "12px",
+                      color: "#475569",
+                      fontSize: "11px",
                       fontWeight: "600",
-                      background: "#f8fafc",
-                      border: "1px solid #e2e8f0",
                     }}
                   >
-                    <span>📦</span> PageKit Catalogue (151+) ↗
+                    <span>🚀</span> Full Page Kits
                   </a>
                 </div>
               </div>
@@ -1514,108 +1490,28 @@ export default function PreMadeSectionsStore() {
 
           {/* ── Right Content Area ── */}
           <div className="cf-pagefly-content">
-            {/* Minimal Classic Studio Header Strip */}
+            {/* Unified Minimal Search & Placement Toolbar */}
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
                 background: "#ffffff",
                 border: "1px solid #e2e8f0",
                 borderRadius: "10px",
-                padding: "10px 16px",
-                boxShadow: "0 1px 2px rgba(0, 0, 0, 0.03)",
-                flexWrap: "wrap",
+                padding: "12px 16px",
+                boxShadow: "0 1px 2px rgba(0, 0, 0, 0.02)",
+                display: "flex",
+                flexDirection: "column",
                 gap: "10px",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "6px",
-                    background: "#0f172a",
-                    color: "#ffffff",
-                    fontSize: "12px",
-                    fontWeight: "800",
-                  }}
-                >
-                  PF
-                </span>
-                <span style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a" }}>
-                  Converflow Studio
-                </span>
-                <span
-                  style={{
-                    background: "#ecfdf5",
-                    color: "#047857",
-                    border: "1px solid #a7f3d0",
-                    padding: "1px 8px",
-                    borderRadius: "999px",
-                    fontSize: "11px",
-                    fontWeight: "700",
-                  }}
-                >
-                  Shopify 2.0 Native
-                </span>
-                <span style={{ color: "#64748b", fontSize: "12px" }}>
-                  • 151 Modular Sections &amp; Funnels
-                </span>
-              </div>
-
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px", color: "#64748b" }}>
-                <span>
-                  Store: <strong style={{ color: "#0f172a" }}>{shopDomain}</strong>
-                </span>
-                <a
-                  href={themeEditorUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "4px",
-                    background: "#0f172a",
-                    color: "#ffffff",
-                    padding: "5px 12px",
-                    borderRadius: "6px",
-                    textDecoration: "none",
-                    fontWeight: "600",
-                    fontSize: "12px",
-                    transition: "background 0.15s ease",
-                  }}
-                >
-                  Open Theme Editor ↗
-                </a>
-              </div>
-            </div>
-
-            {/* Unified Minimal Search & Filter Toolbar */}
-            <div
-              style={{
-                background: "#ffffff",
-                border: "1px solid #e2e8f0",
-                borderRadius: "10px",
-                padding: "14px 16px",
-                boxShadow: "0 1px 2px rgba(0, 0, 0, 0.03)",
-                display: "flex",
-                flexDirection: "column",
-                gap: "12px",
-              }}
-            >
               <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-                <div style={{ flex: 1, minWidth: "260px" }}>
+                <div style={{ flex: 1, minWidth: "240px" }}>
                   <TextField
                     label="Search"
                     labelHidden
                     placeholder={
                       isLandingPageCategory
-                        ? "Search by brand, niche (e.g. skincare, streetwear, jewelry, audio)..."
-                        : "Search sections by name, feature (e.g. hero, sticky cart, faq, timer)..."
+                        ? "Search landing pages by brand, niche..."
+                        : "Search sections by name, feature (e.g. swatches, sticky atc, pincode)..."
                     }
                     value={searchQuery}
                     onChange={handleSearchSubmit}
@@ -1650,78 +1546,79 @@ export default function PreMadeSectionsStore() {
                     <span>Showing <strong>{landingPages.length}</strong> Landing Pages</span>
                   ) : (
                     <span>
-                      Showing <strong>{components.length}</strong> sections
-                      {category !== "all" && ` in ${CATEGORIES.find((c) => c.id === category)?.label}`}
+                      Showing <strong>{components.length}</strong> {category === "1000cr-elite" ? "Flagship Section" : "sections"}
                     </span>
                   )}
                 </div>
               </div>
 
-              {/* Minimal Niche Filter Chips */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  flexWrap: "wrap",
-                  paddingTop: "10px",
-                  borderTop: "1px solid #f1f5f9",
-                }}
-              >
-                <span
+              {/* Minimal Niche Filter Chips - Only shown for legacy archive / landing pages */}
+              {category !== "1000cr-elite" && (
+                <div
                   style={{
-                    fontSize: "11px",
-                    fontWeight: "700",
-                    color: "#94a3b8",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                    marginRight: "4px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    flexWrap: "wrap",
+                    paddingTop: "10px",
+                    borderTop: "1px solid #f1f5f9",
                   }}
                 >
-                  Niche:
-                </span>
-                {NICHE_FILTERS.map((nf) => {
-                  const isActive = niche === nf.id || (niche === "" && nf.id === "all");
-                  return (
-                    <button
-                      key={nf.id}
-                      type="button"
-                      onClick={() => handleNicheChange(nf.id)}
-                      style={{
-                        border: isActive ? "1px solid #0284c7" : "1px solid #e2e8f0",
-                        background: isActive ? "#f0f9ff" : "#ffffff",
-                        color: isActive ? "#0284c7" : "#475569",
-                        borderRadius: "999px",
-                        padding: "3px 10px",
-                        fontSize: "11px",
-                        fontWeight: isActive ? "700" : "500",
-                        cursor: "pointer",
-                        transition: "all 0.15s ease",
-                      }}
-                    >
-                      {nf.label}
-                    </button>
-                  );
-                })}
-                {niche !== "all" && (
-                  <button
-                    type="button"
-                    onClick={() => handleNicheChange("all")}
+                  <span
                     style={{
-                      background: "none",
-                      border: "none",
-                      color: "#e11d48",
                       fontSize: "11px",
-                      fontWeight: "600",
-                      cursor: "pointer",
-                      textDecoration: "underline",
-                      marginLeft: "6px",
+                      fontWeight: "700",
+                      color: "#94a3b8",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                      marginRight: "4px",
                     }}
                   >
-                    Clear niche
-                  </button>
-                )}
-              </div>
+                    Niche:
+                  </span>
+                  {NICHE_FILTERS.map((nf) => {
+                    const isActive = niche === nf.id || (niche === "" && nf.id === "all");
+                    return (
+                      <button
+                        key={nf.id}
+                        type="button"
+                        onClick={() => handleNicheChange(nf.id)}
+                        style={{
+                          border: isActive ? "1px solid #0284c7" : "1px solid #e2e8f0",
+                          background: isActive ? "#f0f9ff" : "#ffffff",
+                          color: isActive ? "#0284c7" : "#475569",
+                          borderRadius: "999px",
+                          padding: "3px 10px",
+                          fontSize: "11px",
+                          fontWeight: isActive ? "700" : "500",
+                          cursor: "pointer",
+                          transition: "all 0.15s ease",
+                        }}
+                      >
+                        {nf.label}
+                      </button>
+                    );
+                  })}
+                  {niche !== "all" && (
+                    <button
+                      type="button"
+                      onClick={() => handleNicheChange("all")}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#e11d48",
+                        fontSize: "11px",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                        textDecoration: "underline",
+                        marginLeft: "6px",
+                      }}
+                    >
+                      Clear niche
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
         {/* CSS for Bento & Landing Page Grids & PageFly Studio Layout */}
@@ -1793,6 +1690,12 @@ export default function PreMadeSectionsStore() {
           }
           .cf-bento-featured {
             grid-column: span 2;
+          }
+          .cf-elite-card {
+            grid-column: 1 / -1;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
           }
           @media (max-width: 768px) {
             .cf-bento-featured {
