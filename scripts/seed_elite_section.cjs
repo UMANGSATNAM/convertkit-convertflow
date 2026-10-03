@@ -14,7 +14,7 @@ async function main() {
 
   const eliteComponent = {
     componentId: 'elite-pdp-buybox',
-    name: 'Signature Minimal Luxury PDP Showcase',
+    name: 'Elite Luxe PDP Buy Box',
     type: '1000cr-elite',
     category: '1000cr-elite',
     sectionType: 'product-page',

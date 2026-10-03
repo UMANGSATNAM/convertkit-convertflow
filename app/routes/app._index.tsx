@@ -52,7 +52,7 @@ const CATEGORY_GROUPS = [
   {
     title: "FLAGSHIP ARCHITECTURE",
     items: [
-      { id: "1000cr-elite", label: "1000cr Flagship Suite", icon: "✨", count: "1", desc: "Signature Minimal Luxury PDP Showcase" },
+      { id: "1000cr-elite", label: "1000cr Flagship Suite", icon: "✨", count: "1", desc: "Elite Luxe PDP Buy Box" },
     ],
   },
   {
@@ -237,13 +237,13 @@ export async function action({ request }: ActionFunctionArgs) {
           ? ({ kind: "group", group: "header", replace: "header" } as const)
           : sectionType === "footer" || sectionType.startsWith("footer")
             ? ({ kind: "group", group: "footer", replace: "footer" } as const)
-            : targetChoice === "product" || (!targetChoice && isPdp)
-              ? ({ kind: "template", template: "product", position: "bottom" } as const)
+            : targetChoice === "product" || (targetChoice === "auto" && isPdp) || (!targetChoice && isPdp)
+              ? ({ kind: "template", template: "product", position: "top" } as const)
               : isCart
                 ? ({ kind: "template", template: "index", position: "bottom" } as const)
                 : isUrgency
                   ? (componentId.includes("sticky") || componentId.includes("stock")
-                      ? ({ kind: "template", template: "product", position: "bottom" } as const)
+                      ? ({ kind: "template", template: "product", position: "top" } as const)
                       : ({ kind: "template", template: "index", position: "top" } as const))
                   : ({ kind: "template", template: "index", position: "top" } as const);
 
@@ -297,13 +297,13 @@ export async function action({ request }: ActionFunctionArgs) {
         target = { kind: "group", group: "header", replace: "header" };
       } else if (sectionType === "footer" || sectionType.startsWith("footer")) {
         target = { kind: "group", group: "footer", replace: "footer" };
-      } else if (targetChoice === "product" || (!targetChoice && isPdp)) {
-        target = { kind: "template", template: "product", position: "bottom" };
+      } else if (targetChoice === "product" || (targetChoice === "auto" && isPdp) || (!targetChoice && isPdp)) {
+        target = { kind: "template", template: "product", position: "top" };
       } else if (isCart) {
         target = { kind: "template", template: "index", position: "bottom" };
       } else if (isUrgency) {
         if (componentId.includes("sticky") || componentId.includes("stock")) {
-          target = { kind: "template", template: "product", position: "bottom" };
+          target = { kind: "template", template: "product", position: "top" };
         } else {
           target = { kind: "template", template: "index", position: "top" };
         }
@@ -453,7 +453,7 @@ function BentoSectionCard({
   }, []);
 
   const isElite = component.category === "1000cr-elite" || component.componentId.startsWith("elite-");
-  const name = component.detail?.name || (isElite ? "Signature Minimal Luxury PDP Showcase" : component.componentId.replace(/[-_]/g, " "));
+  const name = component.detail?.name || (isElite ? "Elite Luxe PDP Buy Box" : component.componentId.replace(/[-_]/g, " "));
   const settingsCount = component.detail?.settings?.length || 23;
   const previewUrl = `/preview?sectionId=${encodeURIComponent(component.componentId)}&shop=${encodeURIComponent(shopDomain)}&embed=1`;
   const containerHeight = isElite ? 380 : (isFeatured ? 290 : 210);

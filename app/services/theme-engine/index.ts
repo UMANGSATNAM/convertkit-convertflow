@@ -174,7 +174,9 @@ export async function upsertThemeFilesBatched(shop: any, themeId: string, filesT
         console.log(`[FastUpload] Batch ${Math.floor(i/batchSize)+1}: ${batch.length} files uploaded [${batchFiles}]`);
         if (res?.themeFilesUpsert?.userErrors?.length > 0) {
           const userErrs = res.themeFilesUpsert.userErrors;
-          console.error(`[FastUpload] ❌ Shopify user errors in batch:`, JSON.stringify(userErrs));
+          const msg = userErrs.map((e: any) => `${e.field?.join('.') || 'Shopify'}: ${e.message}`).join("; ");
+          console.error(`[FastUpload] ❌ Shopify user errors in batch:`, msg);
+          throw new Error(`Shopify theme upload failed: ${msg}`);
         } else {
           console.log(`[FastUpload] ✅ Batch ${Math.floor(i/batchSize)+1} uploaded successfully`);
         }
