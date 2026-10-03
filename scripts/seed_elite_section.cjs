@@ -5,14 +5,8 @@ const crypto = require('crypto');
 
 const prisma = new PrismaClient();
 
-async function main() {
-  console.log("Adding 1000cr Section #1 (elite-pdp-buybox) to Registry & Database...");
-
-  const registryPath = path.join(__dirname, '..', 'app', 'data', 'templates', 'theme-engine', 'registry.json');
-  const registryRaw = fs.readFileSync(registryPath, 'utf8');
-  const registry = JSON.parse(registryRaw);
-
-  const eliteComponent = {
+const eliteComponents = [
+  {
     componentId: 'elite-pdp-buybox',
     name: 'Elite Luxe PDP Buy Box',
     type: '1000cr-elite',
@@ -36,20 +30,104 @@ async function main() {
     croScore: 99.5,
     mobileScore: 99.0,
     performanceScore: 99.0
-  };
+  },
+  {
+    componentId: 'atelier-luxe-pdp',
+    name: 'Atelier Luxe PDP Buy Box',
+    type: '1000cr-elite',
+    category: '1000cr-elite',
+    sectionType: 'product-page',
+    liquidPath: 'components/product-page/atelier-luxe-pdp.liquid',
+    filePath: 'components/product-page/atelier-luxe-pdp.liquid',
+    metaPath: 'components/product-page/atelier-luxe-pdp.meta.json',
+    visualStyle: 'minimalist-luxury',
+    family: '1000cr Elite Luxury',
+    archetypes: ['fashion', 'apparel', 'couture', 'high-cro', 'bundles'],
+    compatibleSlots: [],
+    status: 'PUBLISHED',
+    version: '1',
+    designDirection: 'minimalist-luxury',
+    layoutVariant: 'sticky-editorial-breaks',
+    isUniversal: true,
+    industryTags: ['fashion', 'apparel', 'clothing', 'couture', 'accessories', 'luxury-wear'],
+    styleTags: ['clean', 'sand-gold', 'quantity-breaks', 'fit-guide', 'pincode', 'cod', 'sticky-atc'],
+    searchKeywords: ['1000cr', 'atelier', 'luxe', 'pdp', 'buy box', 'product page', 'fashion', 'bundles', 'cod', 'pincode'],
+    croScore: 99.6,
+    mobileScore: 99.2,
+    performanceScore: 99.1
+  },
+  {
+    componentId: 'clinical-pro-pdp',
+    name: 'Clinical Pro PDP Buy Box',
+    type: '1000cr-elite',
+    category: '1000cr-elite',
+    sectionType: 'product-page',
+    liquidPath: 'components/product-page/clinical-pro-pdp.liquid',
+    filePath: 'components/product-page/clinical-pro-pdp.liquid',
+    metaPath: 'components/product-page/clinical-pro-pdp.meta.json',
+    visualStyle: 'minimalist-luxury',
+    family: '1000cr Elite Luxury',
+    archetypes: ['beauty', 'clinical', 'skincare', 'high-cro', 'subscription'],
+    compatibleSlots: [],
+    status: 'PUBLISHED',
+    version: '1',
+    designDirection: 'minimalist-luxury',
+    layoutVariant: 'clinical-trial-subscribe',
+    isUniversal: true,
+    industryTags: ['beauty', 'skincare', 'cosmetics', 'clinical', 'wellness', 'serum'],
+    styleTags: ['clean', 'slate', 'emerald-accent', 'subscribe-save', 'clinical-trial', 'pincode', 'cod', 'sticky-atc'],
+    searchKeywords: ['1000cr', 'clinical', 'pro', 'pdp', 'buy box', 'product page', 'skincare', 'subscription', 'cod', 'pincode'],
+    croScore: 99.7,
+    mobileScore: 99.4,
+    performanceScore: 99.0
+  },
+  {
+    componentId: 'titan-vault-pdp',
+    name: 'Titan Vault PDP Buy Box',
+    type: '1000cr-elite',
+    category: '1000cr-elite',
+    sectionType: 'product-page',
+    liquidPath: 'components/product-page/titan-vault-pdp.liquid',
+    filePath: 'components/product-page/titan-vault-pdp.liquid',
+    metaPath: 'components/product-page/titan-vault-pdp.meta.json',
+    visualStyle: 'minimalist-luxury',
+    family: '1000cr Elite Luxury',
+    archetypes: ['electronics', 'smart-hardware', 'gadgets', 'high-cro', 'urgency'],
+    compatibleSlots: [],
+    status: 'PUBLISHED',
+    version: '1',
+    designDirection: 'minimalist-luxury',
+    layoutVariant: 'hardware-specs-urgency',
+    isUniversal: true,
+    industryTags: ['electronics', 'audio', 'gadgets', 'tech', 'hardware', 'luxury-tech'],
+    styleTags: ['clean', 'titanium', 'electric-cyan', 'countdown-timer', 'specs-grid', 'shield-care', 'pincode', 'cod', 'sticky-atc'],
+    searchKeywords: ['1000cr', 'titan', 'vault', 'pdp', 'buy box', 'product page', 'electronics', 'gadgets', 'audio', 'countdown', 'cod', 'pincode'],
+    croScore: 99.8,
+    mobileScore: 99.5,
+    performanceScore: 99.2
+  }
+];
 
-  // 1. Add to registry.json if not present or update
-  const existingIdx = registry.components.findIndex(c => c.componentId === 'elite-pdp-buybox');
-  if (existingIdx >= 0) {
-    registry.components[existingIdx] = eliteComponent;
-  } else {
-    // Add right at the very beginning of the components array so it has top prominence!
-    registry.components.unshift(eliteComponent);
+async function main() {
+  console.log("Adding all 4 1000cr PDP Buy Boxes to Registry & Database...");
+
+  const registryPath = path.join(__dirname, '..', 'app', 'data', 'templates', 'theme-engine', 'registry.json');
+  const registryRaw = fs.readFileSync(registryPath, 'utf8');
+  const registry = JSON.parse(registryRaw);
+
+  for (let i = eliteComponents.length - 1; i >= 0; i--) {
+    const comp = eliteComponents[i];
+    const existingIdx = registry.components.findIndex(c => c.componentId === comp.componentId);
+    if (existingIdx >= 0) {
+      registry.components[existingIdx] = comp;
+    } else {
+      registry.components.unshift(comp);
+    }
   }
 
   const updatedRaw = JSON.stringify(registry, null, 2);
   fs.writeFileSync(registryPath, updatedRaw, 'utf8');
-  console.log("Updated registry.json with elite-pdp-buybox at position 0.");
+  console.log("Updated registry.json with all 4 PDP buy boxes at positions 0-3.");
 
   // Update hash in registryMeta
   const canonicalRaw = updatedRaw.replace(/\r\n/g, "\n");
@@ -60,42 +138,45 @@ async function main() {
     create: { id: "singleton", registryHash, seededAt: new Date() }
   });
 
-  // 2. Upsert into ComponentRegistry table
-  const dbData = {
-    componentId: eliteComponent.componentId,
-    category: eliteComponent.category,
-    niche: 'luxury',
-    sectionType: eliteComponent.sectionType,
-    filePath: eliteComponent.filePath,
-    liquidPath: eliteComponent.liquidPath,
-    metaPath: eliteComponent.metaPath,
-    family: eliteComponent.family,
-    archetypes: eliteComponent.archetypes,
-    visualStyle: eliteComponent.visualStyle,
-    compatibleSlots: eliteComponent.compatibleSlots,
-    industryTags: eliteComponent.industryTags,
-    styleTags: eliteComponent.styleTags,
-    searchKeywords: eliteComponent.searchKeywords,
-    croScore: eliteComponent.croScore,
-    mobileScore: eliteComponent.mobileScore,
-    version: eliteComponent.version,
-    status: eliteComponent.status,
-    isUniversal: true,
-    performanceScore: eliteComponent.performanceScore
-  };
+  // Upsert into ComponentRegistry table
+  for (const comp of eliteComponents) {
+    const dbData = {
+      componentId: comp.componentId,
+      category: comp.category,
+      niche: comp.archetypes[0] || 'luxury',
+      sectionType: comp.sectionType,
+      filePath: comp.filePath,
+      liquidPath: comp.liquidPath,
+      metaPath: comp.metaPath,
+      family: comp.family,
+      archetypes: comp.archetypes,
+      visualStyle: comp.visualStyle,
+      compatibleSlots: comp.compatibleSlots,
+      industryTags: comp.industryTags,
+      styleTags: comp.styleTags,
+      searchKeywords: comp.searchKeywords,
+      croScore: comp.croScore,
+      mobileScore: comp.mobileScore,
+      version: comp.version,
+      status: comp.status,
+      isUniversal: true,
+      performanceScore: comp.performanceScore
+    };
 
-  const record = await prisma.componentRegistry.upsert({
-    where: { componentId: 'elite-pdp-buybox' },
-    update: dbData,
-    create: dbData
-  });
+    const record = await prisma.componentRegistry.upsert({
+      where: { componentId: comp.componentId },
+      update: dbData,
+      create: dbData
+    });
+    console.log("Seeded:", record.componentId, "->", comp.name);
+  }
 
-  console.log("Successfully seeded ComponentRegistry record:", record.componentId, "Category:", record.category);
+  console.log("All 4 PDP buy box components registered successfully!");
 }
 
 main()
   .catch(err => {
-    console.error("Error seeding elite section:", err);
+    console.error("Error seeding elite sections:", err);
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());

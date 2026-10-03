@@ -26,61 +26,254 @@ import { ensurePreviewTheme, previewUrl } from "../services/preview-theme.server
 import { D2C_LANDING_PAGES, type LandingPageDefinition } from "../data/landing-pages-registry";
 import { installLandingPage } from "../services/landing-page-install.server";
 
-/**
- * Pre-Made Sections Store
- *
- * Merchants browse pre-made sections (Hero, PDP, Trust, Reviews, FAQ, etc.),
- * preview them live on their store, and click "Add to Store" to inject them
- * straight into their active Shopify theme with 1 click.
- */
+// ── Premium Minimalist Vector Icons (1000cr Aesthetic, Zero Emojis) ──
+function IconGem({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <polygon points="6 3 18 3 22 9 12 22 2 9 6 3" />
+      <polyline points="12 22 7 9 12 3 17 9 12 22" />
+      <line x1="2" y1="9" x2="22" y2="9" />
+    </svg>
+  );
+}
+
+function IconSparkle({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M12 3v18M3 12h18M6.5 6.5l11 11M6.5 17.5l11-11" />
+    </svg>
+  );
+}
+
+function IconBox({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+      <line x1="12" y1="22.08" x2="12" y2="12" />
+    </svg>
+  );
+}
+
+function IconRocket({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+      <path d="M9 12H4s.55-3.03 2-4.5c1.62-1.63 5-2 5-2" />
+      <path d="M12 15v5s3.03-.55 4.5-2c1.63-1.62 2-5 2-5" />
+    </svg>
+  );
+}
+
+function IconLayers({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+      <polyline points="2 17 12 22 22 17" />
+      <polyline points="2 12 12 17 22 12" />
+    </svg>
+  );
+}
+
+function IconFileText({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+      <polyline points="10 9 9 9 8 9" />
+    </svg>
+  );
+}
+
+function IconCart({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="9" cy="21" r="1" />
+      <circle cx="20" cy="21" r="1" />
+      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+    </svg>
+  );
+}
+
+function IconZap({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+  );
+}
+
+function IconTarget({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
+    </svg>
+  );
+}
+
+function IconMegaphone({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="m3 11 18-5v12L3 14v-3z" />
+      <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
+    </svg>
+  );
+}
+
+function IconTag({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+      <line x1="7" y1="7" x2="7.01" y2="7" />
+    </svg>
+  );
+}
+
+function IconShield({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  );
+}
+
+function IconPalette({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+      <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+      <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+      <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
+    </svg>
+  );
+}
+
+function IconEye({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function IconMonitor({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+      <line x1="8" y1="21" x2="16" y2="21" />
+      <line x1="12" y1="17" x2="12" y2="21" />
+    </svg>
+  );
+}
+
+function IconLaptop({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="12" rx="2" />
+      <line x1="2" y1="20" x2="22" y2="20" />
+    </svg>
+  );
+}
+
+function IconTablet({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+      <line x1="12" y1="18" x2="12.01" y2="18" />
+    </svg>
+  );
+}
+
+function IconSmartphone({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+      <line x1="12" y1="18" x2="12.01" y2="18" />
+    </svg>
+  );
+}
+
+function renderNavIcon(iconKey: string, size = 14) {
+  switch (iconKey) {
+    case "flagship":
+      return <IconGem size={size} />;
+    case "archive":
+      return <IconBox size={size} />;
+    case "rocket":
+      return <IconRocket size={size} />;
+    case "file":
+      return <IconFileText size={size} />;
+    case "cart":
+      return <IconCart size={size} />;
+    case "zap":
+      return <IconZap size={size} />;
+    case "target":
+      return <IconTarget size={size} />;
+    case "announcement":
+      return <IconMegaphone size={size} />;
+    case "tag":
+      return <IconTag size={size} />;
+    case "layers":
+      return <IconLayers size={size} />;
+    default:
+      return <IconBox size={size} />;
+  }
+}
 
 const CATEGORIES = [
-  { id: "1000cr-elite", label: "✨ 1000cr Flagship Suite (New)" },
-  { id: "legacy-all", label: "📦 Legacy Archive (All)" },
-  { id: "landing-page", label: "🚀 Landing Pages (D2C Home) (12)" },
-  { id: "product-page", label: "📄 Legacy PDP Variations (88)" },
-  { id: "cart-drawer", label: "🛒 Cart & Slide Drawers (20)" },
-  { id: "urgency", label: "⚡ Emergency & Urgency Boosters (5)" },
-  { id: "hero", label: "🎯 Hero Banners (15)" },
-  { id: "announcement", label: "📢 Announcement Bars (10)" },
-  { id: "product-card", label: "🏷️ Product Cards & Grids (12)" },
-  { id: "header", label: "🔝 Headers (10)" },
-  { id: "footer", label: "🔻 Footers (10)" },
+  { id: "1000cr-elite", label: "1000cr Flagship Suite (4 PDP Buy Boxes)" },
+  { id: "legacy-all", label: "Legacy Archive (All)" },
+  { id: "landing-page", label: "Landing Pages (D2C Home) (12)" },
+  { id: "product-page", label: "Legacy PDP Variations (88)" },
+  { id: "cart-drawer", label: "Cart & Slide Drawers (20)" },
+  { id: "urgency", label: "Emergency & Urgency Boosters (5)" },
+  { id: "hero", label: "Hero Banners (15)" },
+  { id: "announcement", label: "Announcement Bars (10)" },
+  { id: "product-card", label: "Product Cards & Grids (12)" },
+  { id: "header", label: "Headers (10)" },
+  { id: "footer", label: "Footers (10)" },
 ];
 
 const CATEGORY_GROUPS = [
   {
     title: "FLAGSHIP ARCHITECTURE",
     items: [
-      { id: "1000cr-elite", label: "1000cr Flagship Suite", icon: "✨", count: "1", desc: "Elite Luxe PDP Buy Box" },
+      { id: "1000cr-elite", label: "1000cr Flagship Suite", iconKey: "flagship", count: "4 Active", desc: "Elite Conversion PDP Buy Boxes" },
     ],
   },
   {
-    title: "📦 LEGACY ARCHIVE (DEPRECATED)",
+    title: "LEGACY ARCHIVE",
     items: [
-      { id: "legacy-all", label: "All Legacy Sections", icon: "📦", count: "120+", desc: "Old Section Library" },
-      { id: "landing-page", label: "Home Landing Pages", icon: "🚀", count: "12", desc: "Complete D2C Home Stores" },
-      { id: "product-page", label: "Legacy PDP Variations", icon: "📄", count: "88", desc: "Old PDP Variations" },
-      { id: "cart-drawer", label: "Cart & Slide Drawers", icon: "🛒", count: "20", desc: "Drawers with Upsells" },
-      { id: "urgency", label: "Urgency & Scarcity", icon: "⚡", count: "5", desc: "Emergency Sales Boosters" },
-      { id: "hero", label: "Hero Banners", icon: "🎯", count: "15", desc: "Visual Banners" },
-      { id: "announcement", label: "Announcement Bars", icon: "📢", count: "10", desc: "Tickers & Marquees" },
-      { id: "product-card", label: "Product Cards & Grids", icon: "🏷️", count: "12", desc: "Collections & Swatches" },
-      { id: "header", label: "Headers & Navbars", icon: "🔝", count: "10", desc: "Navigation" },
-      { id: "footer", label: "Footers", icon: "🔻", count: "10", desc: "Trust & Legal Links" },
+      { id: "legacy-all", label: "All Legacy Sections", iconKey: "archive", count: "120+", desc: "Old Section Library" },
+      { id: "landing-page", label: "Home Landing Pages", iconKey: "rocket", count: "12", desc: "Complete D2C Home Stores" },
+      { id: "product-page", label: "Legacy PDP Variations", iconKey: "file", count: "88", desc: "Old PDP Variations" },
+      { id: "cart-drawer", label: "Cart & Slide Drawers", iconKey: "cart", count: "20", desc: "Drawers with Upsells" },
+      { id: "urgency", label: "Urgency & Scarcity", iconKey: "zap", count: "5", desc: "Emergency Sales Boosters" },
+      { id: "hero", label: "Hero Banners", iconKey: "target", count: "15", desc: "Visual Banners" },
+      { id: "announcement", label: "Announcement Bars", iconKey: "announcement", count: "10", desc: "Tickers & Marquees" },
+      { id: "product-card", label: "Product Cards & Grids", iconKey: "tag", count: "12", desc: "Collections & Swatches" },
+      { id: "header", label: "Headers & Navbars", iconKey: "layers", count: "10", desc: "Navigation" },
+      { id: "footer", label: "Footers", iconKey: "layers", count: "10", desc: "Trust & Legal Links" },
     ],
   },
 ];
 
 const NICHE_FILTERS = [
-  { id: "all", label: "✨ All Niches" },
-  { id: "streetwear", label: "👗 Streetwear & Urban" },
-  { id: "beauty", label: "💄 Beauty & Skincare" },
-  { id: "luxury", label: "✨ Luxury & Jewelry" },
-  { id: "tech", label: "🎧 Tech & Audio" },
-  { id: "wellness", label: "🌿 Health & Wellness" },
-  { id: "coffee", label: "☕ Food & Artisanal" },
-  { id: "dropship", label: "⚡ High-CRO Dropship" },
+  { id: "all", label: "All Niches" },
+  { id: "streetwear", label: "Streetwear & Apparel" },
+  { id: "beauty", label: "Beauty & Skincare" },
+  { id: "luxury", label: "Luxury & Jewelry" },
+  { id: "tech", label: "Tech & Audio" },
+  { id: "wellness", label: "Health & Wellness" },
+  { id: "coffee", label: "Food & Beverage" },
+  { id: "dropship", label: "High-CRO Funnels" },
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -228,7 +421,7 @@ export async function action({ request }: ActionFunctionArgs) {
     if (intent === "preview") {
       const theme = await ensurePreviewTheme(shop);
 
-      const isPdp = sectionType === "product-page" || sectionType.startsWith("pdp") || componentId.startsWith("pdp") || componentId.startsWith("elite-pdp") || sectionType.startsWith("product-card");
+      const isPdp = sectionType === "product-page" || sectionType.startsWith("pdp") || componentId.includes("-pdp") || componentId.startsWith("pdp") || componentId.startsWith("elite-pdp") || sectionType.startsWith("product-card");
       const isCart = sectionType === "cart-drawer" || componentId.startsWith("cdr");
       const isUrgency = sectionType === "urgency" || componentId.startsWith("urgency");
 
@@ -288,7 +481,7 @@ export async function action({ request }: ActionFunctionArgs) {
         themeName = theme.name;
       }
 
-      const isPdp = sectionType === "product-page" || sectionType.startsWith("pdp") || componentId.startsWith("pdp") || componentId.startsWith("elite-pdp") || sectionType.startsWith("product-card");
+      const isPdp = sectionType === "product-page" || sectionType.startsWith("pdp") || componentId.includes("-pdp") || componentId.startsWith("pdp") || componentId.startsWith("elite-pdp") || sectionType.startsWith("product-card");
       const isCart = sectionType === "cart-drawer" || componentId.startsWith("cdr");
       const isUrgency = sectionType === "urgency" || componentId.startsWith("urgency");
 
@@ -452,8 +645,8 @@ function BentoSectionCard({
     return () => ro.disconnect();
   }, []);
 
-  const isElite = component.category === "1000cr-elite" || component.componentId.startsWith("elite-");
-  const name = component.detail?.name || (isElite ? "Elite Luxe PDP Buy Box" : component.componentId.replace(/[-_]/g, " "));
+  const isElite = component.category === "1000cr-elite" || component.componentId.startsWith("elite-") || component.componentId.startsWith("atelier-") || component.componentId.startsWith("clinical-") || component.componentId.startsWith("titan-");
+  const name = component.detail?.name || (isElite ? (component.name || component.componentId.replace(/[-_]/g, " ")) : component.componentId.replace(/[-_]/g, " "));
   const settingsCount = component.detail?.settings?.length || 23;
   const previewUrl = `/preview?sectionId=${encodeURIComponent(component.componentId)}&shop=${encodeURIComponent(shopDomain)}&embed=1`;
   const containerHeight = isElite ? 380 : (isFeatured ? 290 : 210);
@@ -483,11 +676,10 @@ function BentoSectionCard({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "13px",
               flexShrink: 0,
             }}
           >
-            {isElite ? "✨" : "📦"}
+            {isElite ? <IconGem size={15} /> : <IconBox size={15} />}
           </span>
           <div style={{ minWidth: 0 }}>
             <h3
@@ -612,7 +804,8 @@ function BentoSectionCard({
               boxShadow: "0 8px 24px rgba(0, 0, 0, 0.25)",
             }}
           >
-            👁️ Open Live Preview Studio
+            <IconEye size={14} />
+            <span>Open Live Preview Studio</span>
           </div>
           <span style={{ fontSize: 11, color: "#e2e8f0", fontWeight: 500 }}>
             Click to test responsive mobile & desktop viewports
@@ -651,7 +844,8 @@ function BentoSectionCard({
             onMouseEnter={(e) => (e.currentTarget.style.background = "#f8fafc")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "#ffffff")}
           >
-            👁️ Studio Preview
+            <IconEye size={13} />
+            <span>Studio Preview</span>
           </button>
           <button
             type="button"
@@ -676,7 +870,8 @@ function BentoSectionCard({
             onMouseEnter={(e) => (e.currentTarget.style.background = "#f1f5f9")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "#f8fafc")}
           >
-            🛡️ Test in Draft
+            <IconShield size={13} />
+            <span>Test in Draft</span>
           </button>
           <button
             type="button"
@@ -702,7 +897,8 @@ function BentoSectionCard({
             onMouseEnter={(e) => (e.currentTarget.style.background = "#1e293b")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "#0f172a")}
           >
-            ⚡ Add to Live Store
+            <IconZap size={13} />
+            <span>Add to Live Store</span>
           </button>
         </div>
       </div>
@@ -873,7 +1069,8 @@ function LandingPageCard({
               gap: 6,
             }}
           >
-            👁️ Click for Studio Preview
+            <IconEye size={14} />
+            <span>Click for Studio Preview</span>
           </button>
         </div>
       </div>
@@ -943,7 +1140,7 @@ function LandingPageCard({
             gap: 6,
           }}
         >
-          <span>📊</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           <span>{landingPage.stats}</span>
         </div>
 
@@ -959,9 +1156,12 @@ function LandingPageCard({
                 background: "#f1f5f9",
                 padding: "3px 8px",
                 borderRadius: 6,
+                display: "inline-flex",
+                alignItems: "center",
               }}
             >
-              ✓ {f}
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ marginRight: 4 }}><polyline points="20 6 9 17 4 12"/></svg>
+              {f}
             </span>
           ))}
         </div>
@@ -1013,8 +1213,9 @@ function LandingPageCard({
               />
             </div>
           </div>
-          <span style={{ fontSize: 11, color: "#059669", fontWeight: 700 }}>
-            ⚡ 1-Click Shopify Theme Add
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: "#059669", fontWeight: 700 }}>
+            <IconZap size={12} />
+            <span>1-Click Shopify Theme Add</span>
           </span>
         </div>
 
@@ -1040,7 +1241,8 @@ function LandingPageCard({
               transition: "all 0.15s ease",
             }}
           >
-            👁️ Studio Preview
+            <IconEye size={13} />
+            <span>Studio Preview</span>
           </button>
           <button
             type="button"
@@ -1058,9 +1260,14 @@ function LandingPageCard({
               fontWeight: 600,
               cursor: "pointer",
               whiteSpace: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 4,
             }}
           >
-            🛡️ Add Draft
+            <IconShield size={12} />
+            <span>Add Draft</span>
           </button>
           <button
             type="button"
@@ -1078,10 +1285,15 @@ function LandingPageCard({
               fontWeight: 700,
               cursor: "pointer",
               whiteSpace: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 4,
               transition: "background 0.15s ease",
             }}
           >
-            ⚡ Add Live
+            <IconZap size={12} />
+            <span>Add Live</span>
           </button>
         </div>
       </div>
@@ -1219,7 +1431,7 @@ export default function PreMadeSectionsStore() {
         {data?.ok && data.intent === "install" && (
           <Banner
             tone="success"
-            title={`🎉 Section Added: ${data.sectionName || data.componentId}`}
+            title={`Section Added: ${data.sectionName || data.componentId}`}
           >
             <BlockStack gap="200">
               <Text as="p">
@@ -1246,7 +1458,7 @@ export default function PreMadeSectionsStore() {
         {data?.ok && data.intent === "install-landing-page" && (
           <Banner
             tone="success"
-            title={`🎉 Shopify Landing Page Installed: ${data.pageName}`}
+            title={`Shopify Landing Page Installed: ${data.pageName}`}
           >
             <BlockStack gap="200">
               <Text as="p">
@@ -1276,9 +1488,9 @@ export default function PreMadeSectionsStore() {
           data.error.includes("401") || data.error.includes("Invalid API key") || data.error.includes("access token") ? (
             <Banner
               tone="warning"
-              title="⚡ Reconnect Store Needed (Session Expired)"
+              title="Reconnect Store Needed (Session Expired)"
               action={{
-                content: "⚡ Reconnect Store Now",
+                content: "Reconnect Store Now",
                 url: `/auth?shop=${encodeURIComponent(shopDomain)}`,
                 target: "_top",
               }}
@@ -1300,8 +1512,8 @@ export default function PreMadeSectionsStore() {
           <aside className="cf-pagefly-sidebar">
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px", paddingBottom: "10px", borderBottom: "1px solid #f1f5f9" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <div style={{ width: "24px", height: "24px", borderRadius: "6px", background: "#0f172a", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: "800" }}>
-                  💎
+                <div style={{ width: "24px", height: "24px", borderRadius: "6px", background: "#0f172a", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <IconGem size={13} />
                 </div>
                 <div>
                   <div style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a" }}>Converflow</div>
@@ -1344,7 +1556,7 @@ export default function PreMadeSectionsStore() {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span style={{ fontSize: "13px" }}>✨</span>
+                    <IconSparkle size={14} />
                     <span style={{ fontSize: "12px", fontWeight: category === "1000cr-elite" ? 700 : 500 }}>
                       1000cr Flagship Suite
                     </span>
@@ -1359,7 +1571,7 @@ export default function PreMadeSectionsStore() {
                       color: category === "1000cr-elite" ? "#ffffff" : "#64748b",
                     }}
                   >
-                    1 Active
+                    4 Active
                   </span>
                 </button>
               </div>
@@ -1386,10 +1598,16 @@ export default function PreMadeSectionsStore() {
                   }}
                 >
                   <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span>📦</span>
+                    <IconBox size={13} />
                     <span>Legacy Archive (120+)</span>
                   </span>
-                  <span style={{ fontSize: "9px" }}>{legacyOpen ? "▲" : "▼"}</span>
+                  <span style={{ display: "flex", alignItems: "center" }}>
+                    {legacyOpen ? (
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+                    ) : (
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                    )}
+                  </span>
                 </button>
 
                 {legacyOpen && (
@@ -1418,7 +1636,7 @@ export default function PreMadeSectionsStore() {
                           }}
                         >
                           <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                            <span style={{ fontSize: "12px" }}>{cat.icon}</span>
+                            {renderNavIcon((cat as any).iconKey || "archive", 13)}
                             <span>{cat.label}</span>
                           </span>
                           <span style={{ fontSize: "10px", color: "#94a3b8" }}>{cat.count}</span>
@@ -1449,7 +1667,8 @@ export default function PreMadeSectionsStore() {
                       fontWeight: "600",
                     }}
                   >
-                    <span>🛡️</span> Theme Assets
+                    <IconShield size={13} />
+                    <span>Theme Assets</span>
                   </a>
                   <a
                     href="/app/builder"
@@ -1465,7 +1684,8 @@ export default function PreMadeSectionsStore() {
                       fontWeight: "600",
                     }}
                   >
-                    <span>🎨</span> Custom Builder
+                    <IconPalette size={13} />
+                    <span>Custom Builder</span>
                   </a>
                   <a
                     href="/app/pagekit"
@@ -1481,7 +1701,8 @@ export default function PreMadeSectionsStore() {
                       fontWeight: "600",
                     }}
                   >
-                    <span>🚀</span> Full Page Kits
+                    <IconRocket size={13} />
+                    <span>Full Page Kits</span>
                   </a>
                 </div>
               </div>
@@ -1853,28 +2074,40 @@ export default function PreMadeSectionsStore() {
                         pressed={sectionDevice === "desktop"}
                         onClick={() => setSectionDevice("desktop")}
                       >
-                        🖥️ Desktop
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                          <IconMonitor size={14} />
+                          <span>Desktop</span>
+                        </span>
                       </Button>
                       <Button
                         size="slim"
                         pressed={sectionDevice === "laptop"}
                         onClick={() => setSectionDevice("laptop")}
                       >
-                        💻 Laptop
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                          <IconLaptop size={14} />
+                          <span>Laptop</span>
+                        </span>
                       </Button>
                       <Button
                         size="slim"
                         pressed={sectionDevice === "tablet"}
                         onClick={() => setSectionDevice("tablet")}
                       >
-                        💻 Tablet
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                          <IconTablet size={14} />
+                          <span>Tablet</span>
+                        </span>
                       </Button>
                       <Button
                         size="slim"
                         pressed={sectionDevice === "mobile"}
                         onClick={() => setSectionDevice("mobile")}
                       >
-                        📱 Mobile
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                          <IconSmartphone size={14} />
+                          <span>Mobile</span>
+                        </span>
                       </Button>
                     </InlineStack>
 
@@ -1905,7 +2138,10 @@ export default function PreMadeSectionsStore() {
                               if (lp) submitLandingInstall(lp, "draft");
                             }}
                           >
-                            🛡️ Add Page to Draft Theme
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                              <IconShield size={13} />
+                              <span>Add Page to Draft Theme</span>
+                            </span>
                           </Button>
 
                           <Button
@@ -1917,7 +2153,10 @@ export default function PreMadeSectionsStore() {
                               if (lp) submitLandingInstall(lp, "live");
                             }}
                           >
-                            ⚡ Add Page to Live Theme
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                              <IconZap size={13} />
+                              <span>Add Page to Live Theme</span>
+                            </span>
                           </Button>
                         </>
                       ) : (
@@ -1932,7 +2171,10 @@ export default function PreMadeSectionsStore() {
                               if (c) submitInstall(c, "draft");
                             }}
                           >
-                            🛡️ Submit to Draft Theme
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                              <IconShield size={13} />
+                              <span>Submit to Draft Theme</span>
+                            </span>
                           </Button>
 
                           <Button
@@ -1944,7 +2186,10 @@ export default function PreMadeSectionsStore() {
                               if (c) submitInstall(c, "live");
                             }}
                           >
-                            ⚡ Submit to Live Theme
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                              <IconZap size={13} />
+                              <span>Submit to Live Theme</span>
+                            </span>
                           </Button>
                         </>
                       )}
@@ -1957,7 +2202,7 @@ export default function PreMadeSectionsStore() {
                   <Box padding="300" background="bg-surface-success">
                     <InlineStack align="space-between" blockAlign="center" wrap>
                       <Text as="p" variant="bodyMd" fontWeight="semibold">
-                        🎉 Successfully installed to {data.themeName} ({data.targetLabel})!
+                        Successfully installed to {data.themeName} ({data.targetLabel})!
                       </Text>
                       <InlineStack gap="200">
                         {data.previewUrl && (
@@ -1981,7 +2226,7 @@ export default function PreMadeSectionsStore() {
                   <Box padding="300" background="bg-surface-success">
                     <InlineStack align="space-between" blockAlign="center" wrap>
                       <Text as="p" variant="bodyMd" fontWeight="semibold">
-                        🎉 Successfully created template "{data.templateKey}" with {data.sectionCount} custom sections on {data.themeName}!
+                        Successfully created template "{data.templateKey}" with {data.sectionCount} custom sections on {data.themeName}!
                       </Text>
                       <InlineStack gap="200">
                         {data.previewUrl && (
@@ -2030,7 +2275,7 @@ export default function PreMadeSectionsStore() {
                 <Box padding="300" borderBlockStartWidth="025" borderColor="border">
                   <InlineStack align="space-between" blockAlign="center">
                     <Text as="p" tone="subdued" variant="bodySm">
-                      ⚡ Live store preview. Shoppers won't see changes until you submit.
+                      Live store preview. Shoppers won't see changes until you submit.
                     </Text>
                     <Button onClick={() => setPreviewModalOpen(false)}>
                       Close Preview
