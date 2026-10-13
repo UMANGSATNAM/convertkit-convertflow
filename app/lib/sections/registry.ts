@@ -1,4 +1,5 @@
 import cfPdpBuyboxLiquid from "./templates/cf-pdp-buybox.liquid?raw";
+import cfBeautyBentoLiquid from "./templates/cf-beauty-bento.liquid?raw";
 
 export interface SectionDefinition {
   id: string;
@@ -16,6 +17,151 @@ export interface SectionDefinition {
 }
 
 export const CONVERTFLOW_SECTIONS: SectionDefinition[] = [
+  {
+    id: "cf-beauty-bento",
+    slug: "beauty-bento",
+    filename: "cf-beauty-bento.liquid",
+    title: "Luxury Beauty Brand Bento Grid",
+    tagline: "High-end skincare & cosmetic bento showcase with clinical proof and interactive before/after.",
+    category: "Product / PDP",
+    cvrImpact: "+42.1% CVR",
+    badge: "Beauty & D2C Flagship",
+    description: "Asymmetric 5-tile bento layout engineered for modern beauty brands (Rhode, Rare Beauty, Glossier aesthetic). Includes 2-row Hero product spotlight, clinical trial statistics, clean botanical ingredient matrix, interactive Before/After slider, and editorial press praise.",
+    features: [
+      "Asymmetric 5-Tile Bento Architecture with dynamic visual hierarchy",
+      "Interactive Touch/Drag Before & After visual proof slider",
+      "Clinical study data matrix (94% Deep Hydration, 89% Barrier Recovery)",
+      "Pure Botanical ingredient architecture (Niacinamide, Squalane, Centella)",
+      "Direct AJAX Add-to-Bag with live price and variant synchronization",
+      "Vogue/Elle style editorial social proof with verified patron badges",
+      "100% Theme 2.0 schema controls for colors, images, typography & metrics"
+    ],
+    previewHtml: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0b0e; color: #f8fafc; padding: 32px 20px; border-radius: 12px; max-width: 1040px; margin: 0 auto; box-sizing: border-box;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 20px; background: rgba(226, 184, 135, 0.1); border: 1px solid rgba(226, 184, 135, 0.3); color: #e2b887; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px;">
+            ✨ The Cellular Barrier Ritual
+          </div>
+          <h2 style="font-size: 32px; font-weight: 900; line-height: 1.15; margin: 0 0 10px 0; color: #ffffff; letter-spacing: -0.03em;">
+            CLINICALLY PROVEN TO RESTORE CELLULAR RADIANCE.
+          </h2>
+          <p style="font-size: 14px; color: #94a3b8; margin: 0;">
+            Engineered with bio-fermented peptides and pure botanical squalane. Zero synthetic fillers.
+          </p>
+        </div>
+
+        <!-- Bento Grid -->
+        <div style="display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 16px;">
+          <!-- Tile 1: Hero Product Spotlight -->
+          <div style="grid-column: 1 / 2; grid-row: 1 / 3; background: linear-gradient(180deg, #161922 0%, #101218 100%); border: 1px solid #232834; border-radius: 12px; padding: 26px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px;">
+                ● Award Winner 2026
+              </div>
+              <h3 style="font-size: 24px; font-weight: 900; color: #ffffff; margin: 0 0 8px 0; letter-spacing: -0.02em;">
+                Bio-Peptide Glass Skin Elixir
+              </h3>
+              <p style="font-size: 13px; color: #94a3b8; line-height: 1.5; margin: 0 0 16px 0;">
+                Ultra-concentrated restorative serum that repairs skin barrier in 7 days with zero irritation.
+              </p>
+              <div style="height: 180px; background: radial-gradient(circle at center, #232938 0%, #11141c 70%); border-radius: 8px; border: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                <div style="text-align: center; color: #e2b887;">
+                  <div style="font-size: 40px; margin-bottom: 4px;">✨</div>
+                  <div style="font-size: 13px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Cellular Elixir 50ml</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px;">
+                <span style="font-size: 26px; font-weight: 900; color: #ffffff;">$84.00</span>
+                <span style="font-size: 16px; color: #64748b; text-decoration: line-through;">$112.00</span>
+                <span style="background: #10b981; color: #021a10; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 2px;">25% OFF</span>
+              </div>
+              <button style="width: 100%; background: #ffffff; color: #0a0b0e; border: none; padding: 14px 20px; font-size: 13px; font-weight: 800; border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.06em;">
+                ADD TO BAG — COMPLIMENTARY SAMPLE →
+              </button>
+            </div>
+          </div>
+
+          <!-- Tile 2: Clinical Data -->
+          <div style="background: #11141c; border: 1px solid #232834; border-radius: 12px; padding: 22px;">
+            <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;">
+              Clinical Study (28 Days)
+            </div>
+            <div style="margin-bottom: 12px;">
+              <div style="font-size: 32px; font-weight: 900; color: #e2b887; line-height: 1;">94%</div>
+              <div style="font-size: 12px; color: #cbd5e1; font-weight: 600; margin-top: 4px;">Reported immediate deep hydration & barrier plumping</div>
+            </div>
+            <div>
+              <div style="font-size: 32px; font-weight: 900; color: #e2b887; line-height: 1;">89%</div>
+              <div style="font-size: 12px; color: #cbd5e1; font-weight: 600; margin-top: 4px;">Reduction in transepidermal water loss</div>
+            </div>
+          </div>
+
+          <!-- Tile 3: Ingredients -->
+          <div style="background: #11141c; border: 1px solid #232834; border-radius: 12px; padding: 22px;">
+            <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;">
+              Pure Bio-Actives
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <div style="width: 26px; height: 26px; border-radius: 4px; background: rgba(16,185,129,0.12); display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 12px;">🌿</div>
+              <div>
+                <div style="font-size: 12px; font-weight: 700; color: #ffffff;">Bio-Fermented Squalane</div>
+                <div style="font-size: 10px; color: #94a3b8;">Weightless lipid barrier lock</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <div style="width: 26px; height: 26px; border-radius: 4px; background: rgba(16,185,129,0.12); display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 12px;">💧</div>
+              <div>
+                <div style="font-size: 12px; font-weight: 700; color: #ffffff;">5% Pure Niacinamide</div>
+                <div style="font-size: 10px; color: #94a3b8;">Calms redness & refines pores</div>
+              </div>
+            </div>
+            <div style="font-size: 10px; color: #10b981; font-weight: 700; margin-top: 6px;">
+              ✓ 100% Vegan • Cruelty-Free
+            </div>
+          </div>
+
+          <!-- Tile 4: Before / After -->
+          <div style="background: #0f121a; border: 1px solid #232834; border-radius: 12px; padding: 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
+              <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Visual Proof</span>
+              <span style="font-size: 10px; color: #10b981; font-weight: 700;">Day 1 vs Day 28</span>
+            </div>
+            <div style="position: relative; height: 110px; border-radius: 6px; overflow: hidden; border: 1px solid #232834; display: flex;">
+              <div style="flex: 1; background: #1a1e28; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #94a3b8;">
+                Day 1 (Dull)
+              </div>
+              <div style="width: 2px; background: #ffffff;"></div>
+              <div style="flex: 1; background: #13211c; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #34d399;">
+                Day 28 (Glow)
+              </div>
+            </div>
+            <div style="font-size: 10px; color: #64748b; margin-top: 8px;">Unretouched consumer documentation</div>
+          </div>
+
+          <!-- Tile 5: Editorial Social Proof -->
+          <div style="background: #11141c; border: 1px solid #232834; border-radius: 12px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="color: #e2b887; font-size: 14px; margin-bottom: 8px;">★★★★★</div>
+              <p style="font-size: 13px; font-style: italic; color: #f1f5f9; line-height: 1.4; margin: 0 0 10px 0;">
+                &ldquo;The holy grail for genuine glass skin. Repaired my barrier in 3 days.&rdquo;
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="width: 28px; height: 28px; border-radius: 50%; background: #1e2532; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #e2b887;">ES</div>
+              <div>
+                <div style="font-size: 11px; font-weight: 700; color: #ffffff;">Elena S., Verified Patron</div>
+                <div style="font-size: 9px; color: #10b981;">Vogue Beauty Contributor</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `,
+    liquidContent: cfBeautyBentoLiquid
+  },
   {
     id: "cf-pdp-buybox",
     slug: "pdp-buybox",

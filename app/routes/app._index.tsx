@@ -142,6 +142,33 @@ export default function Index() {
     fetcher.submit({ actionType: "installAll" }, { method: "post" });
   };
 
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
+
+  const constructIframeDoc = (html: string) => `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <style>
+        body {
+          margin: 0;
+          padding: 20px 12px;
+          background: #08090c;
+          color: #f8fafc;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+          -webkit-font-smoothing: antialiased;
+          box-sizing: border-box;
+        }
+        * { box-sizing: border-box; }
+      </style>
+    </head>
+    <body>
+      ${html}
+    </body>
+    </html>
+  `;
+
   return (
     <Page fullWidth>
       <TitleBar title="ConvertFlow • Section Library" />
@@ -183,7 +210,7 @@ export default function Index() {
                   <Badge tone="success">Conversion Engine v1.0</Badge>
                 </InlineStack>
                 <Text as="p" variant="bodyMd" tone="subdued">
-                  5 pre-built, battle-tested Shopify Theme 2.0 sections engineered to maximize CVR with zero code bloat.
+                  6 high-converting, battle-tested Shopify Theme 2.0 sections with real live Iframe preview and zero code bloat.
                 </Text>
               </BlockStack>
 
@@ -199,7 +226,7 @@ export default function Index() {
                   loading={isInstallingAll && isSubmitting}
                   onClick={handleInstallAll}
                 >
-                  ⚡ Install All 5 Sections
+                  ⚡ Install All Sections
                 </Button>
               </InlineStack>
             </InlineStack>
@@ -305,9 +332,12 @@ export default function Index() {
                         <Button
                           variant="secondary"
                           size="slim"
-                          onClick={() => setPreviewSection(section)}
+                          onClick={() => {
+                            setPreviewDevice("desktop");
+                            setPreviewSection(section);
+                          }}
                         >
-                          👁️ Live Preview
+                          👁️ Live Iframe Preview
                         </Button>
 
                         <Button
@@ -340,14 +370,15 @@ export default function Index() {
         </Layout>
       </BlockStack>
 
-      {/* Live Preview Modal */}
+      {/* Live Sandboxed Iframe Preview Modal */}
       {previewSection && (
         <Modal
+          large
           open={Boolean(previewSection)}
           onClose={() => setPreviewSection(null)}
-          title={`Live Preview: ${previewSection.title}`}
+          title={`Live Iframe Preview: ${previewSection.title}`}
           primaryAction={{
-            content: installedMap[previewSection.id] ? "Reinstall / Update" : "Install to Theme Now",
+            content: installedMap[previewSection.id] ? "Reinstall / Update" : "⚡ Install to Theme Now",
             onAction: () => {
               handleInstallOne(previewSection.id);
               setPreviewSection(null);
@@ -355,36 +386,125 @@ export default function Index() {
           }}
           secondaryActions={[
             {
-              content: "Close",
+              content: "Close Preview",
               onAction: () => setPreviewSection(null),
             },
           ]}
         >
           <Modal.Section>
-            <BlockStack gap="300">
-              <InlineStack align="space-between">
+            <BlockStack gap="400">
+              {/* Header meta and device breakpoint toggles */}
+              <InlineStack align="space-between" blockAlign="center">
                 <Text as="p" variant="bodySm" tone="subdued">
                   Category: <strong>{previewSection.category}</strong> • Expected Impact:{" "}
                   <strong>{previewSection.cvrImpact}</strong>
                 </Text>
-                <Badge tone="info">Responsive Desktop & Mobile Ready</Badge>
+
+                {/* Device Switcher Toolbar */}
+                <div style={{ display: "inline-flex", background: "#1e2530", borderRadius: "6px", padding: "3px", gap: "4px" }}>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewDevice("desktop")}
+                    style={{
+                      background: previewDevice === "desktop" ? "#10b981" : "transparent",
+                      color: previewDevice === "desktop" ? "#021a10" : "#94a3b8",
+                      border: "none",
+                      borderRadius: "4px",
+                      padding: "6px 14px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px"
+                    }}
+                  >
+                    🖥️ Desktop
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewDevice("tablet")}
+                    style={{
+                      background: previewDevice === "tablet" ? "#10b981" : "transparent",
+                      color: previewDevice === "tablet" ? "#021a10" : "#94a3b8",
+                      border: "none",
+                      borderRadius: "4px",
+                      padding: "6px 14px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px"
+                    }}
+                  >
+                    📱 Tablet (768px)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewDevice("mobile")}
+                    style={{
+                      background: previewDevice === "mobile" ? "#10b981" : "transparent",
+                      color: previewDevice === "mobile" ? "#021a10" : "#94a3b8",
+                      border: "none",
+                      borderRadius: "4px",
+                      padding: "6px 14px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px"
+                    }}
+                  >
+                    📲 Mobile (375px)
+                  </button>
+                </div>
               </InlineStack>
 
+              {/* Sandboxed Iframe Container */}
               <div
                 style={{
-                  background: "#050608",
-                  padding: "24px 16px",
+                  background: "#030406",
                   borderRadius: "8px",
-                  border: "1px solid #1e293b",
-                  overflowX: "auto",
+                  border: "1px solid #1e2530",
+                  padding: "16px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "flex-start",
+                  minHeight: "560px",
+                  overflowX: "auto"
                 }}
-                dangerouslySetInnerHTML={{ __html: previewSection.previewHtml }}
-              />
+              >
+                <div
+                  style={{
+                    width: previewDevice === "desktop" ? "100%" : previewDevice === "tablet" ? "768px" : "375px",
+                    maxWidth: "100%",
+                    transition: "width 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                    border: previewDevice !== "desktop" ? "2px solid #334155" : "none",
+                    boxShadow: previewDevice !== "desktop" ? "0 20px 40px rgba(0,0,0,0.8)" : "none"
+                  }}
+                >
+                  <iframe
+                    title="Live Section Sandbox"
+                    srcDoc={constructIframeDoc(previewSection.previewHtml)}
+                    style={{
+                      width: "100%",
+                      height: "560px",
+                      border: "none",
+                      display: "block",
+                      background: "#08090c"
+                    }}
+                    sandbox="allow-scripts"
+                  />
+                </div>
+              </div>
 
               <Banner tone="info">
                 <p>
-                  Once installed, you can modify colors, typography, images, and content directly
-                  inside Shopify&apos;s native Theme Customizer under <strong>&quot;Add section&quot;</strong>.
+                  This is a live, sandboxed rendering. When installed into your theme, you can customize all content, colors, and layout directly inside Shopify&apos;s native Theme Customizer under <strong>&quot;Add section&quot;</strong>.
                 </p>
               </Banner>
             </BlockStack>
