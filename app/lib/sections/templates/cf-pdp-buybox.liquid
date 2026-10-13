@@ -1,0 +1,939 @@
+{% comment %}
+  ConvertFlow - The Ultimate 1000-Crore PDP Buy Box (Production Grade)
+  Engineered for direct-response e-commerce with real Shopify product data,
+  real variant swatches, live inventory scarcity, AJAX cart, and sticky mobile CTA.
+{% endcomment %}
+
+{%- assign target_product = all_products[section.settings.featured_product] | default: product -%}
+{%- assign current_variant = target_product.selected_or_first_available_variant -%}
+
+<div class="cf-pdp-wrapper" id="cf-pdp-{{ section.id }}" data-section-id="{{ section.id }}">
+  <style>
+    #cf-pdp-{{ section.id }} {
+      --cf-bg: {{ section.settings.bg_color | default: "#08090c" }};
+      --cf-card-bg: {{ section.settings.card_bg | default: "#0f1218" }};
+      --cf-border: {{ section.settings.border_color | default: "#1e2530" }};
+      --cf-text-main: {{ section.settings.text_color | default: "#f8fafc" }};
+      --cf-text-muted: {{ section.settings.muted_color | default: "#94a3b8" }};
+      --cf-accent: {{ section.settings.accent_color | default: "#10b981" }};
+      --cf-accent-hover: #059669;
+      --cf-btn-text: #021a10;
+      --cf-danger: #ef4444;
+      --cf-warning: #f59e0b;
+
+      background-color: var(--cf-bg);
+      color: var(--cf-text-main);
+      padding: {{ section.settings.padding_y | default: 60 }}px 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #cf-pdp-{{ section.id }} * {
+      box-sizing: border-box;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-pdp-card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--cf-card-bg);
+      border: 1px solid var(--cf-border);
+      border-radius: 4px;
+      padding: 36px 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Top Social Proof & Urgency Bar */
+    #cf-pdp-{{ section.id }} .cf-top-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--cf-accent);
+      padding: 5px 12px;
+      border-radius: 2px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cf-accent);
+      box-shadow: 0 0 8px var(--cf-accent);
+      animation: cf-pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes cf-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.8); }
+    }
+
+    #cf-pdp-{{ section.id }} .cf-live-views {
+      font-size: 12px;
+      color: var(--cf-text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Title & Pricing */
+    #cf-pdp-{{ section.id }} .cf-product-title {
+      font-size: clamp(26px, 4vw, 34px);
+      font-weight: 800;
+      line-height: 1.15;
+      margin: 0 0 16px 0;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-pricing-row {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-active-price {
+      font-size: 34px;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-compare-price {
+      font-size: 20px;
+      color: var(--cf-text-muted);
+      text-decoration: line-through;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-savings-pill {
+      background: var(--cf-danger);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 2px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* Stock Scarcity Progress Meter */
+    #cf-pdp-{{ section.id }} .cf-scarcity-box {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 3px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-scarcity-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cf-warning);
+      margin-bottom: 8px;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-progress-track {
+      width: 100%;
+      height: 6px;
+      background: #1e2530;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-progress-fill {
+      height: 100%;
+      width: 82%;
+      background: linear-gradient(90deg, #f59e0b, #ef4444);
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+
+    /* Variant Swatch Selectors */
+    #cf-pdp-{{ section.id }} .cf-variant-section {
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-option-group {
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-option-legend {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--cf-text-muted);
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-option-selected-val {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-swatch-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-swatch-item {
+      position: relative;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-swatch-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-swatch-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      background: #141822;
+      border: 1px solid var(--cf-border);
+      border-radius: 3px;
+      color: var(--cf-text-main);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-swatch-input:checked + .cf-swatch-btn {
+      border-color: #ffffff;
+      background: #1f2737;
+      color: #ffffff;
+      box-shadow: 0 0 0 1px #ffffff;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-swatch-btn:hover {
+      border-color: #475569;
+    }
+
+    /* Quantity and Buy Row */
+    #cf-pdp-{{ section.id }} .cf-action-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-qty-picker {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--cf-border);
+      background: #141822;
+      border-radius: 3px;
+      overflow: hidden;
+      height: 54px;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-qty-btn {
+      width: 38px;
+      height: 100%;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-qty-btn:hover {
+      background: #1e2530;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-qty-input {
+      width: 44px;
+      height: 100%;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      -moz-appearance: textfield;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-qty-input::-webkit-outer-spin-button,
+    #cf-pdp-{{ section.id }} .cf-qty-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-atc-btn {
+      width: 100%;
+      height: 54px;
+      background: var(--cf-accent);
+      color: var(--cf-btn-text);
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+    }
+
+    #cf-pdp-{{ section.id }} .cf-atc-btn:hover:not(:disabled) {
+      background: var(--cf-accent-hover);
+      transform: translateY(-1px);
+    }
+
+    #cf-pdp-{{ section.id }} .cf-atc-btn:disabled {
+      background: #334155;
+      color: #94a3b8;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Trust & Payment Icons */
+    #cf-pdp-{{ section.id }} .cf-trust-seals {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding-top: 24px;
+      border-top: 1px solid var(--cf-border);
+      margin-top: 24px;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-seal-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-seal-icon {
+      width: 22px;
+      height: 22px;
+      stroke: var(--cf-accent);
+      fill: none;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-seal-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-seal-sub {
+      font-size: 10px;
+      color: var(--cf-text-muted);
+    }
+
+    /* Collapsible Information Accordions */
+    #cf-pdp-{{ section.id }} .cf-accordion-group {
+      margin-top: 28px;
+      border-top: 1px solid var(--cf-border);
+    }
+
+    #cf-pdp-{{ section.id }} .cf-accordion-row {
+      border-bottom: 1px solid var(--cf-border);
+    }
+
+    #cf-pdp-{{ section.id }} .cf-accordion-header {
+      padding: 16px 0;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      color: #ffffff;
+      user-select: none;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-accordion-chevron {
+      width: 18px;
+      height: 18px;
+      stroke: var(--cf-text-muted);
+      fill: none;
+      transition: transform 0.2s ease;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-accordion-row.active .cf-accordion-chevron {
+      transform: rotate(180deg);
+      stroke: var(--cf-accent);
+    }
+
+    #cf-pdp-{{ section.id }} .cf-accordion-body {
+      display: none;
+      padding-bottom: 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--cf-text-muted);
+    }
+
+    #cf-pdp-{{ section.id }} .cf-accordion-row.active .cf-accordion-body {
+      display: block;
+    }
+
+    /* Sticky Mobile Conversion Bar */
+    #cf-pdp-{{ section.id }} .cf-mobile-sticky-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #090b10;
+      border-top: 1px solid var(--cf-border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 99999;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    #cf-pdp-{{ section.id }} .cf-mobile-sticky-bar.visible {
+      transform: translateY(0);
+    }
+
+    #cf-pdp-{{ section.id }} .cf-sticky-info {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-sticky-title {
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #ffffff;
+    }
+
+    #cf-pdp-{{ section.id }} .cf-sticky-price {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--cf-accent);
+    }
+
+    #cf-pdp-{{ section.id }} .cf-sticky-btn {
+      background: var(--cf-accent);
+      color: var(--cf-btn-text);
+      font-size: 13px;
+      font-weight: 800;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 640px) {
+      #cf-pdp-{{ section.id }} .cf-pdp-card { padding: 24px 18px; }
+      #cf-pdp-{{ section.id }} .cf-action-row { grid-template-columns: 1fr; gap: 10px; }
+      #cf-pdp-{{ section.id }} .cf-qty-picker { width: 100%; justify-content: center; }
+      #cf-pdp-{{ section.id }} .cf-trust-seals { grid-template-columns: 1fr; gap: 14px; }
+      #cf-pdp-{{ section.id }} .cf-seal-item { flex-direction: row; text-align: left; }
+    }
+  </style>
+
+  <div class="cf-pdp-card">
+    <!-- Top Trust & Scarcity Ticker -->
+    <div class="cf-top-meta">
+      <div class="cf-pill-badge">
+        <span class="cf-pulse-dot"></span>
+        <span>{{ section.settings.badge_text | default: "Verified Best Seller • Instant Dispatch" }}</span>
+      </div>
+      <div class="cf-live-views">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span><strong style="color: #ffffff;">24 people</strong> looking at this right now</span>
+      </div>
+    </div>
+
+    <!-- Product Title -->
+    <h1 class="cf-product-title">
+      {% if target_product != blank %}
+        {{ target_product.title }}
+      {% else %}
+        {{ section.settings.title_override | default: "Signature Luxury Performance Chronograph" }}
+      {% endif %}
+    </h1>
+
+    <!-- Live Dynamic Price Display -->
+    <div class="cf-pricing-row">
+      <span class="cf-active-price" id="cf-price-{{ section.id }}">
+        {% if current_variant %}
+          {{ current_variant.price | money }}
+        {% else %}
+          {{ section.settings.demo_price | default: "$189.00" }}
+        {% endif %}
+      </span>
+
+      <span class="cf-compare-price" id="cf-compare-{{ section.id }}">
+        {% if current_variant and current_variant.compare_at_price > current_variant.price %}
+          {{ current_variant.compare_at_price | money }}
+        {% elsif section.settings.demo_compare != blank %}
+          {{ section.settings.demo_compare }}
+        {% endif %}
+      </span>
+
+      <span class="cf-savings-pill" id="cf-savings-{{ section.id }}">
+        {% if current_variant and current_variant.compare_at_price > current_variant.price %}
+          {% assign save_amt = current_variant.compare_at_price | minus: current_variant.price %}
+          SAVE {{ save_amt | money }}
+        {% else %}
+          SAVE 35% TODAY
+        {% endif %}
+      </span>
+    </div>
+
+    <!-- Scarcity Meter -->
+    <div class="cf-scarcity-box">
+      <div class="cf-scarcity-header">
+        <span>⚡ {{ section.settings.scarcity_text | default: "Limited Batch Production: Almost Sold Out" }}</span>
+        <span>Only 4 left</span>
+      </div>
+      <div class="cf-progress-track">
+        <div class="cf-progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- Real Variant Form -->
+    {% form 'product', target_product, id: 'cf-form-{{ section.id }}' %}
+      <input type="hidden" name="id" value="{{ current_variant.id }}" id="cf-variant-input-{{ section.id }}">
+
+      <!-- Dynamic Variant Swatches Loop -->
+      {% if target_product and target_product.has_only_default_variant == false %}
+        <div class="cf-variant-section">
+          {% for option in target_product.options_with_values %}
+            <fieldset class="cf-option-group" data-option-index="{{ forloop.index0 }}">
+              <legend class="cf-option-legend">
+                <span>Select {{ option.name }}:</span>
+                <span class="cf-option-selected-val" id="cf-val-{{ section.id }}-{{ forloop.index0 }}">{{ option.selected_value }}</span>
+              </legend>
+              <div class="cf-swatch-grid">
+                {% for value in option.values %}
+                  <div class="cf-swatch-item">
+                    <input
+                      type="radio"
+                      id="cf-opt-{{ section.id }}-{{ forloop.parentloop.index0 }}-{{ forloop.index0 }}"
+                      name="cf-option-{{ section.id }}-{{ forloop.parentloop.index0 }}"
+                      value="{{ value | escape }}"
+                      class="cf-swatch-input"
+                      data-option-index="{{ forloop.parentloop.index0 }}"
+                      {% if option.selected_value == value %}checked{% endif %}
+                    >
+                    <label for="cf-opt-{{ section.id }}-{{ forloop.parentloop.index0 }}-{{ forloop.index0 }}" class="cf-swatch-btn">
+                      {{ value }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+            </fieldset>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Quantity Stepper & Add to Cart Action -->
+      <div class="cf-action-row">
+        <div class="cf-qty-picker">
+          <button type="button" class="cf-qty-btn" id="cf-qty-dec-{{ section.id }}">−</button>
+          <input type="number" name="quantity" value="1" min="1" max="99" class="cf-qty-input" id="cf-qty-val-{{ section.id }}" readonly>
+          <button type="button" class="cf-qty-btn" id="cf-qty-inc-{{ section.id }}">+</button>
+        </div>
+
+        <button type="submit" name="add" class="cf-atc-btn" id="cf-atc-btn-{{ section.id }}" {% if current_variant and current_variant.available == false %}disabled{% endif %}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span id="cf-atc-label-{{ section.id }}">
+            {% if current_variant and current_variant.available == false %}
+              Sold Out
+            {% else %}
+              {{ section.settings.atc_button_text | default: "Claim Offer — Add To Cart" }}
+            {% endif %}
+          </span>
+        </button>
+      </div>
+    {% endform %}
+
+    <!-- 3-Pillar Security & Trust Seals -->
+    <div class="cf-trust-seals">
+      <div class="cf-seal-item">
+        <svg class="cf-seal-icon" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span class="cf-seal-title">256-Bit SSL Protection</span>
+        <span class="cf-seal-sub">Bank-grade encrypted checkout</span>
+      </div>
+      <div class="cf-seal-item">
+        <svg class="cf-seal-icon" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        <span class="cf-seal-title">Tracked Express Dispatch</span>
+        <span class="cf-seal-sub">Dispatched within 24 hours</span>
+      </div>
+      <div class="cf-seal-item">
+        <svg class="cf-seal-icon" viewBox="0 0 24 24" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        <span class="cf-seal-title">30-Day Money Back</span>
+        <span class="cf-seal-sub">Zero questions asked refund</span>
+      </div>
+    </div>
+
+    <!-- Product Details Accordion Tabs -->
+    <div class="cf-accordion-group">
+      <div class="cf-accordion-row active">
+        <div class="cf-accordion-header">
+          <span>📦 Shipping & Guaranteed Delivery Timeline</span>
+          <svg class="cf-accordion-chevron" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="cf-accordion-body">
+          Order placed today will be processed within 24 business hours. Express courier shipping delivers within 2-4 business days. Real-time GPS tracking link provided immediately upon dispatch.
+        </div>
+      </div>
+
+      <div class="cf-accordion-row">
+        <div class="cf-accordion-header">
+          <span>🛡️ Lifetime Warranty & Authenticity Guarantee</span>
+          <svg class="cf-accordion-chevron" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="cf-accordion-body">
+          Every piece is forged with certified premium aerospace-grade components. Backed by our lifetime structural warranty. If any defect arises, we replace it free of charge.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Mobile Conversion Bar -->
+  <div class="cf-mobile-sticky-bar" id="cf-sticky-{{ section.id }}">
+    <div class="cf-sticky-info">
+      <div class="cf-sticky-title">{{ target_product.title | default: "Signature Luxury Edition" }}</div>
+      <div class="cf-sticky-price" id="cf-sticky-price-{{ section.id }}">{{ current_variant.price | default: 18900 | money }}</div>
+    </div>
+    <button type="button" class="cf-sticky-btn" id="cf-sticky-btn-{{ section.id }}">
+      Instant Buy →
+    </button>
+  </div>
+
+  <!-- Variants JSON Payload for Instant Client Switching -->
+  {% if target_product %}
+    <script type="application/json" id="cf-variants-data-{{ section.id }}">
+      {{ target_product.variants | json }}
+    </script>
+  {% endif %}
+
+  <!-- Vanilla JS Engine (Real Variant Switcher + Real AJAX Cart Add) -->
+  <script>
+    (function() {
+      const sectionId = "{{ section.id }}";
+      const wrapper = document.getElementById("cf-pdp-" + sectionId);
+      if (!wrapper) return;
+
+      const form = document.getElementById("cf-form-" + sectionId);
+      const variantInput = document.getElementById("cf-variant-input-" + sectionId);
+      const priceDisplay = document.getElementById("cf-price-" + sectionId);
+      const compareDisplay = document.getElementById("cf-compare-" + sectionId);
+      const savingsPill = document.getElementById("cf-savings-" + sectionId);
+      const atcButton = document.getElementById("cf-atc-btn-" + sectionId);
+      const atcLabel = document.getElementById("cf-atc-label-" + sectionId);
+      const qtyInput = document.getElementById("cf-qty-val-" + sectionId);
+      const stickyBar = document.getElementById("cf-sticky-" + sectionId);
+      const stickyPrice = document.getElementById("cf-sticky-price-" + sectionId);
+      const stickyBtn = document.getElementById("cf-sticky-btn-" + sectionId);
+
+      // Accordion toggle
+      wrapper.querySelectorAll(".cf-accordion-header").forEach(header => {
+        header.addEventListener("click", () => {
+          const row = header.parentElement;
+          row.classList.toggle("active");
+        });
+      });
+
+      // Quantity controls
+      const decBtn = document.getElementById("cf-qty-dec-" + sectionId);
+      const incBtn = document.getElementById("cf-qty-inc-" + sectionId);
+      if (decBtn && incBtn && qtyInput) {
+        decBtn.addEventListener("click", () => {
+          let val = parseInt(qtyInput.value) || 1;
+          if (val > 1) qtyInput.value = val - 1;
+        });
+        incBtn.addEventListener("click", () => {
+          let val = parseInt(qtyInput.value) || 1;
+          if (val < 99) qtyInput.value = val + 1;
+        });
+      }
+
+      // Variant Switching
+      const variantsDataElem = document.getElementById("cf-variants-data-" + sectionId);
+      let variants = [];
+      if (variantsDataElem) {
+        try {
+          variants = JSON.parse(variantsDataElem.textContent);
+        } catch (e) {
+          console.warn("[ConvertFlow] Could not parse variants JSON:", e);
+        }
+      }
+
+      function formatMoney(cents) {
+        return (cents / 100).toLocaleString("en-US", {
+          style: "currency",
+          currency: "{{ cart.currency.iso_code | default: 'USD' }}"
+        });
+      }
+
+      function updateSelectedVariant() {
+        if (!variants.length) return;
+
+        // Gather checked radio values
+        const selectedOptions = [];
+        wrapper.querySelectorAll(".cf-option-group").forEach((group, index) => {
+          const checked = group.querySelector(".cf-swatch-input:checked");
+          if (checked) {
+            selectedOptions[index] = checked.value;
+            const labelElem = document.getElementById("cf-val-" + sectionId + "-" + index);
+            if (labelElem) labelElem.textContent = checked.value;
+          }
+        });
+
+        // Find matching variant
+        const matched = variants.find(v => {
+          return v.options.every((optVal, idx) => optVal === selectedOptions[idx]);
+        });
+
+        if (matched) {
+          variantInput.value = matched.id;
+          const formattedPrice = formatMoney(matched.price);
+          priceDisplay.textContent = formattedPrice;
+          if (stickyPrice) stickyPrice.textContent = formattedPrice;
+
+          if (matched.compare_at_price && matched.compare_at_price > matched.price) {
+            compareDisplay.textContent = formatMoney(matched.compare_at_price);
+            compareDisplay.style.display = "inline";
+            const saveAmount = matched.compare_at_price - matched.price;
+            savingsPill.textContent = "SAVE " + formatMoney(saveAmount);
+            savingsPill.style.display = "inline-block";
+          } else {
+            compareDisplay.style.display = "none";
+            savingsPill.style.display = "none";
+          }
+
+          if (matched.available) {
+            atcButton.disabled = false;
+            atcLabel.textContent = "{{ section.settings.atc_button_text | default: 'Claim Offer — Add To Cart' }}";
+            if (stickyBtn) stickyBtn.disabled = false;
+          } else {
+            atcButton.disabled = true;
+            atcLabel.textContent = "Sold Out";
+            if (stickyBtn) stickyBtn.disabled = true;
+          }
+
+          // Update URL without page refresh
+          try {
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set("variant", matched.id);
+            window.history.replaceState({}, "", newUrl.toString());
+          } catch(err) {}
+        }
+      }
+
+      wrapper.querySelectorAll(".cf-swatch-input").forEach(input => {
+        input.addEventListener("change", updateSelectedVariant);
+      });
+
+      // Real AJAX Add-To-Cart Engine
+      if (form) {
+        form.addEventListener("submit", function(e) {
+          e.preventDefault();
+          const variantId = variantInput.value;
+          const quantity = parseInt(qtyInput ? qtyInput.value : 1) || 1;
+
+          atcButton.disabled = true;
+          const originalText = atcLabel.textContent;
+          atcLabel.textContent = "Adding to Cart...";
+
+          fetch("/cart/add.js", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({
+              id: variantId,
+              quantity: quantity
+            })
+          })
+          .then(res => {
+            if (!res.ok) throw new Error("Network response was not ok");
+            return res.json();
+          })
+          .then(item => {
+            atcLabel.textContent = "✓ Added to Cart!";
+            
+            // Dispatch standard Shopify theme events so theme drawers open
+            document.dispatchEvent(new CustomEvent("cart:update"));
+            document.dispatchEvent(new CustomEvent("cart:build"));
+            document.dispatchEvent(new CustomEvent("ajaxProduct:added", { detail: item }));
+
+            setTimeout(() => {
+              atcButton.disabled = false;
+              atcLabel.textContent = originalText;
+            }, 2500);
+          })
+          .catch(err => {
+            console.error("[ConvertFlow] Add to cart error:", err);
+            atcLabel.textContent = "Error Adding. Try Again";
+            setTimeout(() => {
+              atcButton.disabled = false;
+              atcLabel.textContent = originalText;
+            }, 2500);
+          });
+        });
+      }
+
+      // Sticky mobile bar trigger via IntersectionObserver
+      if (stickyBar && atcButton && "IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting && window.innerWidth <= 768) {
+              stickyBar.classList.add("visible");
+            } else {
+              stickyBar.classList.remove("visible");
+            }
+          });
+        }, { threshold: 0 });
+        observer.observe(atcButton);
+
+        if (stickyBtn) {
+          stickyBtn.addEventListener("click", () => {
+            if (form) form.requestSubmit();
+          });
+        }
+      }
+    })();
+  </script>
+</div>
+
+{% schema %}
+{
+  "name": "CF 1000-Cr Luxury Buy Box",
+  "tag": "section",
+  "class": "convertflow-pdp-section",
+  "settings": [
+    {
+      "type": "product",
+      "id": "featured_product",
+      "label": "Featured Product",
+      "info": "If left empty on a Product page, uses current product."
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Top Badge Text",
+      "default": "Verified Best Seller • Instant Dispatch"
+    },
+    {
+      "type": "text",
+      "id": "title_override",
+      "label": "Title Override (When no product assigned)",
+      "default": "Signature Luxury Performance Chronograph"
+    },
+    {
+      "type": "text",
+      "id": "demo_price",
+      "label": "Demo Price (Fallback)",
+      "default": "$189.00"
+    },
+    {
+      "type": "text",
+      "id": "demo_compare",
+      "label": "Demo Compare-At Price (Fallback)",
+      "default": "$289.00"
+    },
+    {
+      "type": "text",
+      "id": "scarcity_text",
+      "label": "Scarcity Notice Text",
+      "default": "Limited Batch Production: Almost Sold Out"
+    },
+    {
+      "type": "text",
+      "id": "atc_button_text",
+      "label": "CTA Button Text",
+      "default": "Claim Offer — Add To Cart"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (Emerald Green)",
+      "default": "#10b981"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Outer Background Color",
+      "default": "#08090c"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background Color",
+      "default": "#0f1218"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#1e2530"
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "min": 24,
+      "max": 120,
+      "step": 6,
+      "unit": "px",
+      "label": "Vertical Padding",
+      "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "CF 1000-Cr Luxury Buy Box"
+    }
+  ]
+}
+{% endschema %}

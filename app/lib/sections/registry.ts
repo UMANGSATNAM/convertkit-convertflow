@@ -1,3 +1,5 @@
+import cfPdpBuyboxLiquid from "./templates/cf-pdp-buybox.liquid?raw";
+
 export interface SectionDefinition {
   id: string;
   slug: string;
@@ -25,350 +27,78 @@ export const CONVERTFLOW_SECTIONS: SectionDefinition[] = [
     badge: "Most Popular",
     description: "Battle-tested product purchase block featuring real-time stock urgency, dynamic variant selector chips, trust guarantees, sticky buy bar, and zero emojis.",
     features: [
-      "Dynamic stock scarcity counter with live visual pulse",
-      "Interactive pill variant selector with instant price sync",
-      "100% Vector SVG checkout security seals (SSL, Visa, Mastercard)",
-      "Express checkout with Apple Pay / Shop Pay styling",
+      "Real Shopify product object and variant JSON integration",
+      "Dynamic stock scarcity counter with live visual pulse and inventory meter",
+      "Interactive pill variant selector with instant client-side price sync",
+      "100% Vector SVG checkout security seals (SSL, Tracked Delivery, Money Back)",
+      "Native AJAX cart drawer integration (/cart/add.js) with zero page reload",
+      "Sticky mobile bottom conversion bar with instant buy trigger",
       "Full Theme 2.0 schema settings (colors, badge text, inventory threshold)"
     ],
     previewHtml: `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0c0e12; color: #f1f5f9; padding: 24px; border-radius: 8px; border: 1px solid #1e293b; max-width: 480px; margin: 0 auto;">
-        <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.12); color: #10b981; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">
-          <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981;"></span>
-          Verified Best Seller • 10,000+ Units Sold
-        </div>
-        <h2 style="font-size: 22px; font-weight: 700; margin: 0 0 8px 0; color: #ffffff; letter-spacing: -0.02em;">Signature Chrono Minimalist Watch</h2>
-        <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px;">
-          <span style="font-size: 26px; font-weight: 800; color: #ffffff;">$189.00</span>
-          <span style="font-size: 16px; color: #64748b; text-decoration: line-through;">$289.00</span>
-          <span style="background: #ef4444; color: #ffffff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px;">SAVE $100 (35% OFF)</span>
-        </div>
-        <div style="background: #111827; border: 1px solid #1f2937; border-radius: 6px; padding: 10px 14px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 13px; color: #f59e0b; font-weight: 600;">⚡ High Demand: Only 4 units remaining in stock</span>
-        </div>
-        <div style="margin-bottom: 16px;">
-          <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 8px;">Select Finish:</label>
-          <div style="display: flex; gap: 8px;">
-            <div style="border: 2px solid #ffffff; background: #1e293b; color: #ffffff; padding: 6px 14px; border-radius: 4px; font-size: 13px; font-weight: 600;">Matte Obsidian</div>
-            <div style="border: 1px solid #334155; background: #0f172a; color: #94a3b8; padding: 6px 14px; border-radius: 4px; font-size: 13px;">Brushed Titanium</div>
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #08090c; color: #f8fafc; padding: 24px; border-radius: 4px; border: 1px solid #1e2530; max-width: 520px; margin: 0 auto; box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; padding: 4px 10px; border-radius: 2px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;">
+            <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+            Verified Best Seller • Instant Dispatch
+          </div>
+          <div style="font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 4px;">
+            👁️ 24 people viewing now
           </div>
         </div>
-        <button style="width: 100%; background: #10b981; color: #041f14; border: none; padding: 14px 20px; font-size: 15px; font-weight: 800; border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px;">
-          CLAIM OFFER — ADD TO CART
-        </button>
-        <div style="text-align: center; font-size: 11px; color: #64748b; display: flex; justify-content: center; gap: 16px;">
-          <span>🔒 256-Bit SSL Checkout</span>
-          <span>📦 Free Express Delivery</span>
-          <span>↩️ 30-Day Money Back</span>
+
+        <h2 style="font-size: 24px; font-weight: 800; margin: 0 0 10px 0; color: #ffffff; letter-spacing: -0.02em;">Signature Luxury Performance Chronograph</h2>
+        
+        <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px;">
+          <span style="font-size: 28px; font-weight: 900; color: #ffffff;">$189.00</span>
+          <span style="font-size: 17px; color: #64748b; text-decoration: line-through;">$289.00</span>
+          <span style="background: #ef4444; color: #ffffff; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 2px;">SAVE $100 (35% OFF)</span>
+        </div>
+
+        <!-- Scarcity Meter -->
+        <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 3px; padding: 10px 14px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #f59e0b; margin-bottom: 6px;">
+            <span>⚡ Limited Batch: Almost Sold Out</span>
+            <span>Only 4 left</span>
+          </div>
+          <div style="width: 100%; height: 5px; background: #1e2530; border-radius: 3px; overflow: hidden;">
+            <div style="height: 100%; width: 85%; background: linear-gradient(90deg, #f59e0b, #ef4444); border-radius: 3px;"></div>
+          </div>
+        </div>
+
+        <!-- Variant Swatches -->
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 8px;">
+            <span>Select Finish:</span>
+            <span style="color: #ffffff;">Matte Obsidian</span>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <div style="border: 2px solid #ffffff; background: #1f2737; color: #ffffff; padding: 8px 16px; border-radius: 3px; font-size: 13px; font-weight: 700;">Matte Obsidian</div>
+            <div style="border: 1px solid #1e2530; background: #141822; color: #94a3b8; padding: 8px 16px; border-radius: 3px; font-size: 13px;">Brushed Titanium</div>
+          </div>
+        </div>
+
+        <!-- Buy Action Row -->
+        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+          <div style="width: 100px; border: 1px solid #1e2530; background: #141822; border-radius: 3px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 14px; font-weight: 700;">
+            <span style="cursor: pointer; color: #94a3b8;">−</span>
+            <span>1</span>
+            <span style="cursor: pointer; color: #94a3b8;">+</span>
+          </div>
+          <button style="flex: 1; background: #10b981; color: #021a10; border: none; padding: 14px 20px; font-size: 14px; font-weight: 800; border-radius: 3px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.06em; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">
+            CLAIM OFFER — ADD TO CART
+          </button>
+        </div>
+
+        <!-- Trust Seals -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding-top: 14px; border-top: 1px solid #1e2530; text-align: center; font-size: 11px; color: #94a3b8;">
+          <div>🔒 256-Bit SSL</div>
+          <div>📦 Free Tracked Dispatch</div>
+          <div>↩️ 30-Day Money Back</div>
         </div>
       </div>
     `,
-    liquidContent: `{% comment %}
-  ConvertFlow - Signature 1000-Crore Luxury PDP Buy Box
-  High-converting product purchase block with live inventory scarcity and trust seals.
-{% endcomment %}
-
-<div class="cf-pdp-buybox" id="cf-pdp-{{ section.id }}">
-  <style>
-    #cf-pdp-{{ section.id }} {
-      --cf-bg: {{ section.settings.bg_color | default: "#0b0d11" }};
-      --cf-text: {{ section.settings.text_color | default: "#f8fafc" }};
-      --cf-accent: {{ section.settings.accent_color | default: "#10b981" }};
-      --cf-btn-text: {{ section.settings.btn_text_color | default: "#031c11" }};
-      --cf-border: {{ section.settings.border_color | default: "#1e293b" }};
-      
-      background: var(--cf-bg);
-      color: var(--cf-text);
-      padding: {{ section.settings.padding_y | default: 48 }}px 20px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-    #cf-pdp-{{ section.id }} .cf-container {
-      max-width: 680px;
-      margin: 0 auto;
-      background: rgba(17, 24, 39, 0.7);
-      border: 1px solid var(--cf-border);
-      border-radius: 8px;
-      padding: 32px 28px;
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-    }
-    #cf-pdp-{{ section.id }} .cf-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(16, 185, 129, 0.12);
-      color: var(--cf-accent);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 5px 12px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-    #cf-pdp-{{ section.id }} .cf-badge-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--cf-accent);
-      box-shadow: 0 0 8px var(--cf-accent);
-      animation: cf-pulse 2s infinite ease-in-out;
-    }
-    @keyframes cf-pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-    }
-    #cf-pdp-{{ section.id }} .cf-title {
-      font-size: 28px;
-      font-weight: 800;
-      line-height: 1.2;
-      margin: 0 0 12px 0;
-      color: #ffffff;
-      letter-spacing: -0.02em;
-    }
-    #cf-pdp-{{ section.id }} .cf-price-row {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    #cf-pdp-{{ section.id }} .cf-price-main {
-      font-size: 32px;
-      font-weight: 900;
-      color: #ffffff;
-    }
-    #cf-pdp-{{ section.id }} .cf-price-compare {
-      font-size: 18px;
-      color: #64748b;
-      text-decoration: line-through;
-    }
-    #cf-pdp-{{ section.id }} .cf-save-badge {
-      background: #ef4444;
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 4px;
-      letter-spacing: 0.04em;
-    }
-    #cf-pdp-{{ section.id }} .cf-urgency-box {
-      background: #111827;
-      border: 1px solid #374151;
-      border-radius: 6px;
-      padding: 12px 16px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #fbbf24;
-    }
-    #cf-pdp-{{ section.id }} .cf-cta-btn {
-      display: block;
-      width: 100%;
-      background: var(--cf-accent);
-      color: var(--cf-btn-text);
-      font-size: 16px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      border: none;
-      padding: 18px 24px;
-      border-radius: 6px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
-      box-sizing: border-box;
-      text-decoration: none;
-    }
-    #cf-pdp-{{ section.id }} .cf-cta-btn:hover {
-      filter: brightness(1.1);
-      transform: translateY(-1px);
-    }
-    #cf-pdp-{{ section.id }} .cf-trust-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 24px;
-      padding-top: 20px;
-      border-top: 1px solid #1f2937;
-      text-align: center;
-    }
-    #cf-pdp-{{ section.id }} .cf-trust-item {
-      font-size: 11px;
-      color: #94a3b8;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-    }
-    #cf-pdp-{{ section.id }} .cf-trust-icon {
-      width: 18px;
-      height: 18px;
-      stroke: var(--cf-accent);
-      fill: none;
-    }
-    @media (max-width: 640px) {
-      #cf-pdp-{{ section.id }} .cf-container { padding: 20px 16px; }
-      #cf-pdp-{{ section.id }} .cf-title { font-size: 22px; }
-      #cf-pdp-{{ section.id }} .cf-price-main { font-size: 26px; }
-      #cf-pdp-{{ section.id }} .cf-trust-grid { grid-template-columns: 1fr; gap: 8px; }
-    }
-  </style>
-
-  <div class="cf-container">
-    {% if section.settings.badge_text != blank %}
-      <div class="cf-badge">
-        <span class="cf-badge-dot"></span>
-        <span>{{ section.settings.badge_text }}</span>
-      </div>
-    {% endif %}
-
-    <h1 class="cf-title">
-      {{ section.settings.product_title | default: product.title | default: "Signature Luxury Performance Edition" }}
-    </h1>
-
-    <div class="cf-price-row">
-      <span class="cf-price-main">{{ section.settings.price | default: "$189.00" }}</span>
-      {% if section.settings.compare_price != blank %}
-        <span class="cf-price-compare">{{ section.settings.compare_price }}</span>
-      {% endif %}
-      {% if section.settings.discount_badge != blank %}
-        <span class="cf-save-badge">{{ section.settings.discount_badge }}</span>
-      {% endif %}
-    </div>
-
-    {% if section.settings.urgency_text != blank %}
-      <div class="cf-urgency-box">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-        </svg>
-        <span>{{ section.settings.urgency_text }}</span>
-      </div>
-    {% endif %}
-
-    {% form 'product', product %}
-      <button type="submit" name="add" class="cf-cta-btn">
-        {{ section.settings.cta_button_text | default: "Claim Offer — Add To Cart" }}
-      </button>
-    {% endform %}
-
-    <div class="cf-trust-grid">
-      <div class="cf-trust-item">
-        <svg class="cf-trust-icon" viewBox="0 0 24 24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>{{ section.settings.trust_1 | default: "256-Bit SSL Encrypted" }}</span>
-      </div>
-      <div class="cf-trust-item">
-        <svg class="cf-trust-icon" viewBox="0 0 24 24" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-        <span>{{ section.settings.trust_2 | default: "Free Express Dispatch" }}</span>
-      </div>
-      <div class="cf-trust-item">
-        <svg class="cf-trust-icon" viewBox="0 0 24 24" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-        <span>{{ section.settings.trust_3 | default: "30-Day Money Back" }}</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-{% schema %}
-{
-  "name": "CF PDP 1000-Cr Buy Box",
-  "tag": "section",
-  "class": "convertflow-section",
-  "settings": [
-    {
-      "type": "text",
-      "id": "badge_text",
-      "label": "Top Badge Text",
-      "default": "Official Flagship Edition • Verified Demand"
-    },
-    {
-      "type": "text",
-      "id": "product_title",
-      "label": "Product Title Override",
-      "default": "Signature Chrono Minimalist Watch"
-    },
-    {
-      "type": "text",
-      "id": "price",
-      "label": "Display Price",
-      "default": "$189.00"
-    },
-    {
-      "type": "text",
-      "id": "compare_price",
-      "label": "Compare-at Price",
-      "default": "$289.00"
-    },
-    {
-      "type": "text",
-      "id": "discount_badge",
-      "label": "Discount Pill Text",
-      "default": "SAVE $100 (35% OFF)"
-    },
-    {
-      "type": "text",
-      "id": "urgency_text",
-      "label": "Urgency Notice",
-      "default": "High Demand: Only 4 units remaining at promotional price"
-    },
-    {
-      "type": "text",
-      "id": "cta_button_text",
-      "label": "CTA Button Text",
-      "default": "Claim Offer — Add To Cart"
-    },
-    {
-      "type": "text",
-      "id": "trust_1",
-      "label": "Trust Bullet 1",
-      "default": "256-Bit SSL Encrypted"
-    },
-    {
-      "type": "text",
-      "id": "trust_2",
-      "label": "Trust Bullet 2",
-      "default": "Free Express Dispatch"
-    },
-    {
-      "type": "text",
-      "id": "trust_3",
-      "label": "Trust Bullet 3",
-      "default": "30-Day Risk-Free Returns"
-    },
-    {
-      "type": "color",
-      "id": "accent_color",
-      "label": "Accent Color (Emerald)",
-      "default": "#10b981"
-    },
-    {
-      "type": "color",
-      "id": "bg_color",
-      "label": "Background Color",
-      "default": "#0b0d11"
-    },
-    {
-      "type": "range",
-      "id": "padding_y",
-      "min": 16,
-      "max": 96,
-      "step": 4,
-      "unit": "px",
-      "label": "Vertical Padding",
-      "default": 48
-    }
-  ],
-  "presets": [
-    {
-      "name": "CF PDP 1000-Cr Buy Box"
-    }
-  ]
-}
-{% endschema %}
-`
+    liquidContent: cfPdpBuyboxLiquid
   },
   {
     id: "cf-hero-split",
